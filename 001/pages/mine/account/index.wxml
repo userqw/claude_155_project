@@ -1,0 +1,89 @@
+<view class="page theme-{{theme}}">
+  <!-- 账号状态 -->
+  <view class="card">
+    <view class="profile">
+      <image wx:if="{{loggedIn && account.avatarUrl}}" class="avatar" src="{{account.avatarUrl}}" mode="aspectFill"></image>
+      <view wx:elif="{{loggedIn}}" class="avatar avatar-empty">👤</view>
+      <view wx:else class="avatar avatar-empty">🎨</view>
+
+      <view class="grow">
+        <view class="profile-name">{{loggedIn ? (account.nickname || '微信用户') : '未登录'}}</view>
+        <view class="profile-sub">{{statusText}}</view>
+      </view>
+
+      <view class="btn btn-ghost btn-sm" wx:if="{{!loggedIn}}" bindtap="goLogin">去登录</view>
+    </view>
+  </view>
+
+  <!-- 云端备份 -->
+  <view class="card" wx:if="{{loggedIn}}">
+    <view class="section-title">云端备份</view>
+    <view class="section-sub">本机共 {{localCount}} 条记录</view>
+
+    <view class="opt" bindtap="onMerge">
+      <view class="opt-icon">☁️</view>
+      <view class="grow">
+        <view class="opt-title">立即备份到云端</view>
+        <view class="opt-sub">把本机的记录和售出上传到账号</view>
+      </view>
+      <text class="opt-arrow">›</text>
+    </view>
+
+    <view class="opt" bindtap="onSetAvatar">
+      <view class="opt-icon">🖼</view>
+      <view class="grow">
+        <view class="opt-title">修改头像与昵称</view>
+        <view class="opt-sub">均为选填，只在你主动设置后保存</view>
+      </view>
+      <text class="opt-arrow">›</text>
+    </view>
+  </view>
+
+  <view class="card" wx:if="{{!loggedIn}}">
+    <view class="section-title">你的数据现在在哪</view>
+    <view class="tip">
+      游客模式下，数据只存在这台设备上。清理微信缓存、换手机或重装小程序都会丢失。
+      登录后可以自动备份到云端。
+    </view>
+    <view class="btn btn-primary" bindtap="goLogin">登录 / 注册</view>
+    <view class="tip" style="margin-top: 16rpx">
+      不登录也完全不影响使用：打卡、统计、作品库、售出记录全部照常。
+    </view>
+  </view>
+
+  <!-- 退出与注销 -->
+  <view class="card" wx:if="{{loggedIn}}">
+    <view class="section-title">退出与注销</view>
+
+    <view class="opt" bindtap="onLogout">
+      <view class="opt-icon">↩️</view>
+      <view class="grow">
+        <view class="opt-title">退出登录</view>
+        <view class="opt-sub">回到游客模式，本机记录一条都不会少</view>
+      </view>
+      <text class="opt-arrow">›</text>
+    </view>
+
+    <view class="opt" bindtap="onClearLocal">
+      <view class="opt-icon">🧹</view>
+      <view class="grow">
+        <view class="opt-title">清除本机数据</view>
+        <view class="opt-sub">删除这台设备上的记录，云端数据保留</view>
+      </view>
+      <text class="opt-arrow">›</text>
+    </view>
+
+    <view class="opt danger" bindtap="onDeleteAccount">
+      <view class="opt-icon">⚠️</view>
+      <view class="grow">
+        <view class="opt-title danger-text">注销账号</view>
+        <view class="opt-sub danger-text">云端与本机的数据都会永久删除，无法恢复</view>
+      </view>
+      <text class="opt-arrow">›</text>
+    </view>
+  </view>
+
+  <view class="dev-entry" wx:if="{{devVisible}}">
+    <text class="dev-text" bindtap="onDevLogin">开发者模式：本地模拟登录（无后端时预览界面用）</text>
+  </view>
+</view>

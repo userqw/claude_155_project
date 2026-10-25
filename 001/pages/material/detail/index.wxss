@@ -1,0 +1,85 @@
+.gallery {
+  border-radius: 20rpx;
+  overflow: hidden;
+  margin-bottom: 24rpx;
+  background: var(--surface);
+}
+
+.photo {
+  width: 100%;
+  height: 560rpx;
+  display: block;
+}
+
+.field {
+  margin-bottom: 28rpx;
+}
+
+.field:last-child {
+  margin-bottom: 0;
+}
+
+.field-label {
+  font-size: 26rpx;
+  color: var(--text-2);
+  margin-bottom: 16rpx;
+  font-weight: 500;
+}
+
+.optional {
+  font-size: 22rpx;
+  color: var(--text-3);
+  font-weight: 400;
+  margin-left: 10rpx;
+}
+
+.input {
+  width: 100%;
+  height: 84rpx;
+  background: var(--sunken);
+  border-radius: 12rpx;
+  padding: 0 20rpx;
+  font-size: 26rpx;
+  color: var(--text);
+  box-sizing: border-box;
+}
+
+.textarea {
+  width: 100%;
+  height: 120rpx;
+  background: var(--sunken);
+  border-radius: 12rpx;
+  padding: 18rpx 20rpx;
+  font-size: 26rpx;
+  color: var(--text);
+  box-sizing: border-box;
+}
+
+.picker-value {
+  font-size: 28rpx;
+  color: var(--text);
+  background: var(--sunken);
+  border-radius: 12rpx;
+  padding: 18rpx 20rpx;
+}
+
+.arrow {
+  color: var(--text-3);
+  margin-left: 8rpx;
+}
+
+.actions {
+  display: flex;
+}
+
+.actions .btn {
+  margin-right: 20rpx;
+}
+
+.actions .btn:last-child {
+  margin-right: 0;
+}
+
+.danger {
+  color: var(--danger);
+}

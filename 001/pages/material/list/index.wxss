@@ -1,0 +1,52 @@
+.head {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.head-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4rpx;
+}
+
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.material {
+  width: 216rpx;
+  margin: 0 24rpx 28rpx 0;
+}
+
+.material-img {
+  width: 216rpx;
+  height: 216rpx;
+  border-radius: 12rpx;
+  background: var(--sunken);
+  display: block;
+}
+
+.material-name {
+  font-size: 24rpx;
+  color: var(--text);
+  margin-top: 10rpx;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.material-folder {
+  font-size: 20rpx;
+  color: var(--text-3);
+  margin-top: 4rpx;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.add-btn {
+  margin-top: 16rpx;
+}

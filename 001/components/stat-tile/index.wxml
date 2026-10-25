@@ -1,0 +1,20 @@
+<view class="tile theme-{{theme}}" bindtap="onTap">
+  <view class="tile-icon" wx:if="{{icon}}">{{icon}}</view>
+
+  <view class="tile-label" wx:if="{{label}}">{{label}}</view>
+
+  <view class="tile-value-row">
+    <text class="tile-value">{{value}}</text>
+    <text class="tile-unit" wx:if="{{unit}}">{{unit}}</text>
+  </view>
+
+  <view class="tile-sub" wx:if="{{sub}}">{{sub}}</view>
+
+  <!-- 状态点 + 说明（原型里的「已完成烘焙封层」这类） -->
+  <view class="tile-note" wx:if="{{note}}">
+    <view class="tile-dot {{dotTone ? 'tile-dot-' + dotTone : ''}}" style="{{dotTone ? '' : 'background:' + dotColor}}"></view>
+    <text class="tile-note-text">{{note}}</text>
+  </view>
+
+  <view class="tile-delta {{deltaTone}}" wx:if="{{delta}}">{{delta}}</view>
+</view>

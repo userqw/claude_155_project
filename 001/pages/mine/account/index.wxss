@@ -1,0 +1,92 @@
+.profile {
+  display: flex;
+  align-items: center;
+}
+
+.avatar {
+  width: 112rpx;
+  height: 112rpx;
+  border-radius: 50%;
+  margin-right: 24rpx;
+  flex: none;
+  background: var(--sunken);
+}
+
+.avatar-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48rpx;
+}
+
+.profile-name {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6rpx;
+}
+
+.profile-sub {
+  font-size: 22rpx;
+  color: var(--text-3);
+  line-height: 1.5;
+}
+
+.opt {
+  display: flex;
+  align-items: center;
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid var(--border);
+}
+
+.opt:last-child {
+  border-bottom: none;
+}
+
+.opt-icon {
+  font-size: 36rpx;
+  margin-right: 20rpx;
+}
+
+.opt-title {
+  font-size: 28rpx;
+  color: var(--text);
+}
+
+.opt-sub {
+  font-size: 22rpx;
+  color: var(--text-3);
+  margin-top: 4rpx;
+  line-height: 1.5;
+}
+
+.opt-arrow {
+  font-size: 32rpx;
+  color: var(--text-3);
+}
+
+.danger-text {
+  color: var(--danger);
+}
+
+.danger {
+  color: var(--danger);
+}
+
+.tip {
+  font-size: 24rpx;
+  color: var(--text-2);
+  line-height: 1.7;
+  margin: 16rpx 0 24rpx;
+}
+
+.dev-entry {
+  margin-top: 24rpx;
+  text-align: center;
+}
+
+.dev-text {
+  font-size: 22rpx;
+  color: var(--text-3);
+  text-decoration: underline;
+}

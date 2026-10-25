@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_tab" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100%;margin:0;padding:0;background-color:#fff8f4;}body{overscroll-behavior-y:none;}.pb-safe{padding-bottom:calc(env(safe-area-inset-bottom,0px) + 5.5rem);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "error": "#ba1a1a", "cat-ob11": "#F68CA1", "chart-gridline": "#F3E7EE", "outline": "#867276", "on-primary-container": "#72223d", "on-secondary": "#ffffff", "cat-chibi": "#55BCFA", "inverse-surface": "#34302c", "surface-bright": "#fff8f4", "heat-tier-2": "#DB99A4", "surface-variant": "#e9e1db", "primary-fixed": "#ffd9e0", "text-tertiary": "#7C6B85", "on-background": "#1e1b18", "secondary-fixed": "#eaddff", "surface-card": "#FFFFFF", "on-surface-variant": "#544246", "on-tertiary-fixed": "#002114", "tertiary-fixed": "#83f9c3", "cat-scale": "#54CB99", "on-primary-fixed-variant": "#7b2944", "on-secondary-fixed-variant": "#513982", "surface-container": "#f5ece6", "secondary-container": "#c6abfd", "tertiary-container": "#46bf8e", "on-error-container": "#93000a", "outline-variant": "#d9c0c5", "error-container": "#ffdad6", "text-secondary": "#64536E", "tertiary-fixed-dim": "#66dca8", "heat-tier-3": "#CE7788", "on-secondary-fixed": "#240554", "heat-tier-4": "#BC586E", "surface": "#fff8f4", "primary": "#99415c", "inverse-on-surface": "#f8efe9", "surface-container-high": "#efe7e1", "on-surface": "#1e1b18", "secondary-fixed-dim": "#d3bbff", "on-error": "#ffffff", "on-secondary-container": "#543b84", "on-tertiary-fixed-variant": "#005137", "secondary": "#69519b", "primary-fixed-dim": "#ffb1c4", "primary-container": "#f58ba8", "surface-dim": "#e1d8d3", "on-primary-fixed": "#3f001a", "surface-container-highest": "#e9e1db", "surface-tint": "#99415c", "heat-tier-1": "#E5BAC1", "surface-container-lowest": "#ffffff", "text-primary": "#4A3A52", "tertiary": "#006c4a", "background": "#fff8f4", "surface-container-low": "#fbf2ec", "on-tertiary": "#ffffff", "cta-text": "#3A2B45", "on-primary": "#ffffff", "cat-other": "#C49BF3", "on-tertiary-container": "#004931", "inverse-primary": "#ffb1c4" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "gutter": "0.75rem", "margin": "1rem", "space-xl": "1.5rem", "space-lg": "1rem", "space-sm": "0.5rem", "space-md": "0.75rem", "space-xs": "0.25rem" }, fontFamily: { "display-stat": ["Plus Jakarta Sans"], "label-sm": ["Plus Jakarta Sans"], "body-lg": ["Plus Jakarta Sans"], "headline-sm": ["Plus Jakarta Sans"], "body-sm": ["Plus Jakarta Sans"], "headline-md": ["Plus Jakarta Sans"], "headline-xl": ["Plus Jakarta Sans"], "label-md": ["Plus Jakarta Sans"], "label-lg": ["Plus Jakarta Sans"], "headline-lg": ["Plus Jakarta Sans"], "body-md": ["Plus Jakarta Sans"] }, fontSize: { "display-stat": ["32px", { "lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "800" }], "label-sm": ["11px", { "lineHeight": "16px", "fontWeight": "500" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "headline-sm": ["16px", { "lineHeight": "24px", "fontWeight": "600" }], "body-sm": ["12px", { "lineHeight": "18px", "fontWeight": "400" }], "headline-md": ["18px", { "lineHeight": "26px", "fontWeight": "600" }], "headline-xl": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700" }], "label-md": ["13px", { "lineHeight": "18px", "fontWeight": "600" }], "label-lg": ["15px", { "lineHeight": "20px", "fontWeight": "600" }], "headline-lg": ["22px", { "lineHeight": "30px", "letterSpacing": "-0.01em", "fontWeight": "700" }], "body-md": ["14px", { "lineHeight": "22px", "fontWeight": "400" }] } } } };</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface text-text-primary min-h-screen flex flex-col font-body-md text-body-md antialiased selection:bg-primary-fixed"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/85 backdrop-blur-xl shadow-[0_4px_20px_rgba(226,150,190,0.12)]"><div class="h-14 px-margin flex items-center justify-between"><div class="flex items-center gap-space-sm"><div class="w-9 h-9 rounded-full bg-primary-container/20 flex items-center justify-center text-primary-container text-body-lg">🌸</div><div class="flex flex-col"><div class="flex items-center gap-space-xs"><h1 class="font-headline-md text-headline-md text-text-primary tracking-tight font-bold">捏土打卡</h1><span class="text-label-sm font-label-sm px-1.5 py-0.5 rounded-full bg-primary-container text-white leading-none">手作</span></div><span class="text-label-sm font-label-sm text-text-tertiary">Crafter Profile</span></div></div><div class="flex items-center gap-space-sm"><div class="h-8 px-2.5 rounded-full bg-surface-card/90 shadow-[0_2px_8px_rgba(226,150,190,0.18)] flex items-center gap-2"><button class="w-6 h-6 flex items-center justify-center text-text-secondary active:scale-95 transition-transform"><span class="material-symbols-outlined text-[16px]">more_horiz</span></button><div class="w-px h-3.5 bg-outline-variant/50"></div><button class="w-6 h-6 flex items-center justify-center text-text-secondary active:scale-95 transition-transform"><span class="material-symbols-outlined text-[14px]">adjust</span></button></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0 shadow-[0_2px_8px_rgba(245,139,168,0.3)]"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex-1 flex flex-col relative w-full pt-14 pb-safe bg-surface px-margin"><div class="flex flex-col w-full gap-space-lg pb-10">
+<!-- 1. 账号卡片 (PRD §5.6.8 游客优先设计) -->
+<section class="w-full bg-surface-card rounded-xl p-margin shadow-[0_8px_28px_rgba(226,150,190,0.16)] flex flex-col gap-space-md relative overflow-hidden">
+<!-- 装饰底纹光晕 -->
+<div class="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-primary-fixed-dim/30 blur-2xl pointer-events-none"></div>
+<div class="flex items-center gap-space-md z-10">
+<!-- 手作小熊头像插画 -->
+<div class="relative w-16 h-16 rounded-full bg-primary-fixed flex items-center justify-center shadow-[0_4px_14px_rgba(245,139,168,0.25)] shrink-0 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Cute miniature handcrafted teddy bear clay figurine wearing a tiny pastel pink apron, sitting on a craft table with soft studio lighting and warm sakura macaron aesthetics" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCrFPpJQqT5hUr_T5RC39hEMB8Xx3aFXih-mto7YFJNPpUmTAzHKJDzBhOlTn9pNLdTjD80mclA3Hqer3kdVSp_luRfD7IO2D34XpwJPbZkOSpQj7fP2kfa6D5QRwdZEMzrcg3VYqF8pyOvjkr6Bjx7KuSnlgjyCYZTifJqEBzVZN1hcPRNq7Seqlbw9ev-VfObmx2jn9Bu7guUKgjPVaQq1RVS1UYSd6IWpcK5Nw"/>
+<span class="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-secondary-container flex items-center justify-center text-[10px] text-on-secondary-container">✨</span>
+</div>
+<div class="flex flex-col min-w-0 flex-1">
+<div class="flex items-center gap-space-xs">
+<span class="font-headline-md text-headline-md text-text-primary font-bold truncate">手作工坊访客</span>
+<span class="text-label-sm font-label-sm px-2 py-0.5 rounded-full bg-surface-container text-text-secondary">未登录访客</span>
+</div>
+<p class="font-body-sm text-body-sm text-text-tertiary mt-0.5">工匠编号 #CLAY-2026</p>
+</div>
+</div>
+<!-- 游客提示条 -->
+<div class="z-10 flex items-center gap-space-xs bg-surface-container-low p-space-sm rounded-lg text-text-secondary font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[18px] text-primary shrink-0">phonelink_lock</span>
+<span class="truncate">数据安全保存在本手机内 📱 随时可使用全部本地功能</span>
+</div>
+<!-- 醒目一键登录按钮 -->
+<button class="z-10 w-full h-12 rounded-full bg-gradient-to-r from-primary-fixed via-primary-container to-secondary-fixed text-cta-text font-label-lg text-label-lg font-bold shadow-[0_6px_18px_rgba(245,139,168,0.28)] flex items-center justify-center gap-space-xs active:scale-95 transition-transform" id="wechatLoginBtn">
+<span>🎀 微信一键登录 / 云端备份</span>
+<span class="text-label-sm font-label-sm opacity-80">(换手机不丢数据)</span>
+</button>
+</section>
+<!-- 2. 核心功能卡片 —— 素材库专属入口 (PRD §5.7 重点模块) -->
+<section class="w-full rounded-xl bg-gradient-to-br from-primary-fixed/40 via-surface-card to-secondary-fixed/40 p-margin shadow-[0_8px_28px_rgba(226,150,190,0.18)] flex flex-col gap-space-md relative overflow-hidden">
+<div class="flex items-start justify-between">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-space-xs">
+<div class="w-7 h-7 rounded-full bg-primary-container/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[18px]">folder_special</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-text-primary font-bold">📁 素材库 &amp; 灵感参考</h2>
+</div>
+<p class="font-body-sm text-body-sm text-text-secondary leading-snug mt-1">管理配色灵感、粘土包装、教程截图（支持单层文件夹自由归类）</p>
+</div>
+<button class="w-8 h-8 rounded-full bg-surface-card shadow-sm flex items-center justify-center text-primary active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</button>
+</div>
+<!-- 素材缩略预览三联图 -->
+<div class="grid grid-cols-3 gap-space-xs w-full">
+<div class="aspect-square rounded-lg overflow-hidden relative shadow-sm">
+<img class="w-full h-full object-cover" data-alt="Pastel anime polymer clay skin color swatches and paint blending guide, soft macaron studio lighting, macro photography" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDL8puab0jW28veU6SY2O2nbd8-8BNPUT9zfvtHIjpEOsF1tAFmsodC2JiIuluDmzmGbOhoOOOYUKx6I5WY53xkjZn9QzmCRqNj8WGZ0Z7yESmSElZC-lhF7MuAxgM3hIrVNoE80D-2fbt4YT6y2cUEutKtlk4Nb0g8pxDtHj1RGdZbEgC9m-4VY06Wharw4rLUrQa7KKiCcWKl5rpz_3Yth5P9uN_zWHwju8DbBA"/>
+<span class="absolute bottom-1 right-1 px-1.5 py-0.5 rounded-full bg-inverse-surface/60 backdrop-blur-sm text-surface-card text-label-sm font-label-sm">调色</span>
+</div>
+<div class="aspect-square rounded-lg overflow-hidden relative shadow-sm">
+<img class="w-full h-full object-cover" data-alt="Chibi doll eye decal sheet stickers, miniature doll eyes with sparkling anime pupil reflections, cute pastel tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBW7LnZcCmqnphIlVVYrodbjJkpO5-VP4eVER3fBoguAtWG_h0a6Ke6z5QJVO4cbIYMuVhv_AK7V83UWncQyjG-GTkjSuSlXRU-Q1DOobN6buAv9aAPFPmFNzbZ4VZLyLTcglHAzGuco182pGWiJKdiEyUOkydSCH6EjJ9eGn2hqkjoshQkdl3qkSogrdtQUwwzLLaWPffzWpDoZ_q9TV17XCXfH0jIDKIBeaLq_Q"/>
+<span class="absolute bottom-1 right-1 px-1.5 py-0.5 rounded-full bg-inverse-surface/60 backdrop-blur-sm text-surface-card text-label-sm font-label-sm">水贴</span>
+</div>
+<div class="aspect-square rounded-lg overflow-hidden relative shadow-sm">
+<img class="w-full h-full object-cover" data-alt="Macaron palette pastel clay bars in soft mint, lavender, and strawberry cream, organized in a cute handcrafted tray" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDgE3G9KRyESYOuEGHoY6_MPvdBbYLpj9DofDKXRaX8a-nUjJzXFvBTxkGPcLAyiWIM_DM9Sy_7dDpHXy3tPgmwHAy2owb_HOc3M1cDkSjZODKKvLWy5SZLRxkiTB2DzX32dMOzxCDLD21jFBatkiETtA4T9T1ph3SfnmJm62CB0Il-bIfKLS5WRbm3yVfNfLl7YFScze-YFkNgK2iZSBNVRyoB5A-pbzpp54LnRQ"/>
+<span class="absolute bottom-1 right-1 px-1.5 py-0.5 rounded-full bg-inverse-surface/60 backdrop-blur-sm text-surface-card text-label-sm font-label-sm">配色</span>
+</div>
+</div>
+<!-- 数据与胶囊快捷夹 -->
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between text-text-tertiary font-label-sm text-label-sm px-1">
+<span>当前收纳</span>
+<span class="font-bold text-primary">3 个文件夹 · 48 张灵感素材</span>
+</div>
+<div class="flex gap-space-xs overflow-x-auto py-1 scrollbar-none">
+<div class="h-8 px-3 rounded-full bg-surface-card shadow-[0_2px_8px_rgba(226,150,190,0.14)] flex items-center gap-1 shrink-0 text-text-primary text-body-sm font-body-sm active:scale-95 transition-transform">
+<span>🌸 皮肤调色参考</span>
+<span class="text-label-sm font-label-sm text-text-tertiary">16</span>
+</div>
+<div class="h-8 px-3 rounded-full bg-surface-card shadow-[0_2px_8px_rgba(226,150,190,0.14)] flex items-center gap-1 shrink-0 text-text-primary text-body-sm font-body-sm active:scale-95 transition-transform">
+<span>✨ 娃眼水贴素材</span>
+<span class="text-label-sm font-label-sm text-text-tertiary">20</span>
+</div>
+<div class="h-8 px-3 rounded-full bg-surface-card shadow-[0_2px_8px_rgba(226,150,190,0.14)] flex items-center gap-1 shrink-0 text-text-primary text-body-sm font-body-sm active:scale-95 transition-transform">
+<span>🎨 2026秋冬马卡龙配色</span>
+<span class="text-label-sm font-label-sm text-text-tertiary">12</span>
+</div>
+</div>
+</div>
+</section>
+<!-- 3. 手作配置与管理列表 -->
+<section class="w-full flex flex-col gap-space-xs">
+<div class="px-1 flex items-center gap-space-xs">
+<span class="text-primary font-bold">🛠️</span>
+<h3 class="font-headline-sm text-headline-sm text-text-primary font-bold">手作工坊配置</h3>
+</div>
+<div class="w-full bg-surface-card rounded-xl p-space-md shadow-[0_8px_28px_rgba(226,150,190,0.14)] flex flex-col gap-space-sm">
+<!-- 造型分类管理 -->
+<div class="flex items-center justify-between py-2 px-1 rounded-lg hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="w-9 h-9 rounded-full bg-secondary-fixed/50 flex items-center justify-center text-secondary shrink-0">
+<span class="material-symbols-outlined text-[20px]">category</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-lg text-label-lg text-text-primary font-bold">造型与成本设置</span>
+<span class="font-body-sm text-body-sm text-text-tertiary truncate">OB11娃头、QQ人、正比、默认克重单价</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-[20px] text-text-tertiary">chevron_right</span>
+</div>
+<!-- 标签库管理 -->
+<div class="flex items-center justify-between py-2 px-1 rounded-lg hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="w-9 h-9 rounded-full bg-primary-fixed/60 flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[20px]">replace_image</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-lg text-label-lg text-text-primary font-bold">标签库管理</span>
+<div class="flex items-center gap-1 mt-0.5 truncate">
+<span class="px-1.5 py-0.2 rounded-full bg-surface-container text-label-sm font-label-sm text-text-secondary">限定配色</span>
+<span class="px-1.5 py-0.2 rounded-full bg-surface-container text-label-sm font-label-sm text-text-secondary">练手</span>
+<span class="px-1.5 py-0.2 rounded-full bg-surface-container text-label-sm font-label-sm text-text-secondary">急单</span>
+</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-[20px] text-text-tertiary">chevron_right</span>
+</div>
+<!-- 打卡提醒设置开关 -->
+<div class="flex items-center justify-between py-2 px-1 rounded-lg">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="w-9 h-9 rounded-full bg-tertiary-fixed-dim/40 flex items-center justify-center text-tertiary shrink-0">
+<span class="material-symbols-outlined text-[20px]">notifications_active</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-lg text-label-lg text-text-primary font-bold">每日打卡催促</span>
+<span class="font-body-sm text-body-sm text-text-tertiary">每晚 20:00 微信服务号提醒</span>
+</div>
+</div>
+<!-- 切换开关组件 -->
+<button aria-checked="true" class="w-12 h-7 rounded-full bg-primary-container p-0.5 flex items-center justify-end shadow-inner transition-colors duration-200" id="reminderToggle">
+<span class="w-6 h-6 rounded-full bg-surface-card shadow-md"></span>
+</button>
+</div>
+</div>
+</section>
+<!-- 4. 数据安全与备份 (PRD §5.4.4) -->
+<section class="w-full flex flex-col gap-space-xs">
+<div class="px-1 flex items-center gap-space-xs">
+<span class="text-primary font-bold">💾</span>
+<h3 class="font-headline-sm text-headline-sm text-text-primary font-bold">数据存储与成果分享</h3>
+</div>
+<div class="grid grid-cols-2 gap-gutter">
+<!-- 导出数据 -->
+<div class="bg-surface-card rounded-xl p-space-md shadow-[0_8px_28px_rgba(226,150,190,0.12)] flex flex-col justify-between gap-space-md active:scale-98 transition-transform">
+<div class="flex flex-col gap-1">
+<div class="w-8 h-8 rounded-full bg-secondary-fixed/60 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[18px]">cloud_download</span>
+</div>
+<span class="font-label-lg text-label-lg text-text-primary font-bold mt-1">导出全部数据</span>
+<span class="font-body-sm text-body-sm text-text-tertiary leading-tight">JSON 备份 / CSV 打卡流水</span>
+</div>
+<button class="w-full py-1.5 rounded-full bg-surface-container-low text-text-primary font-label-sm text-label-sm font-bold text-center">
+          立即导出
+        </button>
+</div>
+<!-- 生成年鉴长图海报 -->
+<div class="bg-surface-card rounded-xl p-space-md shadow-[0_8px_28px_rgba(226,150,190,0.12)] flex flex-col justify-between gap-space-md active:scale-98 transition-transform">
+<div class="flex flex-col gap-1">
+<div class="w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[18px]">photo_camera</span>
+</div>
+<span class="font-label-lg text-label-lg text-text-primary font-bold mt-1">2026 手作年鉴</span>
+<span class="font-body-sm text-body-sm text-text-tertiary leading-tight">生成九宫格长图海报</span>
+</div>
+<button class="w-full py-1.5 rounded-full bg-primary-fixed-dim/60 text-primary font-label-sm text-label-sm font-bold text-center">
+          一键生成
+        </button>
+</div>
+</div>
+</section>
+<!-- 5. 设置与关于 -->
+<section class="w-full bg-surface-card rounded-xl p-space-md shadow-[0_8px_28px_rgba(226,150,190,0.12)] flex flex-col gap-space-xs text-text-primary">
+<!-- 深色模式 -->
+<div class="flex items-center justify-between py-2 px-1">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-text-secondary text-[20px]">routine</span>
+<span class="font-body-md text-body-md">外观跟随系统 (深色模式)</span>
+</div>
+<span class="font-label-md text-label-md text-text-tertiary">已开启</span>
+</div>
+<!-- 清理缓存 -->
+<div class="flex items-center justify-between py-2 px-1">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-text-secondary text-[20px]">cleaning_services</span>
+<span class="font-body-md text-body-md">清除本地缓存</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="font-label-md text-label-md text-text-tertiary">12.4 MB</span>
+<button class="px-2 py-0.5 rounded-full bg-surface-container text-label-sm font-label-sm text-text-secondary active:scale-95 transition-transform" id="clearCacheBtn">清理</button>
+</div>
+</div>
+<!-- 隐私政策与注销 -->
+<div class="flex items-center justify-between py-2 px-1">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-text-secondary text-[20px]">verified_user</span>
+<span class="font-body-md text-body-md">隐私政策与协议</span>
+</div>
+<span class="material-symbols-outlined text-[18px] text-text-tertiary">chevron_right</span>
+</div>
+<div class="flex items-center justify-between py-2 px-1">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-outline text-[20px]">cancel</span>
+<span class="font-body-md text-body-md text-text-secondary">账号注销与数据彻底清除</span>
+</div>
+<span class="material-symbols-outlined text-[18px] text-text-tertiary">chevron_right</span>
+</div>
+</section>
+<!-- 底部暖心微文案 -->
+<div class="w-full flex flex-col items-center justify-center py-2 text-center text-text-tertiary">
+<span class="font-label-sm text-label-sm">捏土打卡工作室 · 陪你记录每一份热爱 🌸 v2.4.0</span>
+</div>
+</div>
+<script>
+  // 提醒开关切换逻辑
+  const toggleBtn = document.getElementById('reminderToggle');
+  if (toggleBtn) {
+    let isChecked = true;
+    toggleBtn.addEventListener('click', () => {
+      isChecked = !isChecked;
+      toggleBtn.setAttribute('aria-checked', isChecked.toString());
+      if (isChecked) {
+        toggleBtn.classList.remove('bg-surface-variant', 'justify-start');
+        toggleBtn.classList.add('bg-primary-container', 'justify-end');
+      } else {
+        toggleBtn.classList.remove('bg-primary-container', 'justify-end');
+        toggleBtn.classList.add('bg-surface-variant', 'justify-start');
+      }
+    });
+  }
+
+  // 清除缓存轻提示交互
+  const clearBtn = document.getElementById('clearCacheBtn');
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      clearBtn.textContent = '已清理';
+      clearBtn.classList.add('text-primary');
+      setTimeout(() => {
+        clearBtn.textContent = '0.0 MB';
+      }, 800);
+    });
+  }
+
+  // 微信登录点击轻动效反馈
+  const loginBtn = document.getElementById('wechatLoginBtn');
+  if (loginBtn) {
+    loginBtn.addEventListener('click', () => {
+      const originalText = loginBtn.innerHTML;
+      loginBtn.innerHTML = '<span>✨ 正在安全连接微信中...</span>';
+      setTimeout(() => {
+        loginBtn.innerHTML = originalText;
+      }, 1500);
+    });
+  }
+</script></main><nav class="fixed bottom-0 w-full z-50 px-margin pb-4 pointer-events-none" data-active-classes="text-cta-text font-label-md font-bold scale-105 bg-gradient-to-r from-primary-fixed via-primary-container/40 to-secondary-container/40 shadow-[0_4px_16px_rgba(245,139,168,0.25)]"><div class="max-w-md mx-auto h-16 rounded-full bg-surface-card/90 backdrop-blur-xl shadow-[0_8px_28px_rgba(226,150,190,0.22)] px-2 flex items-center justify-around pointer-events-auto"><a class="flex flex-col items-center justify-center py-1 px-3 rounded-full min-w-[56px] text-text-secondary transition-all duration-200 active:scale-95" data-path="home-log" href="#"><span class="material-symbols-outlined text-[22px]">cottage</span><span class="text-label-sm font-label-sm mt-0.5">小屋</span></a><a class="flex flex-col items-center justify-center py-1 px-3 rounded-full min-w-[56px] text-text-secondary transition-all duration-200 active:scale-95" data-path="sculpture-stats" href="#"><span class="material-symbols-outlined text-[22px]">auto_graph</span><span class="text-label-sm font-label-sm mt-0.5">年鉴</span></a><a class="flex flex-col items-center justify-center py-1 px-3 rounded-full min-w-[56px] text-text-secondary transition-all duration-200 active:scale-95" data-path="gallery-library" href="#"><span class="material-symbols-outlined text-[22px]">view_quilt</span><span class="text-label-sm font-label-sm mt-0.5">作品库</span></a><a aria-current="page" class="flex flex-col items-center justify-center py-1 px-3 rounded-full min-w-[56px] transition-all duration-200 text-cta-text font-label-md font-bold scale-105 bg-gradient-to-r from-primary-fixed via-primary-container/40 to-secondary-container/40 shadow-[0_4px_16px_rgba(245,139,168,0.25)]" data-path="crafter-profile" href="#"><span class="material-symbols-outlined text-[22px]">face_3</span><span class="text-label-sm font-label-sm mt-0.5">我的</span></a></div></nav></body></html>

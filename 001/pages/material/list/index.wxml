@@ -1,0 +1,27 @@
+<view class="page theme-{{theme}}">
+  <view class="head">
+    <view class="grow">
+      <view class="head-title">{{title}}</view>
+      <view class="section-sub">{{materials.length}} 张素材</view>
+    </view>
+    <view class="btn btn-ghost btn-sm" wx:if="{{folder}}" bindtap="onEditFolder">编辑</view>
+  </view>
+
+  <view class="grid">
+    <view class="material" wx:for="{{materials}}" wx:key="id" data-id="{{item.id}}" bindtap="goMaterial">
+      <image class="material-img" src="{{item.url}}" mode="aspectFill"></image>
+      <view class="material-name">{{item.name}}</view>
+      <view class="material-folder" wx:if="{{showFolder}}">{{item.folderName}}</view>
+    </view>
+  </view>
+
+  <view class="btn btn-primary add-btn" bindtap="onAddMaterial">+ 添加素材</view>
+
+  <empty-state
+    wx:if="{{!materials.length}}"
+    theme="{{theme}}"
+    icon="🖼"
+    title="这里还没有素材"
+    sub="把参考图存进来，做的时候随手翻"
+  ></empty-state>
+</view>

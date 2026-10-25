@@ -1,0 +1,56 @@
+<view class="page theme-{{theme}}">
+  <view class="card">
+    <view class="section-title">数据概况</view>
+    <view class="counts">
+      <view class="count-box">
+        <text class="count-value">{{counts.records}}</text>
+        <text class="count-label">条记录</text>
+      </view>
+      <view class="count-box">
+        <text class="count-value">{{counts.sales}}</text>
+        <text class="count-label">笔售出</text>
+      </view>
+      <view class="count-box">
+        <text class="count-value">{{counts.photos}}</text>
+        <text class="count-label">张照片</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">导出</view>
+    <view class="section-sub">数据保存在你自己的设备上，导出后可以随意备份或用表格工具分析</view>
+
+    <view class="opt" bindtap="onExportCsv">
+      <view class="opt-icon">📊</view>
+      <view class="grow">
+        <view class="opt-title">导出流水表（CSV）</view>
+        <view class="opt-sub">日期、造型、数量、售出金额，可用 Excel 打开</view>
+      </view>
+      <text class="opt-arrow">›</text>
+    </view>
+
+    <view class="opt" bindtap="onExportJson">
+      <view class="opt-icon">🧾</view>
+      <view class="grow">
+        <view class="opt-title">导出完整备份（JSON）</view>
+        <view class="opt-sub">全部记录、售出与照片信息</view>
+      </view>
+      <text class="opt-arrow">›</text>
+    </view>
+
+    <view class="opt" bindtap="onCopySummary">
+      <view class="opt-icon">📋</view>
+      <view class="grow">
+        <view class="opt-title">复制摘要</view>
+        <view class="opt-sub">一行汇总，粘贴给别人看</view>
+      </view>
+      <text class="opt-arrow">›</text>
+    </view>
+  </view>
+
+  <view class="tip">
+    小程序无法把文件直接存到手机「文件」App。导出 CSV 时会调用系统文档预览，
+    在预览页里用「···」选择「用其他应用打开 / 存储到」即可保存。
+  </view>
+</view>

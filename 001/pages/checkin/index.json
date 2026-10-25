@@ -1,0 +1,8 @@
+{
+  "usingComponents": {
+    "app-header": "../../components/app-header/index",
+    "shape-picker": "../../components/shape-picker/index",
+    "photo-uploader": "../../components/photo-uploader/index"
+  },
+  "navigationBarTitleText": "打卡"
+}

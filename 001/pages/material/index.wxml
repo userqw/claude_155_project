@@ -1,0 +1,83 @@
+<view class="page theme-{{theme}}">
+  <!-- 分组切换 -->
+  <view class="tabs">
+    <view class="tab {{tab === 'folders' ? 'tab-active' : ''}}" data-t="folders" bindtap="onTab">文件夹</view>
+    <view class="tab {{tab === 'all' ? 'tab-active' : ''}}" data-t="all" bindtap="onTab">全部素材</view>
+  </view>
+
+  <!-- 文件夹 -->
+  <block wx:if="{{tab === 'folders'}}">
+    <view class="grid">
+      <!-- 全部素材入口 -->
+      <view class="folder" bindtap="goAll">
+        <view class="folder-cover folder-cover-all">
+          <view class="folder-icon">🖼</view>
+          <text class="folder-all-count">{{counts.total}}</text>
+        </view>
+        <view class="folder-name">全部素材</view>
+        <view class="folder-count">共 {{counts.total}} 张</view>
+      </view>
+
+      <!-- 未分类 -->
+      <view class="folder" wx:if="{{counts.unfiled > 0}}" bindtap="goUnfiled">
+        <view class="folder-cover folder-cover-unfiled">
+          <view class="folder-icon">📥</view>
+          <text class="folder-all-count">{{counts.unfiled}}</text>
+        </view>
+        <view class="folder-name">未分类</view>
+        <view class="folder-count">{{counts.unfiled}} 张</view>
+      </view>
+
+      <!-- 用户文件夹 -->
+      <view class="folder" wx:for="{{folders}}" wx:key="id" data-id="{{item.id}}" bindtap="goFolder">
+        <image wx:if="{{item.cover}}" class="folder-cover" src="{{item.cover}}" mode="aspectFill"></image>
+        <view wx:else class="folder-cover folder-cover-empty">
+          <view class="folder-icon">📁</view>
+        </view>
+        <view class="folder-name">{{item.name}}</view>
+        <view class="folder-count">{{item.count}} 张</view>
+      </view>
+    </view>
+
+    <view class="btn btn-primary add-btn" bindtap="onCreateFolder">+ 新建文件夹</view>
+
+    <empty-state
+      wx:if="{{!folders.length && !counts.total}}"
+      theme="{{theme}}"
+      icon="📁"
+      title="素材库还是空的"
+      sub="新建一个文件夹，把配色参考、工具照片存进来"
+    ></empty-state>
+  </block>
+
+  <!-- 全部素材 -->
+  <block wx:else>
+    <view class="search">
+      <input
+        class="search-input"
+        placeholder="搜索素材名称或备注"
+        value="{{keyword}}"
+        bindinput="onSearch"
+        confirm-type="search"
+      />
+      <text class="search-clear" wx:if="{{keyword}}" bindtap="onClearSearch">✕</text>
+    </view>
+
+    <view class="grid grid-materials">
+      <view class="material" wx:for="{{materials}}" wx:key="id" data-id="{{item.id}}" bindtap="goMaterial">
+        <image class="material-img" src="{{item.url}}" mode="aspectFill"></image>
+        <view class="material-name">{{item.name}}</view>
+      </view>
+    </view>
+
+    <view class="btn btn-primary add-btn" bindtap="onAddMaterial">+ 添加素材</view>
+
+    <empty-state
+      wx:if="{{!materials.length}}"
+      theme="{{theme}}"
+      icon="🖼"
+      title="{{keyword ? '没有匹配的素材' : '还没有素材'}}"
+      sub="{{keyword ? '换个关键词试试' : '把参考图存进来，做的时候随手翻'}}"
+    ></empty-state>
+  </block>
+</view>

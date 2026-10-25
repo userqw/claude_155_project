@@ -1,0 +1,85 @@
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24rpx;
+}
+
+.hero {
+  font-size: 72rpx;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.1;
+}
+
+.year-pill {
+  font-size: 26rpx;
+  color: var(--text-2);
+  background: var(--surface);
+  border-radius: 30rpx;
+  padding: 12rpx 24rpx;
+}
+
+.tiles {
+  display: flex;
+}
+
+.tile-gap {
+  width: 16rpx;
+}
+
+.warn {
+  margin-top: 24rpx;
+  padding: 16rpx 20rpx;
+  border-radius: 12rpx;
+  background: var(--sunken);
+  font-size: 22rpx;
+  color: var(--text-2);
+  line-height: 1.6;
+}
+
+.sale {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid var(--border);
+}
+
+.sale:last-child {
+  border-bottom: none;
+}
+
+.sale-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.sale-shape {
+  font-size: 26rpx;
+  color: var(--text);
+  margin-left: 12rpx;
+  margin-right: 16rpx;
+}
+
+.sale-date {
+  font-size: 22rpx;
+  color: var(--text-3);
+}
+
+.sale-sub {
+  flex: 1;
+  font-size: 22rpx;
+  color: var(--text-3);
+}
+
+.sale-channel {
+  margin-left: 16rpx;
+}
+
+.sale-total {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}

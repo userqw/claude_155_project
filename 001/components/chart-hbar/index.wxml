@@ -1,0 +1,38 @@
+<view class="hbar theme-{{theme}}">
+  <block wx:if="{{!stacked}}">
+    <view class="hbar-row" wx:for="{{rows}}" wx:key="key">
+      <view class="hbar-label">
+        <view class="swatch" style="background:{{item.color}}"></view>
+        <text class="hbar-name">{{item.name}}</text>
+      </view>
+      <view class="hbar-track">
+        <view class="hbar-bar" style="width:{{item.ratio}}%; background:{{item.color}}"></view>
+      </view>
+      <view class="hbar-value">
+        <text class="hbar-count">{{item.display}}</text>
+        <text class="hbar-pct" wx:if="{{showPercent}}">{{item.percentText}}</text>
+      </view>
+    </view>
+  </block>
+
+  <!-- 原型布局：分类名在左、数量+百分比在右，下方一条通栏进度条 -->
+  <block wx:else>
+    <view class="hbar-stack" wx:for="{{rows}}" wx:key="key">
+      <view class="hbar-stack-head">
+        <view class="hbar-stack-label">
+          <view class="swatch" style="background:{{item.color}}"></view>
+          <text class="hbar-stack-name">{{item.name}}</text>
+        </view>
+        <view class="hbar-stack-value">
+          <text class="hbar-stack-count">{{item.display}}</text>
+          <text class="hbar-stack-pct" wx:if="{{showPercent}}">{{item.percentText}}</text>
+        </view>
+      </view>
+      <view class="hbar-stack-track">
+        <view class="hbar-stack-bar" style="width:{{item.ratio}}%; background:{{item.color}}"></view>
+      </view>
+    </view>
+  </block>
+
+  <view class="hbar-empty" wx:if="{{!rows.length}}">暂无数据</view>
+</view>

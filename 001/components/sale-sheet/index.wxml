@@ -1,0 +1,69 @@
+<view wx:if="{{visible}}" class="mask theme-{{theme}}" bindtap="onClose">
+  <view class="sheet theme-{{theme}}" catchtap="onStop">
+    <view class="handle"></view>
+
+    <view class="sheet-head">
+      <text class="sheet-title">记录售出</text>
+      <text class="sheet-close" bindtap="onClose">✕</text>
+    </view>
+
+    <scroll-view class="body" scroll-y="true">
+      <view class="target" wx:if="{{targetName}}">
+        <text class="target-label">关联记录</text>
+        <text class="target-name">{{targetName}}</text>
+        <text class="target-stock">可售 {{maxQuantity}} 个</text>
+      </view>
+
+      <view class="field">
+        <view class="field-label">售出数量</view>
+        <view class="counter">
+          <view class="counter-btn {{form.quantity <= 1 ? 'disabled' : ''}}" bindtap="onMinus">−</view>
+          <input class="counter-input" type="number" value="{{form.quantity}}" bindinput="onQtyInput" />
+          <view class="counter-btn" bindtap="onPlus">＋</view>
+        </view>
+      </view>
+
+      <view class="field">
+        <view class="field-label">单价（元）</view>
+        <input class="input" type="digit" placeholder="0.00" value="{{form.unitPrice}}" bindinput="onPriceInput" />
+      </view>
+
+      <view class="field">
+        <view class="field-label">合计</view>
+        <view class="total">¥ {{totalText}}</view>
+      </view>
+
+      <view class="field">
+        <view class="field-label">售出日期</view>
+        <picker mode="date" value="{{form.soldDate}}" start="{{minDate}}" end="{{maxDate}}" bindchange="onDateChange">
+          <view class="picker-value">{{form.soldDate}} <text class="arrow">›</text></view>
+        </picker>
+      </view>
+
+      <view class="field">
+        <view class="field-label">销售渠道</view>
+        <view class="tags">
+          <view
+            class="tag {{form.channel === item.id ? 'tag-active' : ''}}"
+            wx:for="{{channels}}"
+            wx:key="id"
+            data-id="{{item.id}}"
+            bindtap="onChannel"
+          >{{item.name}}</view>
+        </view>
+      </view>
+
+      <view class="field">
+        <view class="field-label">备注<text class="optional">选填</text></view>
+        <input class="input" placeholder="买家、快递单号…" value="{{form.note}}" bindinput="onNoteInput" />
+      </view>
+    </scroll-view>
+
+    <view class="footer">
+      <view
+        class="btn btn-primary grow {{saving ? 'btn-disabled' : ''}}"
+        bindtap="onSave"
+      >{{saving ? '保存中…' : '保存'}}</view>
+    </view>
+  </view>
+</view>

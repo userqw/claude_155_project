@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "营收统计", 
+  "usingComponents": {
+    "empty-state": "../../../components/empty-state/index", 
+    "shape-icon": "../../../components/shape-icon/index", 
+    "stat-tile": "../../../components/stat-tile/index", 
+    "chart-hbar": "../../../components/chart-hbar/index", 
+    "chart-line": "../../../components/chart-line/index"
+  }
+}

@@ -1,0 +1,4 @@
+@import "../../styles/theme.wxss";
+@import "../../styles/common.wxss";
+
+/* .empty / .empty-icon / .empty-title / .empty-sub 与 .btn 由 common.wxss 提供 */

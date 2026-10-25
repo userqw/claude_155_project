@@ -1,0 +1,103 @@
+<view class="page theme-{{theme}}" wx:if="{{record}}">
+  <!-- 图片 -->
+  <view class="gallery" wx:if="{{photos.length}}">
+    <swiper class="swiper" indicator-dots="{{photos.length > 1}}" circular="{{false}}">
+      <swiper-item wx:for="{{photos}}" wx:key="*this">
+        <image class="photo" src="{{item}}" mode="aspectFit" data-url="{{item}}" bindtap="onPreview"></image>
+      </swiper-item>
+    </swiper>
+  </view>
+  <view wx:else class="gallery gallery-empty">
+    <shape-icon
+      theme="{{theme}}"
+      path="{{record.shape.iconPath}}"
+      emoji="{{record.shape.icon}}"
+      size="lg"
+    ></shape-icon>
+    <text class="gallery-text">这条记录没有照片</text>
+  </view>
+
+  <!-- 信息 -->
+  <view class="card">
+    <view class="row-between">
+      <view class="shape-name">
+        <view class="swatch" style="background:{{record.shape.color}}"></view>
+        <text>{{record.shape.name}}</text>
+      </view>
+      <text class="count">× {{record.count}}</text>
+    </view>
+
+    <view class="meta-row">
+      <text class="meta-label">日期</text>
+      <text class="meta-value">{{record.date}}（{{record.dateText}}）</text>
+    </view>
+    <view class="meta-row" wx:if="{{record.durationMin}}">
+      <text class="meta-label">耗时</text>
+      <text class="meta-value">{{record.durationMin}} 分钟</text>
+    </view>
+    <view class="meta-row" wx:if="{{record.tags.length}}">
+      <text class="meta-label">标签</text>
+      <view class="tag-wrap">
+        <text class="tag" wx:for="{{record.tags}}" wx:key="id">{{item.name}}</text>
+      </view>
+    </view>
+    <view class="note" wx:if="{{record.note}}">{{record.note}}</view>
+  </view>
+
+  <!-- 售出 -->
+  <view class="card">
+    <view class="row-between">
+      <view class="section-title">售出</view>
+      <text class="link" bindtap="onSell">记一笔 ›</text>
+    </view>
+
+    <view class="stat-row">
+      <view class="stat-box">
+        <text class="stat-value">{{soldCount}}</text>
+        <text class="stat-label">已售出</text>
+      </view>
+      <view class="stat-box">
+        <text class="stat-value">{{unsold}}</text>
+        <text class="stat-label">未售出</text>
+      </view>
+      <view class="stat-box">
+        <text class="stat-value">¥{{totalAmount}}</text>
+        <text class="stat-label">营收</text>
+      </view>
+    </view>
+
+    <view class="sale" wx:for="{{sales}}" wx:key="id">
+      <view class="grow">
+        <view class="sale-main">
+          <text>{{item.quantity}} 个 × ¥{{item.unitPrice}}</text>
+          <text class="sale-channel">{{item.channel}}</text>
+        </view>
+        <view class="sale-date">{{item.dateText}}</view>
+      </view>
+      <text class="sale-total">¥{{item.total}}</text>
+      <text class="sale-del" data-id="{{item.id}}" catchtap="onRemoveSale">删除</text>
+    </view>
+
+    <view class="sale-empty" wx:if="{{!sales.length}}">还没有售出记录</view>
+  </view>
+
+  <!-- 操作 -->
+  <view class="card actions">
+    <view class="btn btn-ghost grow" bindtap="onEdit">编辑</view>
+    <view class="btn btn-primary grow" bindtap="onSell">标记售出</view>
+  </view>
+</view>
+
+<view class="page theme-{{theme}}" wx:else>
+  <empty-state theme="{{theme}}" icon="🔍" title="记录不存在" sub="它可能已经被删除了"></empty-state>
+</view>
+
+
+<sale-sheet
+  visible="{{showSale}}"
+  check-in="{{saleTarget}}"
+  max-quantity="{{saleMax}}"
+  theme="{{theme}}"
+  bindclose="onSaleClose"
+  bindsave="onSaleSave"
+></sale-sheet>

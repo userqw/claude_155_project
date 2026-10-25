@@ -1,0 +1,19 @@
+<view class="picker theme-{{theme}}">
+  <view
+    class="chip {{value === item.id ? 'chip-active' : ''}}"
+    wx:for="{{shapes}}"
+    wx:key="id"
+    data-id="{{item.id}}"
+    bindtap="onSelect"
+  >
+    <view class="chip-badge" style="background:{{item.softColor}}">
+      <shape-icon
+        theme="{{theme}}"
+        path="{{item.iconPath}}"
+        emoji="{{item.icon}}"
+        size="md"
+      ></shape-icon>
+    </view>
+    <view class="chip-name">{{item.name}}</view>
+  </view>
+</view>

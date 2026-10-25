@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "日历热力图", 
+  "usingComponents": {
+    "empty-state": "../../../components/empty-state/index", 
+    "shape-icon": "../../../components/shape-icon/index", 
+    "app-header": "../../../components/app-header/index"
+  }
+}

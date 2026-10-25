@@ -1,0 +1,67 @@
+@import "../styles/theme.wxss";
+
+/* 悬浮药丸 dock：白色半透明 + 粉紫氛围阴影，选中项图标套粉色圆底 */
+.tabbar {
+  /* 几何尺寸不依赖主题类，直接定义在这里。
+     万一 theme 属性没传上，dock 也不会因为 var() 取不到值而丢掉定位和高度。 */
+  --tabbar-h: 116rpx;
+  --tabbar-gap: 16rpx;
+
+  position: fixed;
+  left: 20rpx;
+  right: 20rpx;
+  /* env() 不被支持时用兜底值，别让 bottom 整个失效 */
+  bottom: var(--tabbar-gap);
+  bottom: calc(var(--tabbar-gap) + env(safe-area-inset-bottom));
+  height: var(--tabbar-h);
+  border-radius: 58rpx;
+  background: var(--glass-strong);
+  box-shadow: 0 10rpx 34rpx var(--pink-28);
+  display: flex;
+  align-items: center;
+  padding: 0 12rpx;
+  box-sizing: border-box;
+  z-index: 90;
+}
+
+
+.tabbar-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.tabbar-icon-wrap {
+  width: 64rpx;
+  height: 56rpx;
+  border-radius: 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+}
+
+.tabbar-item-active .tabbar-icon-wrap {
+  background: var(--accent-grad);
+  box-shadow: 0 6rpx 16rpx var(--pink-32);
+}
+
+.tabbar-icon {
+  font-size: 30rpx;
+  line-height: 1;
+}
+
+.tabbar-label {
+  font-size: 20rpx;
+  color: var(--text-3);
+  margin-top: 6rpx;
+  font-weight: 500;
+}
+
+.tabbar-item-active .tabbar-label {
+  color: var(--text);
+  font-weight: 600;
+}

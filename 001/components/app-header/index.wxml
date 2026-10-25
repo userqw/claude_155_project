@@ -1,0 +1,11 @@
+<view class="app-header theme-{{theme}}">
+  <view class="app-header-avatar">{{avatar}}</view>
+  <view class="grow">
+    <view class="app-header-title">
+      <text class="app-header-name">{{title}}</text>
+      <text class="app-header-badge">{{badge}}</text>
+    </view>
+    <view class="app-header-sub" wx:if="{{subtitle}}">{{subtitle}}</view>
+  </view>
+  <slot name="action"></slot>
+</view>

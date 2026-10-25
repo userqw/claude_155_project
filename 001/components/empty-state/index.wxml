@@ -1,0 +1,6 @@
+<view class="empty theme-{{theme}}">
+  <view class="empty-icon">{{icon}}</view>
+  <view class="empty-title">{{title}}</view>
+  <view class="empty-sub" wx:if="{{sub}}">{{sub}}</view>
+  <view class="btn btn-ghost btn-sm" wx:if="{{actionText}}" bindtap="onAction">{{actionText}}</view>
+</view>

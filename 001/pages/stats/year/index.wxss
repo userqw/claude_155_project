@@ -1,0 +1,428 @@
+/* 年度统计页 —— 对齐 Stitch 原型的「樱花马卡龙年鉴」样式。
+   所有颜色都走 styles/theme.wxss 的变量，浅色/暗色自动成立。 */
+
+/* -- 年份选择卡片：粉色浅底 -- */
+
+.year-card {
+  background: var(--surface-soft);
+  border-radius: 32rpx;
+  padding: 26rpx 28rpx 24rpx;
+  margin-bottom: 24rpx;
+  box-shadow: var(--shadow-sm);
+}
+
+.year-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.year-nav {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.year-arrow {
+  width: 56rpx;
+  height: 56rpx;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  line-height: 1;
+  color: var(--text-2);
+}
+
+.year-value {
+  display: flex;
+  align-items: center;
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.5rpx;
+  padding: 0 8rpx;
+  white-space: nowrap;
+}
+
+.year-caret {
+  font-size: 24rpx;
+  color: var(--text-3);
+  margin-left: 8rpx;
+}
+
+.year-compare {
+  flex: none;
+  display: flex;
+  align-items: center;
+  padding: 8rpx 20rpx;
+  border-radius: 24rpx;
+  background: var(--accent-grad);
+  color: var(--on-accent);
+  box-shadow: 0 6rpx 14rpx var(--pink-28);
+}
+
+.year-compare-arrow {
+  font-size: 22rpx;
+  margin-right: 8rpx;
+}
+
+.year-compare-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.year-compare-text {
+  font-size: 22rpx;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.year-compare-delta {
+  font-size: 18rpx;
+  opacity: 0.78;
+  line-height: 1.3;
+}
+
+.year-sub {
+  font-size: 22rpx;
+  color: var(--text-3);
+  margin-top: 14rpx;
+  line-height: 1.6;
+}
+
+/* -- 四宫格统计卡 --
+   stat-tile 是自定义组件：宿主节点在父级 flex 里宽度不可控，
+   所以外面包一层 view 定宽，并让宿主节点撑满，两列才真的各占一半。 */
+
+.tiles-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-bottom: 24rpx;
+}
+
+.tile-cell {
+  width: 48.4%;
+  margin-bottom: 20rpx;
+}
+
+.tiles-grid stat-tile {
+  display: block;
+  width: 100%;
+}
+
+/* -- 提示条 -- */
+
+.warn {
+  background: var(--pink-14);
+  border-radius: 24rpx;
+  padding: 18rpx 24rpx;
+  font-size: 22rpx;
+  color: var(--text-2);
+  line-height: 1.6;
+  margin-bottom: 24rpx;
+}
+
+/* -- 区块小标题 -- */
+
+.section-title-sm {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--text);
+  margin: 24rpx 0 8rpx;
+}
+
+.link {
+  font-size: 24rpx;
+  color: var(--text-3);
+  flex: none;
+}
+
+/* -- 表格视图 -- */
+
+.table {
+  margin-top: 12rpx;
+}
+
+.tr {
+  display: flex;
+  align-items: center;
+  padding: 14rpx 0;
+  border-bottom: 1rpx solid var(--border);
+}
+
+.th {
+  color: var(--text-3);
+  font-size: 24rpx;
+}
+
+.td {
+  flex: 1;
+  font-size: 26rpx;
+  color: var(--text-2);
+  display: flex;
+  align-items: center;
+}
+
+.td-shape {
+  margin-left: 10rpx;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.td.num {
+  flex: none;
+  width: 140rpx;
+  text-align: right;
+  color: var(--text);
+}
+
+/* -- 营收数字条 -- */
+
+.money-row {
+  display: flex;
+  margin-top: 20rpx;
+  padding: 24rpx 0;
+  border-radius: 28rpx;
+  background: var(--surface-soft);
+}
+
+.money-cell {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+}
+
+.money-label {
+  font-size: 22rpx;
+  color: var(--text-3);
+  margin-bottom: 8rpx;
+}
+
+.money-value {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.money-strong {
+  color: var(--accent-ink);
+}
+
+.money-unit {
+  font-size: 22rpx;
+  font-weight: 400;
+  color: var(--text-3);
+  margin-left: 6rpx;
+}
+
+/* -- 结缘溢价榜首 -- */
+
+.hero-shape {
+  display: flex;
+  align-items: center;
+  margin-top: 20rpx;
+  padding: 20rpx 24rpx;
+  border-radius: 28rpx;
+  background: var(--sunken);
+}
+
+.hero-shape-icon {
+  width: 64rpx;
+  height: 64rpx;
+  flex: none;
+  border-radius: 50%;
+  background: var(--accent-grad);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  margin-right: 18rpx;
+}
+
+.hero-shape-title {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.hero-shape-sub {
+  font-size: 22rpx;
+  color: var(--text-3);
+  margin-top: 4rpx;
+}
+
+.hero-shape-price {
+  flex: none;
+  margin-left: 16rpx;
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--accent-ink);
+}
+
+.hero-shape-unit {
+  font-size: 20rpx;
+  font-weight: 400;
+  color: var(--text-3);
+  display: block;
+  text-align: right;
+  margin-top: 2rpx;
+}
+
+.sub-block {
+  margin-top: 8rpx;
+}
+
+/* -- 年度代表作掠影：两列卡片 -- */
+
+.work-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-top: 8rpx;
+}
+
+.work {
+  width: 48.5%;
+  margin-bottom: 20rpx;
+  background: var(--sunken);
+  border-radius: 24rpx;
+  overflow: hidden;
+  padding-bottom: 18rpx;
+}
+
+.work-cover {
+  position: relative;
+  width: 100%;
+  height: 260rpx;
+}
+
+.work-img {
+  width: 100%;
+  height: 260rpx;
+  display: block;
+}
+
+.work-img-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 72rpx;
+  background: var(--surface-soft);
+}
+
+.work-flag {
+  position: absolute;
+  top: 14rpx;
+  right: 14rpx;
+  height: 40rpx;
+  line-height: 40rpx;
+  padding: 0 16rpx;
+  border-radius: 20rpx;
+  background: var(--accent-grad);
+  color: var(--on-accent);
+  font-size: 20rpx;
+  font-weight: 600;
+}
+
+.work-title {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--text);
+  margin: 16rpx 20rpx 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.work-shape {
+  display: flex;
+  align-items: center;
+  margin: 10rpx 20rpx 0;
+}
+
+.work-shape-name {
+  font-size: 22rpx;
+  color: var(--text-2);
+  margin-left: 10rpx;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.work-meta {
+  display: flex;
+  align-items: center;
+  margin: 8rpx 20rpx 0;
+  font-size: 22rpx;
+  color: var(--text-3);
+}
+
+.work-dot {
+  margin: 0 8rpx;
+}
+
+/* 数量比耗时更值得看，稍微加重一点 */
+.work-count {
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.work-time {
+  color: var(--text-3);
+}
+
+.work-state {
+  display: inline-flex;
+  align-items: center;
+  height: 36rpx;
+  padding: 0 14rpx;
+  border-radius: 18rpx;
+  background: var(--pink-16);
+  color: var(--pink-text);
+  font-size: 20rpx;
+  font-weight: 600;
+  margin: 12rpx 20rpx 0;
+}
+
+.work-state.sold {
+  background: var(--green-16);
+  color: var(--green-text);
+}
+
+/* -- 快捷入口 -- */
+
+.links {
+  padding: 8rpx 28rpx;
+}
+
+.link-item {
+  display: flex;
+  align-items: center;
+  padding: 26rpx 0;
+  border-bottom: 1rpx solid var(--border);
+}
+
+.link-item:last-child {
+  border-bottom: none;
+}
+
+.link-icon {
+  font-size: 36rpx;
+  margin-right: 20rpx;
+}
+
+.link-text {
+  flex: 1;
+  font-size: 28rpx;
+  color: var(--text);
+}
+
+.link-arrow {
+  font-size: 32rpx;
+  color: var(--text-3);
+}

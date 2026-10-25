@@ -1,0 +1,179 @@
+/* 打卡页：底部提交条常驻，表单区留出空间 */
+.checkin-page {
+  padding-bottom: calc(180rpx + env(safe-area-inset-bottom));
+}
+
+.field {
+  margin-bottom: 32rpx;
+}
+
+.field-label {
+  font-size: 26rpx;
+  color: var(--text-2);
+  margin-bottom: 18rpx;
+  font-weight: 500;
+}
+
+.field-hint {
+  font-size: 22rpx;
+  color: var(--text-3);
+}
+
+.optional {
+  font-size: 22rpx;
+  color: var(--text-3);
+  font-weight: 400;
+  margin-left: 10rpx;
+}
+
+.picker-value {
+  font-size: 28rpx;
+  color: var(--text);
+  background: var(--sunken);
+  border-radius: 24rpx;
+  padding: 18rpx 20rpx;
+}
+
+.arrow {
+  color: var(--text-3);
+  margin-left: 8rpx;
+}
+
+/* 数量 */
+.counter {
+  display: flex;
+  align-items: center;
+  background: var(--sunken);
+  border-radius: 28rpx;
+  padding: 10rpx 16rpx;
+}
+
+.counter-btn {
+  width: 68rpx;
+  height: 68rpx;
+  border-radius: 50%;
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+}
+
+.counter-btn.disabled {
+  opacity: 0.4;
+}
+
+.counter-value {
+  flex: 1;
+  text-align: center;
+  font-size: 56rpx;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.counter-unit {
+  font-size: 24rpx;
+  color: var(--text-3);
+  margin-left: 8rpx;
+  font-weight: 400;
+}
+
+.quick {
+  display: flex;
+  align-items: center;
+  margin-top: 18rpx;
+}
+
+.quick-label {
+  font-size: 22rpx;
+  color: var(--text-3);
+  margin-right: 16rpx;
+}
+
+.quick-item {
+  min-width: 68rpx;
+  height: 56rpx;
+  line-height: 56rpx;
+  text-align: center;
+  border-radius: 28rpx;
+  background: var(--sunken);
+  color: var(--text-2);
+  font-size: 24rpx;
+  margin-right: 14rpx;
+}
+
+.quick-active {
+  background: var(--accent-grad);
+  color: var(--on-accent);
+  font-weight: 600;
+  box-shadow: 0 4rpx 12rpx var(--pink-28);
+}
+
+/* 笔记 */
+.note-input {
+  width: 100%;
+  height: 160rpx;
+  background: var(--sunken);
+  border-radius: 24rpx;
+  padding: 20rpx 24rpx;
+  font-size: 26rpx;
+  color: var(--text);
+  line-height: 1.6;
+  box-sizing: border-box;
+}
+
+.input {
+  width: 100%;
+  height: 84rpx;
+  background: var(--sunken);
+  border-radius: 24rpx;
+  padding: 0 20rpx;
+  font-size: 26rpx;
+  color: var(--text);
+  box-sizing: border-box;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.tag {
+  height: 60rpx;
+  line-height: 60rpx;
+  padding: 0 24rpx;
+  border-radius: 30rpx;
+  background: var(--sunken);
+  color: var(--text-2);
+  font-size: 24rpx;
+  margin: 0 16rpx 16rpx 0;
+}
+
+.tag-active {
+  background: var(--accent-grad);
+  color: var(--on-accent);
+}
+
+/* 常驻底部的提交条 */
+.submit-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  padding: 20rpx 32rpx calc(28rpx + env(safe-area-inset-bottom));
+  background: var(--surface);
+  border-top: 1rpx solid var(--border);
+  box-shadow: 0 -6rpx 24rpx var(--pink-14);
+  z-index: 20;
+}
+
+.submit-delete {
+  margin-right: 20rpx;
+  color: var(--danger);
+  background: transparent;
+  border: 2rpx solid var(--border);
+}

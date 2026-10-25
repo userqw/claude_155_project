@@ -1,0 +1,92 @@
+<view class="page theme-{{theme}}">
+  <view class="card">
+    <view class="row-between">
+      <view class="section-title">分类</view>
+      <text class="section-sub">内置分类可改名，不能删除</text>
+    </view>
+
+    <view class="shape" wx:for="{{shapes}}" wx:key="id">
+      <view class="shape-left" data-id="{{item.id}}" bindtap="onEdit">
+        <view class="shape-icon" style="background:{{item.color}}">
+          <shape-icon
+            theme="{{theme}}"
+            path="{{item.iconPath}}"
+            emoji="{{item.icon}}"
+            size="md"
+          ></shape-icon>
+        </view>
+        <view class="grow">
+          <view class="shape-name">
+            {{item.name}}
+            <text class="builtin" wx:if="{{item.isBuiltin}}">内置</text>
+          </view>
+          <view class="shape-sub">
+            已记录 {{item.used}} 个
+            <text wx:if="{{item.defaultPrice}}">· 默认单价 ¥{{item.defaultPrice}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="shape-actions">
+        <text class="mini" catchtap="onMoveUp" data-id="{{item.id}}">↑</text>
+        <text class="mini" catchtap="onMoveDown" data-id="{{item.id}}">↓</text>
+        <text class="mini danger" catchtap="onDelete" data-id="{{item.id}}">删除</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="btn btn-primary" bindtap="onAdd">+ 新造型</view>
+</view>
+
+<!-- 编辑弹层 -->
+<view wx:if="{{showEditor}}" class="mask" bindtap="onClose">
+  <view class="sheet theme-{{theme}}" catchtap="onClose">
+    <view class="sheet-body">
+      <view class="field">
+        <view class="field-label">名称</view>
+        <input class="input" placeholder="例如：OB11娃头" value="{{form.name}}" bindinput="onName" />
+      </view>
+
+      <view class="field">
+        <view class="field-label">图标</view>
+        <view class="icons">
+          <view
+            class="icon {{form.icon === icon ? 'icon-active' : ''}}"
+            wx:for="{{icons}}"
+            wx:key="*this"
+            wx:for-item="icon"
+            data-icon="{{icon}}"
+            bindtap="onIcon"
+          >{{icon}}</view>
+        </view>
+      </view>
+
+      <view class="field">
+        <view class="field-label">颜色</view>
+        <view class="colors">
+          <view
+            class="color {{form.slot === index ? 'color-active' : ''}}"
+            wx:for="{{palette}}"
+            wx:key="*this"
+            wx:for-item="c"
+            wx:for-index="index"
+            style="background:{{c}}"
+            data-slot="{{index}}"
+            bindtap="onSlot"
+          ></view>
+        </view>
+        <view class="field-sub">颜色跟随分类固定，筛选后不会换色</view>
+      </view>
+
+      <view class="field">
+        <view class="field-label">默认单价<text class="optional">选填，元</text></view>
+        <input class="input" type="digit" placeholder="记录售出时自动带出" value="{{form.defaultPrice}}" bindinput="onPrice" />
+      </view>
+
+      <view class="footer">
+        <view class="btn btn-ghost grow" bindtap="onClose">取消</view>
+        <view class="btn btn-primary grow" bindtap="onSave">保存</view>
+      </view>
+    </view>
+  </view>
+</view>

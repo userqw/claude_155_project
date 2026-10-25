@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "作品详情", 
+  "usingComponents": {
+    "empty-state": "../../../components/empty-state/index", 
+    "shape-icon": "../../../components/shape-icon/index", 
+    "sale-sheet": "../../../components/sale-sheet/index"
+  }
+}

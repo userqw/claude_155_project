@@ -1,0 +1,35 @@
+/**
+ * 全局样式——二次元可爱风 · 樱花马卡龙。
+ *
+ * 主题通过根节点上的 .theme-light / .theme-dark 类切换 CSS 变量。
+ * 小程序不支持 prefers-color-scheme 媒体查询，主题由 JS 读取系统 theme 后
+ * 写到根节点 class 上（app.js initTheme）。
+ *
+ * 主题变量与公共类抽到了 styles/ 下的独立文件：
+ * 自定义组件默认样式隔离，app.wxss 里的规则匹配不到组件内部的节点，
+ * 所以组件必须自己 @import 这两份文件，否则会出现「弹层透明、文字看不清」。
+ */
+
+@import "styles/theme.wxss";
+@import "styles/common.wxss";
+
+page {
+  background: #FFF6F0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-size: 28rpx;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 页面根容器：底色与文字色跟着主题走，
+   组件里的文字默认继承这里的 color，浅色/暗色都不会串 */
+.page {
+  min-height: 100vh;
+  background: var(--page);
+  color: var(--text);
+  padding: 24rpx 24rpx 48rpx;
+  box-sizing: border-box;
+}
+
+.safe-bottom {
+  padding-bottom: calc(48rpx + env(safe-area-inset-bottom));
+}

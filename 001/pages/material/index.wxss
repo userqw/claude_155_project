@@ -1,0 +1,135 @@
+.tabs {
+  display: flex;
+  background: var(--sunken);
+  border-radius: 40rpx;
+  padding: 6rpx;
+  margin-bottom: 24rpx;
+}
+
+.tab {
+  flex: 1;
+  height: 68rpx;
+  line-height: 68rpx;
+  text-align: center;
+  font-size: 28rpx;
+  color: var(--text-2);
+  border-radius: 34rpx;
+}
+
+.tab-active {
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 500;
+}
+
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.folder {
+  width: 216rpx;
+  margin: 0 24rpx 28rpx 0;
+}
+
+.folder-cover {
+  width: 216rpx;
+  height: 216rpx;
+  border-radius: 28rpx;
+  background: var(--sunken);
+  margin-bottom: 12rpx;
+}
+
+.folder-cover-empty,
+.folder-cover-all,
+.folder-cover-unfiled {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.folder-cover-all {
+  background: var(--pink-16);
+}
+
+.folder-cover-unfiled {
+  background: var(--sunken);
+}
+
+.folder-icon {
+  font-size: 56rpx;
+  line-height: 1;
+}
+
+.folder-all-count {
+  font-size: 24rpx;
+  color: var(--text-3);
+  margin-top: 10rpx;
+}
+
+.folder-name {
+  font-size: 26rpx;
+  color: var(--text);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.folder-count {
+  font-size: 22rpx;
+  color: var(--text-3);
+  margin-top: 4rpx;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  background: var(--surface);
+  border-radius: 40rpx;
+  padding: 0 24rpx;
+  margin-bottom: 24rpx;
+}
+
+.search-input {
+  flex: 1;
+  height: 76rpx;
+  font-size: 26rpx;
+  color: var(--text);
+}
+
+.search-clear {
+  font-size: 28rpx;
+  color: var(--text-3);
+  padding: 8rpx;
+}
+
+.grid-materials {
+  margin: 0 -8rpx;
+}
+
+.material {
+  width: 216rpx;
+  margin: 0 8rpx 24rpx 8rpx;
+}
+
+.material-img {
+  width: 216rpx;
+  height: 216rpx;
+  border-radius: 24rpx;
+  background: var(--sunken);
+  display: block;
+}
+
+.material-name {
+  font-size: 22rpx;
+  color: var(--text-2);
+  margin-top: 8rpx;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.add-btn {
+  margin-top: 16rpx;
+}

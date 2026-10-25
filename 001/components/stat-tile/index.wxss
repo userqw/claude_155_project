@@ -1,0 +1,118 @@
+@import "../../styles/theme.wxss";
+
+.tile {
+  flex: 1;
+  min-width: 0;
+  background: var(--surface);
+  border-radius: 28rpx;
+  padding: 24rpx 24rpx 22rpx;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+}
+
+/* 右上角的图标徽章，原型里是彩色圆形 + emoji */
+.tile-icon {
+  position: absolute;
+  top: 20rpx;
+  right: 20rpx;
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  background: var(--sunken);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  line-height: 1;
+}
+
+.tile-label {
+  font-size: 24rpx;
+  color: var(--text-2);
+  margin-bottom: 10rpx;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tile-value-row {
+  display: flex;
+  align-items: baseline;
+}
+
+/* 大号数字用比例数字，不用 tabular-nums（等宽数字在大字号下发散） */
+.tile-value {
+  font-size: 52rpx;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.1;
+  letter-spacing: -1rpx;
+}
+
+.tile-unit {
+  font-size: 24rpx;
+  color: var(--text-3);
+  margin-left: 8rpx;
+}
+
+.tile-sub {
+  font-size: 22rpx;
+  color: var(--text-3);
+  margin-top: 8rpx;
+}
+
+.tile-note {
+  display: flex;
+  align-items: center;
+  margin-top: 12rpx;
+}
+
+.tile-dot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  margin-right: 10rpx;
+  flex: none;
+}
+
+/* 语义色点：走主题变量，浅色/暗色自动切换 */
+.tile-dot-accent {
+  background: var(--accent);
+}
+
+.tile-dot-accent2 {
+  background: var(--accent-2);
+}
+
+.tile-dot-good {
+  background: var(--good);
+}
+
+.tile-dot-danger {
+  background: var(--danger);
+}
+
+.tile-note-text {
+  font-size: 22rpx;
+  color: var(--text-3);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.tile-delta {
+  font-size: 22rpx;
+  margin-top: 8rpx;
+}
+
+.tile-delta.up {
+  color: var(--good);
+}
+
+.tile-delta.down {
+  color: var(--danger);
+}
+
+.tile-delta.flat {
+  color: var(--text-3);
+}

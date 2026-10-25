@@ -1,0 +1,18 @@
+<view class="uploader theme-{{theme}}">
+  <view class="grid">
+    <view class="cell" wx:for="{{photos}}" wx:key="id">
+      <image class="thumb" src="{{item.url}}" mode="aspectFill" bindtap="onPreview" data-url="{{item.url}}"></image>
+      <view class="remove" catchtap="onRemove" data-id="{{item.id}}">✕</view>
+    </view>
+
+    <view class="cell add" wx:if="{{photos.length < max}}" bindtap="onAdd">
+      <view class="add-icon">＋</view>
+      <view class="add-text">添加照片</view>
+    </view>
+  </view>
+
+  <view class="hint" wx:if="{{photos.length < max}}">
+    最多 {{max}} 张，已选 {{photos.length}} 张
+  </view>
+  <view class="hint" wx:elif="{{busy}}">正在处理照片…</view>
+</view>

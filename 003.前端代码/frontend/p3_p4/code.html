@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_tab" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100%;margin:0;padding:0;background-color:#fff8f4;}body{overscroll-behavior-y:none;}.pb-safe{padding-bottom:calc(env(safe-area-inset-bottom,0px) + 5.5rem);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "error": "#ba1a1a", "cat-ob11": "#F68CA1", "chart-gridline": "#F3E7EE", "outline": "#867276", "on-primary-container": "#72223d", "on-secondary": "#ffffff", "cat-chibi": "#55BCFA", "inverse-surface": "#34302c", "surface-bright": "#fff8f4", "heat-tier-2": "#DB99A4", "surface-variant": "#e9e1db", "primary-fixed": "#ffd9e0", "text-tertiary": "#7C6B85", "on-background": "#1e1b18", "secondary-fixed": "#eaddff", "surface-card": "#FFFFFF", "on-surface-variant": "#544246", "on-tertiary-fixed": "#002114", "tertiary-fixed": "#83f9c3", "cat-scale": "#54CB99", "on-primary-fixed-variant": "#7b2944", "on-secondary-fixed-variant": "#513982", "surface-container": "#f5ece6", "secondary-container": "#c6abfd", "tertiary-container": "#46bf8e", "on-error-container": "#93000a", "outline-variant": "#d9c0c5", "error-container": "#ffdad6", "text-secondary": "#64536E", "tertiary-fixed-dim": "#66dca8", "heat-tier-3": "#CE7788", "on-secondary-fixed": "#240554", "heat-tier-4": "#BC586E", "surface": "#fff8f4", "primary": "#99415c", "inverse-on-surface": "#f8efe9", "surface-container-high": "#efe7e1", "on-surface": "#1e1b18", "secondary-fixed-dim": "#d3bbff", "on-error": "#ffffff", "on-secondary-container": "#543b84", "on-tertiary-fixed-variant": "#005137", "secondary": "#69519b", "primary-fixed-dim": "#ffb1c4", "primary-container": "#f58ba8", "surface-dim": "#e1d8d3", "on-primary-fixed": "#3f001a", "surface-container-highest": "#e9e1db", "surface-tint": "#99415c", "heat-tier-1": "#E5BAC1", "surface-container-lowest": "#ffffff", "text-primary": "#4A3A52", "tertiary": "#006c4a", "background": "#fff8f4", "surface-container-low": "#fbf2ec", "on-tertiary": "#ffffff", "cta-text": "#3A2B45", "on-primary": "#ffffff", "cat-other": "#C49BF3", "on-tertiary-container": "#004931", "inverse-primary": "#ffb1c4" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "gutter": "0.75rem", "margin": "1rem", "space-xl": "1.5rem", "space-lg": "1rem", "space-sm": "0.5rem", "space-md": "0.75rem", "space-xs": "0.25rem" }, fontFamily: { "display-stat": ["Plus Jakarta Sans"], "label-sm": ["Plus Jakarta Sans"], "body-lg": ["Plus Jakarta Sans"], "headline-sm": ["Plus Jakarta Sans"], "body-sm": ["Plus Jakarta Sans"], "headline-md": ["Plus Jakarta Sans"], "headline-xl": ["Plus Jakarta Sans"], "label-md": ["Plus Jakarta Sans"], "label-lg": ["Plus Jakarta Sans"], "headline-lg": ["Plus Jakarta Sans"], "body-md": ["Plus Jakarta Sans"] }, fontSize: { "display-stat": ["32px", { "lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "800" }], "label-sm": ["11px", { "lineHeight": "16px", "fontWeight": "500" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "headline-sm": ["16px", { "lineHeight": "24px", "fontWeight": "600" }], "body-sm": ["12px", { "lineHeight": "18px", "fontWeight": "400" }], "headline-md": ["18px", { "lineHeight": "26px", "fontWeight": "600" }], "headline-xl": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700" }], "label-md": ["13px", { "lineHeight": "18px", "fontWeight": "600" }], "label-lg": ["15px", { "lineHeight": "20px", "fontWeight": "600" }], "headline-lg": ["22px", { "lineHeight": "30px", "letterSpacing": "-0.01em", "fontWeight": "700" }], "body-md": ["14px", { "lineHeight": "22px", "fontWeight": "400" }] } } } };</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface text-text-primary min-h-screen flex flex-col font-body-md text-body-md antialiased selection:bg-primary-fixed"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/85 backdrop-blur-xl shadow-[0_4px_20px_rgba(226,150,190,0.12)]"><div class="h-14 px-margin flex items-center justify-between"><div class="flex items-center gap-space-sm"><div class="w-9 h-9 rounded-full bg-primary-container/20 flex items-center justify-center text-primary-container text-body-lg">🌸</div><div class="flex flex-col"><div class="flex items-center gap-space-xs"><h1 class="font-headline-md text-headline-md text-text-primary tracking-tight font-bold">捏土打卡</h1><span class="text-label-sm font-label-sm px-1.5 py-0.5 rounded-full bg-primary-container text-white leading-none">手作</span></div><span class="text-label-sm font-label-sm text-text-tertiary">Sculpture Stats</span></div></div><div class="flex items-center gap-space-sm"><div class="h-8 px-2.5 rounded-full bg-surface-card/90 shadow-[0_2px_8px_rgba(226,150,190,0.18)] flex items-center gap-2"><button class="w-6 h-6 flex items-center justify-center text-text-secondary active:scale-95 transition-transform"><span class="material-symbols-outlined text-[16px]">more_horiz</span></button><div class="w-px h-3.5 bg-outline-variant/50"></div><button class="w-6 h-6 flex items-center justify-center text-text-secondary active:scale-95 transition-transform"><span class="material-symbols-outlined text-[14px]">adjust</span></button></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0 shadow-[0_2px_8px_rgba(245,139,168,0.3)]"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex-1 flex flex-col relative w-full pt-14 pb-safe bg-surface px-margin"><div class="flex flex-col w-full pb-6 space-y-space-md">
+<!-- 1. 年份切换器与年度宏观洞察 -->
+<section class="w-full bg-surface-card rounded-xl p-space-md shadow-[0_8px_28px_rgba(226,150,190,0.16)] flex flex-col gap-space-xs relative overflow-hidden">
+<div class="absolute -right-3 -top-3 w-16 h-16 rounded-full bg-primary-fixed/30 pointer-events-none blur-lg"></div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<button aria-label="上一年" class="w-7 h-7 rounded-full bg-surface-container flex items-center justify-center text-text-secondary active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[18px]">chevron_left</span>
+</button>
+<div class="flex items-center gap-1 px-space-sm py-1 rounded-full bg-surface-container-low active:bg-surface-container transition-colors cursor-pointer">
+<span class="font-headline-sm text-headline-sm text-text-primary font-bold">2026年度手作年鉴 🎀</span>
+<span class="material-symbols-outlined text-text-tertiary text-[16px]">arrow_drop_down</span>
+</div>
+<button aria-label="下一年" class="w-7 h-7 rounded-full bg-surface-container flex items-center justify-center text-text-secondary active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+<div class="flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary-fixed text-primary font-label-sm text-label-sm font-semibold">
+<span class="material-symbols-outlined text-[13px]">trending_up</span>
+<span>对比25年 ↑24%</span>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-text-tertiary px-1">
+      手作者的指尖时光胶囊：记录每一次揉捏、烘烤与落色 ✨
+    </p>
+</section>
+<!-- 2. 四大核心数据看板 (2x2 圆润糖果卡片) -->
+<section class="w-full grid grid-cols-2 gap-space-sm">
+<!-- 今年累计 -->
+<div class="bg-surface-card rounded-xl p-space-md shadow-[0_8px_28px_rgba(226,150,190,0.14)] relative overflow-hidden flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-text-secondary">今年累计捏制</span>
+<span class="w-6 h-6 rounded-full bg-primary-fixed flex items-center justify-center text-[12px]">🧸</span>
+</div>
+<div class="mt-2 flex items-baseline gap-1">
+<span class="font-display-stat text-display-stat text-text-primary tracking-tight">128</span>
+<span class="font-label-sm text-label-sm text-text-tertiary font-bold">个</span>
+</div>
+<div class="mt-1 flex items-center gap-1 font-label-sm text-label-sm text-primary">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+<span>已完成烘烤封层</span>
+</div>
+</div>
+<!-- 制作天数 -->
+<div class="bg-surface-card rounded-xl p-space-md shadow-[0_8px_28px_rgba(226,150,190,0.14)] relative overflow-hidden flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-text-secondary">开工打卡天数</span>
+<span class="w-6 h-6 rounded-full bg-secondary-fixed flex items-center justify-center text-[12px]">🎨</span>
+</div>
+<div class="mt-2 flex items-baseline gap-1">
+<span class="font-display-stat text-display-stat text-text-primary tracking-tight">86</span>
+<span class="font-label-sm text-label-sm text-text-tertiary font-bold">天</span>
+</div>
+<div class="mt-1 flex items-center gap-1 font-label-sm text-label-sm text-secondary">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+<span>最长连打 11 天</span>
+</div>
+</div>
+<!-- 每日平均产出 -->
+<div class="bg-surface-card rounded-xl p-space-md shadow-[0_8px_28px_rgba(226,150,190,0.14)] relative overflow-hidden flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-text-secondary">开工日均产出</span>
+<span class="w-6 h-6 rounded-full bg-tertiary-fixed flex items-center justify-center text-[12px]">⏱️</span>
+</div>
+<div class="mt-2 flex items-baseline gap-1">
+<span class="font-display-stat text-display-stat text-text-primary tracking-tight">1.2</span>
+<span class="font-label-sm text-label-sm text-text-tertiary font-bold">个/打卡天</span>
+</div>
+<div class="mt-1 flex items-center gap-1 font-label-sm text-label-sm text-tertiary">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+<span>手感渐入佳境</span>
+</div>
+</div>
+<!-- 在库待结缘 -->
+<div class="bg-surface-card rounded-xl p-space-md shadow-[0_8px_28px_rgba(226,150,190,0.14)] relative overflow-hidden flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-text-secondary">现货待结缘</span>
+<span class="w-6 h-6 rounded-full bg-primary-fixed-dim/40 flex items-center justify-center text-[12px]">📦</span>
+</div>
+<div class="mt-2 flex items-baseline gap-1">
+<span class="font-display-stat text-display-stat text-text-primary tracking-tight">66</span>
+<span class="font-label-sm text-label-sm text-text-tertiary font-bold">个</span>
+</div>
+<div class="mt-1 flex items-center gap-1 font-label-sm text-label-sm text-text-tertiary">
+<span class="w-1.5 h-1.5 rounded-full bg-outline-variant"></span>
+<span>售罄率 48.4%</span>
+</div>
+</div>
+</section>
+<!-- 3. 分造型统计横向条形图 (PRD §5.2.1) -->
+<section class="w-full bg-surface-card rounded-xl p-space-md shadow-[0_8px_28px_rgba(226,150,190,0.16)] flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="text-body-lg">🧁</span>
+<h2 class="font-headline-sm text-headline-sm text-text-primary font-bold">造型偏好与品类分布</h2>
+</div>
+<button class="flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-container text-text-secondary font-label-sm text-label-sm active:scale-95 transition-transform" id="toggle-chart-view">
+<span class="material-symbols-outlined text-[14px]">table_chart</span>
+<span id="view-mode-label">切换表格</span>
+</button>
+</div>
+<!-- 条形图视图 -->
+<div class="flex flex-col gap-3 pt-1" id="bar-chart-view">
+<!-- 条目 1: OB11娃头 -->
+<div class="flex flex-col gap-1">
+<div class="flex items-center justify-between font-label-md text-label-md">
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-cat-ob11"></span>
+<span class="text-text-primary font-semibold">OB11娃头</span>
+</div>
+<div class="text-text-primary">
+<span class="font-bold">58</span>
+<span class="text-text-tertiary font-body-sm text-body-sm font-normal">个 (45.3%)</span>
+</div>
+</div>
+<div class="w-full h-3 rounded-full bg-chart-gridline overflow-hidden">
+<div class="h-full rounded-full bg-cat-ob11 transition-all duration-700" style="width: 45.3%;"></div>
+</div>
+</div>
+<!-- 条目 2: QQ人 -->
+<div class="flex flex-col gap-1">
+<div class="flex items-center justify-between font-label-md text-label-md">
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-cat-chibi"></span>
+<span class="text-text-primary font-semibold">QQ人/粘土人</span>
+</div>
+<div class="text-text-primary">
+<span class="font-bold">42</span>
+<span class="text-text-tertiary font-body-sm text-body-sm font-normal">个 (32.8%)</span>
+</div>
+</div>
+<div class="w-full h-3 rounded-full bg-chart-gridline overflow-hidden">
+<div class="h-full rounded-full bg-cat-chibi transition-all duration-700" style="width: 32.8%;"></div>
+</div>
+</div>
+<!-- 条目 3: 正比 -->
+<div class="flex flex-col gap-1">
+<div class="flex items-center justify-between font-label-md text-label-md">
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-cat-scale"></span>
+<span class="text-text-primary font-semibold">正比手办/景品</span>
+</div>
+<div class="text-text-primary">
+<span class="font-bold">20</span>
+<span class="text-text-tertiary font-body-sm text-body-sm font-normal">个 (15.6%)</span>
+</div>
+</div>
+<div class="w-full h-3 rounded-full bg-chart-gridline overflow-hidden">
+<div class="h-full rounded-full bg-cat-scale transition-all duration-700" style="width: 15.6%;"></div>
+</div>
+</div>
+<!-- 条目 4: 其他 -->
+<div class="flex flex-col gap-1">
+<div class="flex items-center justify-between font-label-md text-label-md">
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-cat-other"></span>
+<span class="text-text-primary font-semibold">配件/场景/其他</span>
+</div>
+<div class="text-text-primary">
+<span class="font-bold">8</span>
+<span class="text-text-tertiary font-body-sm text-body-sm font-normal">个 (6.3%)</span>
+</div>
+</div>
+<div class="w-full h-3 rounded-full bg-chart-gridline overflow-hidden">
+<div class="h-full rounded-full bg-cat-other transition-all duration-700" style="width: 6.3%;"></div>
+</div>
+</div>
+</div>
+<!-- 表格无障碍替代视图 (初始隐藏) -->
+<div class="hidden flex-col gap-2 pt-1" id="table-alt-view">
+<div class="w-full rounded-lg bg-surface-container-low p-space-sm">
+<div class="grid grid-cols-3 font-label-sm text-label-sm text-text-tertiary pb-1">
+<span>造型类别</span>
+<span class="text-center">累计产量</span>
+<span class="text-right">占比份额</span>
+</div>
+<div class="flex flex-col divide-none gap-1 font-body-sm text-body-sm text-text-primary">
+<div class="grid grid-cols-3 py-1">
+<span class="font-semibold text-cat-ob11">OB11娃头</span>
+<span class="text-center">58 个</span>
+<span class="text-right font-bold">45.3%</span>
+</div>
+<div class="grid grid-cols-3 py-1">
+<span class="font-semibold text-cat-chibi">QQ人</span>
+<span class="text-center">42 个</span>
+<span class="text-right font-bold">32.8%</span>
+</div>
+<div class="grid grid-cols-3 py-1">
+<span class="font-semibold text-cat-scale">正比</span>
+<span class="text-center">20 个</span>
+<span class="text-right font-bold">15.6%</span>
+</div>
+<div class="grid grid-cols-3 py-1">
+<span class="font-semibold text-cat-other">其他</span>
+<span class="text-center">8 个</span>
+<span class="text-right font-bold">6.3%</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 4. 年度打卡热力图 (PRD §5.2.2 单一色相樱粉色阶) -->
+<section class="w-full bg-surface-card rounded-xl p-space-md shadow-[0_8px_28px_rgba(226,150,190,0.16)] flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="text-body-lg">🌸</span>
+<div class="flex flex-col">
+<h2 class="font-headline-sm text-headline-sm text-text-primary font-bold leading-tight">手作热力日历</h2>
+<span class="font-label-sm text-label-sm text-text-tertiary">连续捏土激发连击 🔥</span>
+</div>
+</div>
+<div class="flex items-center gap-1 font-label-sm text-label-sm text-text-secondary bg-surface-container px-2 py-1 rounded-full">
+<span>连打纪录</span>
+<span class="font-bold text-primary">11 天</span>
+</div>
+</div>
+<!-- 月份标签与周几标识 -->
+<div class="w-full flex items-center justify-between text-label-sm font-label-sm text-text-tertiary px-1">
+<span>1月</span>
+<span>3月</span>
+<span>5月</span>
+<span>7月</span>
+<span>9月</span>
+<span>11月</span>
+</div>
+<!-- 迷你紧凑型年度热力网格示意 (横向滚动或紧凑16列阵列) -->
+<div class="w-full overflow-x-auto pb-1">
+<div class="inline-grid grid-rows-7 grid-flow-col gap-1 min-w-[320px]">
+<!-- 样例网格方块 (采用PRD标准樱粉4级色阶) -->
+<!-- 第1列 -->
+<div class="w-3.5 h-3.5 rounded-[3px] bg-chart-gridline/50"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-1"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-2"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-chart-gridline/50"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-3"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-4 flex items-center justify-center text-[7px] text-white font-bold">🔥</div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-2"></div>
+<!-- 第2列 -->
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-1"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-chart-gridline/50"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-chart-gridline/50"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-3"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-4 flex items-center justify-center text-[7px] text-white font-bold">🔥</div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-4"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-1"></div>
+<!-- 第3列 -->
+<div class="w-3.5 h-3.5 rounded-[3px] bg-chart-gridline/50"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-2"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-1"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-3"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-chart-gridline/50"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-2"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-3"></div>
+<!-- 第4列 -->
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-4 flex items-center justify-center text-[7px] text-white font-bold">🔥</div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-3"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-2"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-1"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-chart-gridline/50"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-chart-gridline/50"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-1"></div>
+<!-- 第5列 -->
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-2"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-2"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-3"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-chart-gridline/50"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-chart-gridline/50"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-1"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-chart-gridline/50"></div>
+<!-- 第6列 -->
+<div class="w-3.5 h-3.5 rounded-[3px] bg-chart-gridline/50"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-1"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-4 flex items-center justify-center text-[7px] text-white font-bold">🔥</div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-3"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-2"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-1"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-chart-gridline/50"></div>
+<!-- 第7列 -->
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-1"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-2"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-chart-gridline/50"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-3"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-4"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-4 flex items-center justify-center text-[7px] text-white font-bold">🔥</div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-2"></div>
+<!-- 第8列 -->
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-1"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-chart-gridline/50"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-2"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-1"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-3"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-2"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-1"></div>
+<!-- 第9列 -->
+<div class="w-3.5 h-3.5 rounded-[3px] bg-chart-gridline/50"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-1"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-2"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-3"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-4"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-3"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-1"></div>
+<!-- 第10列 -->
+<div class="w-3.5 h-3.5 rounded-[3px] bg-chart-gridline/50"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-1"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-chart-gridline/50"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-2"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-3"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-2"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-1"></div>
+<!-- 第11列 -->
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-2"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-3"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-4 flex items-center justify-center text-[7px] text-white font-bold">🔥</div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-4"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-chart-gridline/50"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-1"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-chart-gridline/50"></div>
+<!-- 第12列 (本周) -->
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-2"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-3"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-4 flex items-center justify-center text-[7px] text-white font-bold">🔥</div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-chart-gridline/50"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-heat-tier-1"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-chart-gridline/50"></div>
+<div class="w-3.5 h-3.5 rounded-[3px] bg-chart-gridline/50"></div>
+</div>
+</div>
+<!-- 色阶图例 -->
+<div class="flex items-center justify-between pt-1">
+<span class="font-label-sm text-label-sm text-text-tertiary">休养蓄力 (0件)</span>
+<div class="flex items-center gap-1.5">
+<span class="w-3 h-3 rounded-[3px] bg-chart-gridline/60"></span>
+<span class="w-3 h-3 rounded-[3px] bg-heat-tier-1"></span>
+<span class="w-3 h-3 rounded-[3px] bg-heat-tier-2"></span>
+<span class="w-3 h-3 rounded-[3px] bg-heat-tier-3"></span>
+<span class="w-3 h-3 rounded-[3px] bg-heat-tier-4"></span>
+</div>
+<span class="font-label-sm text-label-sm text-text-tertiary">火力全开 (3件+)</span>
+</div>
+</section>
+<!-- 5. 营收与销售渠道看板 (PRD §5.2.3) -->
+<section class="w-full bg-surface-card rounded-xl p-space-md shadow-[0_8px_28px_rgba(226,150,190,0.16)] flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="text-body-lg">💸</span>
+<h2 class="font-headline-sm text-headline-sm text-text-primary font-bold">作品结缘与营收</h2>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-label-sm text-label-sm font-semibold">自给自足中</span>
+</div>
+<!-- 营收核心三元组 -->
+<div class="grid grid-cols-3 gap-2 bg-surface-container-low rounded-lg p-space-sm text-center">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-text-tertiary">累计结缘金</span>
+<span class="font-headline-md text-headline-md text-primary font-bold mt-0.5">¥3,860</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-text-tertiary">已结缘数量</span>
+<span class="font-headline-md text-headline-md text-text-primary font-bold mt-0.5">62 个</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-text-tertiary">单件平均价</span>
+<span class="font-headline-md text-headline-md text-text-primary font-bold mt-0.5">¥62.3</span>
+</div>
+</div>
+<!-- 最赚钱榜首高光卡片 -->
+<div class="flex items-center justify-between bg-primary-fixed/40 rounded-lg px-space-md py-space-sm">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-primary-container text-white flex items-center justify-center font-bold text-body-sm">
+          👑
+        </div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-text-primary font-bold">结缘溢价榜首：OB11娃头</span>
+<span class="font-label-sm text-label-sm text-text-secondary">精致面部雕刻与磁吸后发极受喜爱</span>
+</div>
+</div>
+<div class="text-right">
+<span class="font-headline-sm text-headline-sm text-primary font-extrabold">¥85</span>
+<span class="font-label-sm text-label-sm text-text-tertiary block">/个均价</span>
+</div>
+</div>
+<!-- 渠道分布胶囊进度条 -->
+<div class="flex flex-col gap-2">
+<div class="flex items-center justify-between font-label-md text-label-md">
+<span class="text-text-primary font-semibold">结缘渠道来源构成</span>
+<span class="text-text-tertiary font-label-sm text-label-sm">4大主要通路</span>
+</div>
+<!-- 多段复合彩色进度条 -->
+<div class="w-full h-3.5 rounded-full overflow-hidden flex bg-chart-gridline">
+<div class="h-full bg-cat-ob11" style="width: 48%;" title="小红书 48%"></div>
+<div class="h-full bg-cat-chibi" style="width: 32%;" title="闲鱼 32%"></div>
+<div class="h-full bg-cat-scale" style="width: 15%;" title="微信好友 15%"></div>
+<div class="h-full bg-cat-other" style="width: 5%;" title="线下市集 5%"></div>
+</div>
+<!-- 渠道图例数值 -->
+<div class="grid grid-cols-2 gap-2 pt-1 font-body-sm text-body-sm">
+<div class="flex items-center justify-between bg-surface-container-low px-2.5 py-1.5 rounded-lg">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-cat-ob11"></span>
+<span class="text-text-secondary">小红书主页</span>
+</div>
+<span class="font-bold text-text-primary">48%</span>
+</div>
+<div class="flex items-center justify-between bg-surface-container-low px-2.5 py-1.5 rounded-lg">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-cat-chibi"></span>
+<span class="text-text-secondary">闲鱼手作坛</span>
+</div>
+<span class="font-bold text-text-primary">32%</span>
+</div>
+<div class="flex items-center justify-between bg-surface-container-low px-2.5 py-1.5 rounded-lg">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-cat-scale"></span>
+<span class="text-text-secondary">微信同好结缘</span>
+</div>
+<span class="font-bold text-text-primary">15%</span>
+</div>
+<div class="flex items-center justify-between bg-surface-container-low px-2.5 py-1.5 rounded-lg">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-cat-other"></span>
+<span class="text-text-secondary">线下手作市集</span>
+</div>
+<span class="font-bold text-text-primary">5%</span>
+</div>
+</div>
+</div>
+</section>
+<!-- 6. 灵感与年鉴手作剪影掠影 -->
+<section class="w-full bg-surface-card rounded-xl p-space-md shadow-[0_8px_28px_rgba(226,150,190,0.16)] flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="text-body-lg">🌷</span>
+<h2 class="font-headline-sm text-headline-sm text-text-primary font-bold">年度代表作掠影</h2>
+</div>
+<span class="font-label-sm text-label-sm text-primary font-semibold">点赞收藏 Top 2</span>
+</div>
+<div class="grid grid-cols-2 gap-space-sm">
+<div class="rounded-lg overflow-hidden flex flex-col bg-surface-container-low">
+<div class="relative w-full h-28 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Chibi anime miniature clay head handmade doll with pink hair and detailed eyelashes, macro photography on wooden craft desk, soft studio lighting, macaron pastel colors" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5Sh-ClXVY_7fmYvCrBrkXMZUMJ8NpGEAE3FsD_WnNTDzg6h1HIxbCii79pBA47LLexK0t8kzYqpXVFGW9glT_4_LUS6VDa8yXFOTrIwLxBQtezf3c-XeldhtjjC2ZGMG1O7TeZ5I_y3PmP6vZTUfiPrW2CGMCW3g9zvKS7lYem254MkZu48b-1Vjm3Or4Yw-0UjA4sCI1CQqs-X77sw2OxdG2SRZNPikNhalsFA"/>
+<span class="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-full bg-surface-card/90 font-label-sm text-label-sm text-primary font-bold">
+            人气王
+          </span>
+</div>
+<div class="p-2 flex flex-col">
+<span class="font-label-md text-label-md text-text-primary font-bold truncate">樱落·OB11定制娃头</span>
+<span class="font-label-sm text-label-sm text-text-tertiary">耗时 8.5h · 已结缘</span>
+</div>
+</div>
+<div class="rounded-lg overflow-hidden flex flex-col bg-surface-container-low">
+<div class="relative w-full h-28 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Handcrafted miniature clay figurine of fantasy cat girl sitting on macaron cake, smooth cured polymer surface, pastel blue and lavender accents, warm ambient light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDBdYVsb21FTL9hNwXi_ELtuTY-8u3kKW2KQuY4zLYrHkBmKqdHbUx_8uHiM_B2nkFsqkesM1Xr1UPSLyUCSDe1LSpU7blVqNcTimh_xzLhbSfqpihNme8ISjpIKDEXDo4lcoIPPzcsC6xJKJunaN3_TVydyBvzywmpf9q9QLViGOhAppDQAYuFMofELLtdTaxID7mlxqJJ1nIx6VZNJ2lJcPiGTSGOCcAmw02nfQ"/>
+<span class="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-full bg-surface-card/90 font-label-sm text-label-sm text-text-secondary font-bold">
+            典藏版
+          </span>
+</div>
+<div class="p-2 flex flex-col">
+<span class="font-label-md text-label-md text-text-primary font-bold truncate">薄荷汽水·QQ小兽耳</span>
+<span class="font-label-sm text-label-sm text-text-tertiary">耗时 6.0h · 展出中</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+<script>
+  // 简易视图切换微交互
+  (function() {
+    const toggleBtn = document.getElementById('toggle-chart-view');
+    const barView = document.getElementById('bar-chart-view');
+    const tableView = document.getElementById('table-alt-view');
+    const label = document.getElementById('view-mode-label');
+
+    if (toggleBtn && barView && tableView && label) {
+      let isTable = false;
+      toggleBtn.addEventListener('click', function() {
+        isTable = !isTable;
+        if (isTable) {
+          barView.classList.add('hidden');
+          tableView.classList.remove('hidden');
+          tableView.classList.add('flex');
+          label.textContent = '看条形图';
+        } else {
+          tableView.classList.add('hidden');
+          tableView.classList.remove('flex');
+          barView.classList.remove('hidden');
+          label.textContent = '切换表格';
+        }
+      });
+    }
+  })();
+</script></main><nav class="fixed bottom-0 w-full z-50 px-margin pb-4 pointer-events-none" data-active-classes="text-cta-text font-label-md font-bold scale-105 bg-gradient-to-r from-primary-fixed via-primary-container/40 to-secondary-container/40 shadow-[0_4px_16px_rgba(245,139,168,0.25)]"><div class="max-w-md mx-auto h-16 rounded-full bg-surface-card/90 backdrop-blur-xl shadow-[0_8px_28px_rgba(226,150,190,0.22)] px-2 flex items-center justify-around pointer-events-auto"><a class="flex flex-col items-center justify-center py-1 px-3 rounded-full min-w-[56px] text-text-secondary transition-all duration-200 active:scale-95" data-path="home-log" href="#"><span class="material-symbols-outlined text-[22px]">cottage</span><span class="text-label-sm font-label-sm mt-0.5">小屋</span></a><a aria-current="page" class="flex flex-col items-center justify-center py-1 px-3 rounded-full min-w-[56px] transition-all duration-200 text-cta-text font-label-md font-bold scale-105 bg-gradient-to-r from-primary-fixed via-primary-container/40 to-secondary-container/40 shadow-[0_4px_16px_rgba(245,139,168,0.25)]" data-path="sculpture-stats" href="#"><span class="material-symbols-outlined text-[22px]">auto_graph</span><span class="text-label-sm font-label-sm mt-0.5">年鉴</span></a><a class="flex flex-col items-center justify-center py-1 px-3 rounded-full min-w-[56px] text-text-secondary transition-all duration-200 active:scale-95" data-path="gallery-library" href="#"><span class="material-symbols-outlined text-[22px]">view_quilt</span><span class="text-label-sm font-label-sm mt-0.5">作品库</span></a><a class="flex flex-col items-center justify-center py-1 px-3 rounded-full min-w-[56px] text-text-secondary transition-all duration-200 active:scale-95" data-path="crafter-profile" href="#"><span class="material-symbols-outlined text-[22px]">face_3</span><span class="text-label-sm font-label-sm mt-0.5">我的</span></a></div></nav></body></html>

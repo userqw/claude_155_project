@@ -1,0 +1,300 @@
+/* 搜索 */
+.search {
+  display: flex;
+  align-items: center;
+  background: var(--surface);
+  border-radius: 44rpx;
+  padding: 0 24rpx;
+  margin-bottom: 24rpx;
+  box-shadow: var(--shadow-sm);
+}
+
+.search-icon {
+  font-size: 26rpx;
+  margin-right: 12rpx;
+}
+
+.search-input {
+  flex: 1;
+  height: 84rpx;
+  font-size: 26rpx;
+  color: var(--text);
+}
+
+.search-clear {
+  font-size: 28rpx;
+  color: var(--text-3);
+  padding: 8rpx;
+}
+
+/* 造型筛选 */
+.chips {
+  white-space: nowrap;
+  margin-bottom: 20rpx;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  height: 64rpx;
+  padding: 0 22rpx;
+  border-radius: 32rpx;
+  background: var(--surface);
+  color: var(--text-2);
+  font-size: 24rpx;
+  margin-right: 14rpx;
+  border: 2rpx solid transparent;
+  box-sizing: border-box;
+}
+
+.chip-active {
+  background: var(--accent-grad);
+  color: var(--on-accent);
+  font-weight: 600;
+  border-color: transparent;
+}
+
+.chip-dot {
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  margin-right: 10rpx;
+  flex: none;
+}
+
+.chip-count {
+  margin-left: 10rpx;
+  font-size: 22rpx;
+  opacity: 0.7;
+}
+
+/* 库存状态 + 排序 */
+.filter-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+}
+
+.segmented {
+  display: flex;
+  background: var(--sunken);
+  border-radius: 34rpx;
+  padding: 5rpx;
+}
+
+.seg {
+  height: 56rpx;
+  line-height: 56rpx;
+  padding: 0 22rpx;
+  border-radius: 28rpx;
+  font-size: 23rpx;
+  color: var(--text-2);
+}
+
+.seg-active {
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+}
+
+.sort {
+  display: flex;
+  align-items: center;
+  font-size: 24rpx;
+  color: var(--text-2);
+  background: var(--surface);
+  border-radius: 30rpx;
+  padding: 12rpx 22rpx;
+}
+
+.sort-icon {
+  color: var(--accent);
+  margin-right: 8rpx;
+}
+
+.sort-caret {
+  color: var(--text-3);
+  margin-left: 6rpx;
+  font-size: 20rpx;
+}
+
+.count-line {
+  font-size: 24rpx;
+  color: var(--text-2);
+  margin-bottom: 20rpx;
+}
+
+.count-line-emoji {
+  margin-right: 8rpx;
+}
+
+/* 瀑布流 */
+.waterfall {
+  display: flex;
+  align-items: flex-start;
+}
+
+.col {
+  flex: 1;
+  min-width: 0;
+}
+
+.col:first-child {
+  margin-right: 20rpx;
+}
+
+.item {
+  margin-bottom: 24rpx;
+  background: var(--surface);
+  border-radius: 28rpx;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.cover-wrap {
+  position: relative;
+}
+
+.cover {
+  width: 100%;
+  height: 320rpx;
+  display: block;
+  background: var(--sunken);
+  border-radius: 28rpx 28rpx 0 0;
+}
+
+.cover-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 60rpx;
+}
+
+/* 图片上的浮层：分类角标、状态角标、价格、件数 */
+.cover-tag {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  height: 40rpx;
+  padding: 0 14rpx;
+  border-radius: 20rpx;
+  font-size: 20rpx;
+  font-weight: 600;
+  color: var(--on-inverse);
+  line-height: 1;
+}
+
+.cover-tag-left {
+  left: 14rpx;
+  top: 14rpx;
+  gap: 6rpx;
+}
+
+.cover-tag-right {
+  right: 14rpx;
+  bottom: 14rpx;
+  background: var(--glass);
+  color: var(--text);
+}
+
+.cover-price {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--glass);
+  border-radius: 40rpx;
+  padding: 12rpx 26rpx;
+  font-size: 24rpx;
+  font-weight: 700;
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+  white-space: nowrap;
+}
+
+/* 状态角标挂在图片右上。
+   注意：自定义组件有样式隔离，父级样式选择器打不进组件内部，
+   所以用一层定位容器把 badge 包起来。 */
+.cover-status {
+  position: absolute;
+  right: 14rpx;
+  top: 14rpx;
+}
+
+.item-body {
+  padding: 18rpx 20rpx 20rpx;
+}
+
+.item-title-row {
+  display: flex;
+  align-items: center;
+}
+
+.item-title {
+  flex: 1;
+  font-size: 27rpx;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.item-heart {
+  font-size: 30rpx;
+  color: var(--accent);
+  margin-left: 12rpx;
+}
+
+.item-desc {
+  font-size: 22rpx;
+  color: var(--text-2);
+  margin-top: 6rpx;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.item-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12rpx;
+}
+
+.item-date {
+  font-size: 21rpx;
+  color: var(--text-3);
+}
+
+.item-price {
+  font-size: 26rpx;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* 到底 */
+.end {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 32rpx 0 8rpx;
+}
+
+.end-line {
+  flex: 1;
+  height: 1rpx;
+  background: var(--border);
+}
+
+.end-text {
+  font-size: 22rpx;
+  color: var(--text-3);
+  margin: 0 20rpx;
+}
+
+.add-btn {
+  margin-top: 16rpx;
+}

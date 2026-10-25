@@ -1,0 +1,61 @@
+.counts {
+  display: flex;
+  margin-top: 20rpx;
+}
+
+.count-box {
+  flex: 1;
+}
+
+.count-value {
+  display: block;
+  font-size: 44rpx;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.1;
+}
+
+.count-label {
+  font-size: 22rpx;
+  color: var(--text-3);
+}
+
+.opt {
+  display: flex;
+  align-items: center;
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid var(--border);
+}
+
+.opt:last-child {
+  border-bottom: none;
+}
+
+.opt-icon {
+  font-size: 36rpx;
+  margin-right: 20rpx;
+}
+
+.opt-title {
+  font-size: 28rpx;
+  color: var(--text);
+}
+
+.opt-sub {
+  font-size: 22rpx;
+  color: var(--text-3);
+  margin-top: 4rpx;
+  line-height: 1.5;
+}
+
+.opt-arrow {
+  font-size: 32rpx;
+  color: var(--text-3);
+}
+
+.tip {
+  font-size: 22rpx;
+  color: var(--text-3);
+  line-height: 1.7;
+  padding: 8rpx 8rpx 24rpx;
+}

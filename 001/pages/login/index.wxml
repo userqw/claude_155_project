@@ -1,0 +1,58 @@
+<view class="page theme-{{theme}}">
+  <view class="head">
+    <view class="logo-badge">🎨</view>
+    <view class="title">捏土打卡</view>
+    <view class="subtitle">让记录跟着你走 🌸</view>
+  </view>
+
+  <view class="card">
+    <!-- 头像：chooseAvatar 由用户主动点击拉起微信头像选择 -->
+    <view class="avatar-row">
+      <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+        <image wx:if="{{avatarUrl}}" class="avatar-img" src="{{avatarUrl}}" mode="aspectFill"></image>
+        <text wx:else class="avatar-placeholder">选头像</text>
+      </button>
+      <view class="avatar-tip">点击设置头像<text wx:if="{{!avatarUrl}}">（选填）</text></view>
+    </view>
+
+    <!-- 昵称：type="nickname" 组件 -->
+    <view class="field">
+      <view class="field-label">昵称<text class="optional">选填</text></view>
+      <input
+        class="input"
+        type="nickname"
+        placeholder="怎么称呼你"
+        value="{{nickname}}"
+        bindinput="onNicknameInput"
+        bindblur="onNicknameInput"
+      />
+    </view>
+
+    <view class="warn" wx:if="{{errorMessage}}">{{errorMessage}}</view>
+
+    <view class="btn btn-primary login-btn {{loading ? 'btn-disabled' : ''}}" bindtap="onLogin">
+      {{loading ? '处理中…' : (alreadyLoggedIn ? '保存资料' : '微信一键登录')}}
+    </view>
+
+    <!-- 跳过：任何状态下都可用，不把用户堵死在登录页 -->
+    <view class="skip" bindtap="onSkip">{{alreadyLoggedIn ? '返回' : '先随便看看'}}</view>
+
+    <view class="agreed">
+      <view class="check {{agreed ? 'check-on' : ''}}" bindtap="onToggleAgree">
+        <text wx:if="{{agreed}}">✓</text>
+      </view>
+      <text class="agreed-text" bindtap="onToggleAgree">我已阅读并同意</text>
+      <text class="link" data-type="terms" bindtap="onShowPolicy">《用户协议》</text>
+      <text class="link" data-type="privacy" bindtap="onShowPolicy">《隐私政策》</text>
+    </view>
+
+    <view class="note">
+      不收集手机号，不做实名。登录只是为了让记录能自动备份到云端，
+      不登录也能完整使用这个小程序。
+    </view>
+  </view>
+
+  <view class="dev-entry" wx:if="{{devVisible}}">
+    <text class="dev-text" bindtap="onDevLogin">开发者模式（本地模拟登录，仅供预览界面）</text>
+  </view>
+</view>

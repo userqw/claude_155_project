@@ -1,0 +1,169 @@
+.shape {
+  display: flex;
+  align-items: center;
+  padding: 22rpx 0;
+  border-bottom: 1rpx solid var(--border);
+}
+
+.shape:last-child {
+  border-bottom: none;
+}
+
+.shape-left {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.shape-icon {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+  margin-right: 20rpx;
+  flex: none;
+}
+
+.shape-name {
+  font-size: 28rpx;
+  color: var(--text);
+}
+
+.builtin {
+  font-size: 20rpx;
+  color: var(--text-3);
+  border: 1rpx solid var(--border);
+  border-radius: 6rpx;
+  padding: 2rpx 10rpx;
+  margin-left: 12rpx;
+}
+
+.shape-sub {
+  font-size: 22rpx;
+  color: var(--text-3);
+  margin-top: 4rpx;
+}
+
+.shape-actions {
+  display: flex;
+  align-items: center;
+}
+
+.mini {
+  font-size: 24rpx;
+  color: var(--text-3);
+  padding: 12rpx 14rpx;
+}
+
+.mini.danger {
+  color: var(--danger);
+}
+
+.mask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: var(--mask);
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+}
+
+.sheet {
+  width: 100%;
+  background: var(--surface);
+  border-radius: 28rpx 28rpx 0 0;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.sheet-body {
+  padding: 32rpx 32rpx 28rpx;
+  max-height: 84vh;
+}
+
+.field {
+  margin-bottom: 28rpx;
+}
+
+.field-label {
+  font-size: 26rpx;
+  color: var(--text-2);
+  margin-bottom: 16rpx;
+  font-weight: 500;
+}
+
+.field-sub {
+  font-size: 22rpx;
+  color: var(--text-3);
+  margin-top: 12rpx;
+}
+
+.optional {
+  font-size: 22rpx;
+  color: var(--text-3);
+  font-weight: 400;
+  margin-left: 10rpx;
+}
+
+.input {
+  width: 100%;
+  height: 84rpx;
+  background: var(--sunken);
+  border-radius: 12rpx;
+  padding: 0 20rpx;
+  font-size: 26rpx;
+  color: var(--text);
+  box-sizing: border-box;
+}
+
+.icons {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.icon {
+  width: 80rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  text-align: center;
+  font-size: 40rpx;
+  border-radius: 12rpx;
+  margin: 0 16rpx 16rpx 0;
+  background: var(--sunken);
+}
+
+.icon-active {
+  background: var(--accent-grad);
+}
+
+.colors {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.color {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  margin: 0 20rpx 20rpx 0;
+  border: 4rpx solid transparent;
+  box-sizing: border-box;
+}
+
+.color-active {
+  border-color: var(--accent);
+}
+
+.footer {
+  display: flex;
+}
+
+.footer .btn:first-child {
+  margin-right: 20rpx;
+}

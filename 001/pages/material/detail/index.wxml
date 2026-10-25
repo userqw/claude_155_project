@@ -1,0 +1,33 @@
+<view class="page theme-{{theme}}" wx:if="{{material}}">
+  <view class="gallery">
+    <image class="photo" src="{{material.url}}" mode="aspectFit" bindtap="onPreview"></image>
+  </view>
+
+  <view class="card">
+    <view class="field">
+      <view class="field-label">名称</view>
+      <input class="input" placeholder="给素材起个名，比如「暖橘色」" value="{{name}}" bindinput="onName" />
+    </view>
+
+    <view class="field">
+      <view class="field-label">备注<text class="optional">选填</text></view>
+      <textarea class="textarea" placeholder="在哪买的、什么牌子的土…" maxlength="100" value="{{note}}" bindinput="onNote"></textarea>
+    </view>
+
+    <view class="field">
+      <view class="field-label">所属文件夹</view>
+      <picker mode="selector" range="{{folderNames}}" value="{{folderIndex}}" bindchange="onFolderChange">
+        <view class="picker-value">{{material.folderName}} <text class="arrow">›</text></view>
+      </picker>
+    </view>
+  </view>
+
+  <view class="card actions">
+    <view class="btn btn-ghost grow" bindtap="onSave">保存修改</view>
+    <view class="btn btn-outline danger grow" bindtap="onDelete">删除素材</view>
+  </view>
+</view>
+
+<view class="page theme-{{theme}}" wx:else>
+  <empty-state theme="{{theme}}" icon="🔍" title="素材不存在" sub="它可能已经被删除了"></empty-state>
+</view>

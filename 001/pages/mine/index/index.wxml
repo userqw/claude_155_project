@@ -1,0 +1,181 @@
+<view class="page page-tabbed theme-{{theme}}">
+  <app-header
+    theme="{{theme}}"
+    title="捏土打卡"
+    badge="手作"
+    subtitle="手作工坊"
+    avatar="🌷"
+  ></app-header>
+
+  <!-- 身份卡 -->
+  <view class="card profile">
+    <view class="profile-top">
+      <view class="profile-avatar">
+        <image wx:if="{{loggedIn && account.avatarUrl}}" src="{{account.avatarUrl}}" mode="aspectFill"></image>
+        <text wx:else>🎀</text>
+      </view>
+      <view class="grow">
+        <view class="profile-name-row">
+          <text class="profile-name">{{displayName}}</text>
+          <text class="profile-pill">{{loggedIn ? '微信账号' : '未登录访客'}}</text>
+        </view>
+        <view class="profile-code">工匠编号 #{{craftCode}}</view>
+      </view>
+    </view>
+
+    <view class="profile-strip">
+      <text class="strip-item">📱 数据安全保存在本机中</text>
+      <text class="strip-item">📱 随时可使用全部本地功能</text>
+    </view>
+
+    <view class="btn btn-primary profile-cta" wx:if="{{!loggedIn}}" bindtap="goLogin">
+      🎀 微信一键登录 / 云端备份
+    </view>
+    <view class="btn btn-ghost profile-cta" wx:else bindtap="goAccount">
+      🎀 查看账号设置
+    </view>
+    <view class="profile-cta-hint" wx:if="{{!loggedIn}}">换手机不丢数据</view>
+  </view>
+
+  <!-- 素材库 -->
+  <view class="card material-card" bindtap="goMaterial">
+    <view class="row-between">
+      <view class="section-title">📁 素材库 · 灵感参考</view>
+      <text class="arrow">›</text>
+    </view>
+    <view class="section-sub">配色灵感、粘土包装、教程截图，都能收在这里</view>
+
+    <view class="material-previews">
+      <view class="preview" wx:for="{{materialPreviews}}" wx:key="id">
+        <image src="{{item.url}}" mode="aspectFill"></image>
+        <text class="preview-tag">{{item.name}}</text>
+      </view>
+      <view class="preview preview-empty" wx:if="{{!materialPreviews.length}}">
+        <text class="preview-empty-text">还没有素材</text>
+      </view>
+    </view>
+
+    <view class="material-stats">
+      <text class="material-stats-label">已收纳</text>
+      <text class="material-stats-value">{{folderCount}} 个文件夹 · {{materialCount}} 张素材</text>
+    </view>
+
+    <view class="folder-chips">
+      <text class="folder-chip" wx:for="{{folders}}" wx:key="id">🌸 {{item.name}} {{item.count}} 张</text>
+    </view>
+  </view>
+
+  <!-- 库存明细 -->
+  <view class="card" wx:if="{{inventory.length}}">
+    <view class="section-title">📦 库存明细</view>
+    <view class="section-sub">跨年结转后的做 / 卖对照</view>
+    <view class="inv" wx:for="{{inventory}}" wx:key="shapeId">
+      <view class="swatch" style="background:{{item.color}}"></view>
+      <text class="inv-name">{{item.name}}</text>
+      <text class="grow"></text>
+      <text class="inv-num">做 {{item.made}}</text>
+      <text class="inv-num">卖 {{item.sold}}</text>
+      <text class="inv-stock">余 {{item.stock}}</text>
+    </view>
+  </view>
+
+  <!-- 配置 -->
+  <view class="card">
+    <view class="section-title">✂️ 手作工坊配置</view>
+
+    <view class="row-item" bindtap="goShapes">
+      <view class="row-icon row-icon-purple">🎨</view>
+      <view class="grow">
+        <view class="row-title">造型与成本设置</view>
+        <view class="row-sub">OB11娃头、QQ人、正比、默认克重单价</view>
+      </view>
+      <text class="arrow">›</text>
+    </view>
+
+    <view class="row-item" bindtap="goTags">
+      <view class="row-icon row-icon-pink">🏷</view>
+      <view class="grow">
+        <view class="row-title">标签库管理</view>
+        <view class="row-sub">{{tagNames}}</view>
+      </view>
+      <text class="arrow">›</text>
+    </view>
+
+    <view class="row-item">
+      <view class="row-icon row-icon-green">🔔</view>
+      <view class="grow">
+        <view class="row-title">每日打卡催促</view>
+        <view class="row-sub">每晚 20:00 微信服务提醒</view>
+      </view>
+      <view class="toggle toggle-off"><view class="toggle-dot"></view></view>
+    </view>
+  </view>
+
+  <!-- 存储与分享 -->
+  <view class="card">
+    <view class="section-title">📊 数据存储与成果分享</view>
+
+    <view class="sub-cards">
+      <view class="sub-card" bindtap="goExport">
+        <view class="sub-icon">☁️</view>
+        <view class="sub-title">导出全部数据</view>
+        <view class="sub-sub">JSON 备份 / CSV 打卡流水</view>
+        <view class="btn btn-ghost btn-sm sub-btn">立即导出</view>
+      </view>
+
+      <view class="sub-card">
+        <view class="sub-icon">📮</view>
+        <view class="sub-title">{{year}} 手作年鉴</view>
+        <view class="sub-sub">生成九宫格长图海报</view>
+        <view class="btn btn-primary btn-sm sub-btn sub-btn-disabled">即将上线</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 系统 -->
+  <view class="card">
+    <view class="row-item">
+      <view class="row-icon row-icon-plain">🌗</view>
+      <view class="grow">
+        <view class="row-title">外观跟随系统（深色模式）</view>
+      </view>
+      <text class="row-value">{{theme === 'dark' ? '已开启' : '已关闭'}}</text>
+    </view>
+
+    <view class="row-item" bindtap="onClearCache">
+      <view class="row-icon row-icon-plain">🧹</view>
+      <view class="grow">
+        <view class="row-title">清除本地缓存</view>
+      </view>
+      <text class="row-value">{{cacheSize}} MB</text>
+      <text class="row-action">清理</text>
+    </view>
+
+    <view class="row-item" bindtap="onRestoreTrash">
+      <view class="row-icon row-icon-plain">🗑</view>
+      <view class="grow">
+        <view class="row-title">回收站</view>
+        <view class="row-sub">{{trashCount}} 条可恢复（保留 30 天）</view>
+      </view>
+      <text class="arrow">›</text>
+    </view>
+
+    <view class="row-item" bindtap="onShowPolicy">
+      <view class="row-icon row-icon-plain">🛡</view>
+      <view class="grow">
+        <view class="row-title">隐私政策与协议</view>
+      </view>
+      <text class="arrow">›</text>
+    </view>
+
+    <view class="row-item" bindtap="goAccount">
+      <view class="row-icon row-icon-plain">⛔</view>
+      <view class="grow">
+        <view class="row-title">账号注销与数据彻底清除</view>
+      </view>
+      <text class="arrow">›</text>
+    </view>
+  </view>
+
+ 
+</view>

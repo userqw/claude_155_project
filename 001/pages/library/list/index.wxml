@@ -1,0 +1,195 @@
+<view class="page page-tabbed theme-{{theme}}">
+  <app-header
+    theme="{{theme}}"
+    title="捏土打卡"
+    badge="手作"
+    subtitle="作品展柜"
+    avatar="🖼"
+  ></app-header>
+
+  <!-- 搜索 -->
+  <view class="search">
+    <text class="search-icon">🔍</text>
+    <input
+      class="search-input"
+      placeholder="搜索作品名称、说明或标签…"
+      value="{{keyword}}"
+      bindinput="onSearch"
+      confirm-type="search"
+    />
+    <text class="search-clear" wx:if="{{keyword}}" bindtap="onClearSearch">✕</text>
+  </view>
+
+  <!-- 造型筛选 -->
+  <scroll-view class="chips" scroll-x="true" show-scrollbar="{{false}}">
+    <view
+      class="chip {{!shapeFilter ? 'chip-active' : ''}}"
+      wx:for="{{shapes}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="onShapeFilter"
+    >
+      <view class="chip-dot" style="background:{{item.color}}"></view>
+      <text>{{item.name}}</text>
+      <text class="chip-count">{{item.count}}</text>
+    </view>
+  </scroll-view>
+
+  <!-- 库存状态 + 排序 -->
+  <view class="filter-row">
+    <view class="segmented">
+      <view
+        class="seg {{saleFilter === '' ? 'seg-active' : ''}}"
+        data-v=""
+        bindtap="onSaleFilter"
+      >全部 {{counts.total}}</view>
+      <view
+        class="seg {{saleFilter === 'unsold' ? 'seg-active' : ''}}"
+        data-v="unsold"
+        bindtap="onSaleFilter"
+      >在库 {{counts.unsold}}</view>
+      <view
+        class="seg {{saleFilter === 'sold' ? 'seg-active' : ''}}"
+        data-v="sold"
+        bindtap="onSaleFilter"
+      >已售出 {{counts.sold}}</view>
+    </view>
+
+    <view class="sort" bindtap="onToggleSort">
+      <text class="sort-icon">⇅</text>
+      <text>{{sortText}}</text>
+      <text class="sort-caret">▾</text>
+    </view>
+  </view>
+
+  <view class="count-line">
+    <text class="count-line-emoji">✨</text>
+    共 {{counts.total}} 件黏土手作作品
+  </view>
+
+  <empty-state
+    wx:if="{{!left.length && !right.length}}"
+    theme="{{theme}}"
+    icon="🖼"
+    title="这里还空空的"
+    sub="换个筛选条件，或者去补录第一件作品"
+  ></empty-state>
+
+  <!-- 瀑布流 -->
+  <view class="waterfall" wx:if="{{left.length || right.length}}">
+    <view class="col">
+      <view class="item" wx:for="{{left}}" wx:key="id" data-id="{{item.id}}" bindtap="goDetail">
+        <view class="cover-wrap">
+          <image wx:if="{{item.cover}}" class="cover" src="{{item.cover}}" mode="aspectFill"></image>
+          <view wx:else class="cover cover-empty">
+            <shape-icon
+              theme="{{theme}}"
+              path="{{item.shape.iconPath}}"
+              emoji="{{item.shape.icon}}"
+              size="lg"
+            ></shape-icon>
+          </view>
+
+          <view class="cover-tag cover-tag-left" style="background:{{item.shape.color}}">
+            <shape-icon
+              theme="{{theme}}"
+              path="{{item.shape.iconPath}}"
+              emoji="{{item.shape.icon}}"
+              size="sm"
+            ></shape-icon>
+            <text>{{item.shape.name}}</text>
+          </view>
+
+          <view class="cover-status" wx:if="{{item.fullySold}}">
+            <badge
+              theme="{{theme}}"
+              tone="sold"
+              outline="{{true}}"
+              text="已售出"
+            ></badge>
+          </view>
+
+          <view class="cover-price" wx:if="{{item.fullySold && item.soldAmount}}">
+            已结缘 ¥{{item.soldAmount}}
+          </view>
+
+          <view class="cover-tag cover-tag-right" wx:if="{{item.photoCount}}">×{{item.count}} 件</view>
+        </view>
+
+        <view class="item-body">
+          <view class="item-title-row">
+            <text class="item-title">{{item.title}}</text>
+            <text class="item-heart">♡</text>
+          </view>
+          <view class="item-desc" wx:if="{{item.note}}">{{item.note}}</view>
+          <view class="item-foot">
+            <text class="item-date">{{item.dateText}}</text>
+            <text class="item-price" wx:if="{{item.soldAmount}}">¥{{item.soldAmount}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="col">
+      <view class="item" wx:for="{{right}}" wx:key="id" data-id="{{item.id}}" bindtap="goDetail">
+        <view class="cover-wrap">
+          <image wx:if="{{item.cover}}" class="cover" src="{{item.cover}}" mode="aspectFill"></image>
+          <view wx:else class="cover cover-empty">
+            <shape-icon
+              theme="{{theme}}"
+              path="{{item.shape.iconPath}}"
+              emoji="{{item.shape.icon}}"
+              size="lg"
+            ></shape-icon>
+          </view>
+
+          <view class="cover-tag cover-tag-left" style="background:{{item.shape.color}}">
+            <shape-icon
+              theme="{{theme}}"
+              path="{{item.shape.iconPath}}"
+              emoji="{{item.shape.icon}}"
+              size="sm"
+            ></shape-icon>
+            <text>{{item.shape.name}}</text>
+          </view>
+
+          <view class="cover-status" wx:if="{{item.fullySold}}">
+            <badge
+              theme="{{theme}}"
+              tone="sold"
+              outline="{{true}}"
+              text="已售出"
+            ></badge>
+          </view>
+
+          <view class="cover-price" wx:if="{{item.fullySold && item.soldAmount}}">
+            已结缘 ¥{{item.soldAmount}}
+          </view>
+
+          <view class="cover-tag cover-tag-right" wx:if="{{item.photoCount}}">×{{item.count}} 件</view>
+        </view>
+
+        <view class="item-body">
+          <view class="item-title-row">
+            <text class="item-title">{{item.title}}</text>
+            <text class="item-heart">♡</text>
+          </view>
+          <view class="item-desc" wx:if="{{item.note}}">{{item.note}}</view>
+          <view class="item-foot">
+            <text class="item-date">{{item.dateText}}</text>
+            <text class="item-price" wx:if="{{item.soldAmount}}">¥{{item.soldAmount}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 到底提示 -->
+  <view class="end" wx:if="{{left.length || right.length}}">
+    <view class="end-line"></view>
+    <text class="end-text">🌸 已经翻到底啦 · 每一块土都记录历史 🌸</text>
+    <view class="end-line"></view>
+  </view>
+
+  <view class="btn btn-primary add-btn" bindtap="onAddWork">＋ 补录作品</view>
+</view>

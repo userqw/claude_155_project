@@ -1,0 +1,11 @@
+<view class="shape-icon shape-icon-{{size}}">
+  <!-- 有 svg 就用 svg，加载失败回落到 emoji -->
+  <image
+    wx:if="{{path && !failed}}"
+    class="shape-icon-img"
+    src="{{path}}"
+    mode="aspectFit"
+    binderror="onError"
+  ></image>
+  <text wx:else class="shape-icon-text">{{emoji}}</text>
+</view>

@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "造型管理", 
+  "usingComponents": {
+    "shape-icon": "../../../components/shape-icon/index"
+  }
+}

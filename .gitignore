@@ -1,0 +1,21 @@
+# 微信开发者工具的本机配置（含个人路径与本机设置，不进版本库）
+project.private.config.json
+
+# project.config.json 带 AppID，属个人标识，不入库；
+# 克隆后从 project.config.template.json 复制一份并填入自己的 AppID
+project.config.json
+
+# Claude Code 的个人设置（项目共享的 settings.json 要提交）
+.claude/settings.local.json
+
+# Stitch 原型压缩包（3.1M 二进制，不可 diff；解压后的 UI原型/ 已入库）
+stitch_.zip
+
+# 依赖与构建产物
+node_modules/
+dist/
+*.log
+
+# 系统文件
+.DS_Store
+Thumbs.db

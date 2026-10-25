@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "作品库", 
+  "usingComponents": {
+    "empty-state": "../../../components/empty-state/index", 
+    "shape-icon": "../../../components/shape-icon/index", 
+    "app-header": "../../../components/app-header/index", 
+    "badge": "../../../components/badge/index"
+  }
+}

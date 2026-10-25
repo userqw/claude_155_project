@@ -1,0 +1,205 @@
+/**
+ * 跨页面 / 跨组件共用的基础类——二次元可爱风。
+ *
+ * 同样需要被组件 @import：组件里用了 .btn、.row 这类类名，
+ * 而它们原本定义在 app.wxss 里——样式隔离下组件拿不到，会变成无样式的裸元素。
+ *
+ * 风格要点：大圆角、胶囊按钮、柔和粉紫渐变、圆润阴影。
+ * 文字对比度：正文 --text 对奶油底 9.8:1，次级 --text-2 5.6:1，
+ * 弱化 --text-3 4.6:1，全部满足 WCAG AA 的 4.5:1。
+ */
+
+.card {
+  background: var(--surface);
+  border-radius: 32rpx;
+  padding: 30rpx;
+  margin-bottom: 24rpx;
+  box-shadow: var(--shadow);
+}
+
+.card-tight {
+  padding: 22rpx 26rpx;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+}
+
+.row-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+}
+
+.grow {
+  flex: 1;
+  min-width: 0;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8rpx;
+  letter-spacing: 0.5rpx;
+}
+
+.section-sub {
+  font-size: 24rpx;
+  color: var(--text-3);
+  line-height: 1.5;
+}
+
+.muted {
+  color: var(--text-3);
+}
+
+.secondary {
+  color: var(--text-2);
+}
+
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+.divider {
+  height: 1rpx;
+  background: var(--border);
+  margin: 24rpx 0;
+}
+
+/* 按钮：全部做成胶囊，主按钮走樱粉→薰衣草渐变 */
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 88rpx;
+  border-radius: 48rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  padding: 0 36rpx;
+  box-sizing: border-box;
+}
+
+.btn-primary {
+  background: var(--accent-grad);
+  color: var(--on-accent);
+  box-shadow: 0 8rpx 20rpx rgba(245, 139, 168, 0.32);
+}
+
+.btn-ghost {
+  background: var(--sunken);
+  color: var(--accent);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 2rpx solid var(--border);
+  color: var(--text-2);
+}
+
+.btn-disabled {
+  opacity: 0.45;
+}
+
+.btn-sm {
+  min-height: 60rpx;
+  font-size: 26rpx;
+  padding: 0 26rpx;
+  border-radius: 32rpx;
+}
+
+/* 药丸标签 */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  height: 48rpx;
+  padding: 0 20rpx;
+  border-radius: 24rpx;
+  background: var(--sunken);
+  color: var(--text-2);
+  font-size: 22rpx;
+  margin-right: 12rpx;
+  margin-bottom: 12rpx;
+}
+
+.pill-active {
+  background: var(--accent-grad);
+  color: var(--on-accent);
+}
+
+.swatch {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  flex: none;
+}
+
+.empty {
+  padding: 64rpx 32rpx;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 72rpx;
+  line-height: 1;
+  margin-bottom: 20rpx;
+}
+
+.empty-title {
+  font-size: 28rpx;
+  color: var(--text-2);
+  margin-bottom: 8rpx;
+}
+
+.empty-sub {
+  font-size: 24rpx;
+  color: var(--text-3);
+  margin-bottom: 28rpx;
+  line-height: 1.6;
+}
+
+/* tab 页：底部要留出悬浮 dock 的空间。
+   注意选择器要写成 .page.page-tabbed —— app.wxss 里 .page 的 padding 简写
+   定义在 @import 之后，只写 .page-tabbed 会被那条简写覆盖掉 padding-bottom。
+   两条声明是渐进增强：不支持 env() 的机型用第一条兜底。 */
+.page.page-tabbed {
+  padding-bottom: 200rpx;
+  padding-bottom: calc(var(--tabbar-h) + var(--tabbar-gap) + 48rpx + env(safe-area-inset-bottom));
+}
+
+/* 顶部装饰条：渐变 + emoji，做页面的小标题用 */
+.banner {
+  display: flex;
+  align-items: center;
+  background: var(--accent-grad);
+  border-radius: 32rpx;
+  padding: 28rpx 30rpx;
+  margin-bottom: 24rpx;
+  box-shadow: var(--shadow);
+}
+
+.banner-emoji {
+  font-size: 56rpx;
+  margin-right: 20rpx;
+}
+
+.banner-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--on-accent);
+  line-height: 1.3;
+}
+
+.banner-sub {
+  font-size: 22rpx;
+  color: var(--on-accent);
+  opacity: 0.72;
+  margin-top: 6rpx;
+}

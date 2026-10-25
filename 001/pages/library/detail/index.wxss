@@ -1,0 +1,166 @@
+.gallery {
+  border-radius: 20rpx;
+  overflow: hidden;
+  margin-bottom: 24rpx;
+  background: var(--surface);
+}
+
+.swiper {
+  width: 100%;
+  height: 620rpx;
+}
+
+.photo {
+  width: 100%;
+  height: 620rpx;
+}
+
+.gallery-empty {
+  height: 320rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.gallery-text {
+  font-size: 26rpx;
+  color: var(--text-3);
+}
+
+.shape-name {
+  display: flex;
+  align-items: center;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.count {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.meta-row {
+  display: flex;
+  align-items: flex-start;
+  margin-top: 20rpx;
+}
+
+.meta-label {
+  width: 100rpx;
+  flex: none;
+  font-size: 24rpx;
+  color: var(--text-3);
+}
+
+.meta-value {
+  flex: 1;
+  font-size: 26rpx;
+  color: var(--text-2);
+}
+
+.tag-wrap {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.tag {
+  font-size: 22rpx;
+  color: var(--text-2);
+  background: var(--sunken);
+  border-radius: 20rpx;
+  padding: 6rpx 16rpx;
+  margin: 0 12rpx 8rpx 0;
+}
+
+.note {
+  margin-top: 24rpx;
+  padding-top: 24rpx;
+  border-top: 1rpx solid var(--border);
+  font-size: 26rpx;
+  color: var(--text-2);
+  line-height: 1.7;
+}
+
+.stat-row {
+  display: flex;
+  margin: 24rpx 0;
+}
+
+.stat-box {
+  flex: 1;
+}
+
+.stat-value {
+  display: block;
+  font-size: 36rpx;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.stat-label {
+  font-size: 22rpx;
+  color: var(--text-3);
+}
+
+.link {
+  font-size: 24rpx;
+  color: var(--text-3);
+}
+
+.sale {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid var(--border);
+}
+
+.sale-main {
+  font-size: 26rpx;
+  color: var(--text);
+}
+
+.sale-channel {
+  font-size: 22rpx;
+  color: var(--text-3);
+  margin-left: 16rpx;
+}
+
+.sale-date {
+  font-size: 22rpx;
+  color: var(--text-3);
+  margin-top: 4rpx;
+}
+
+.sale-total {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--text);
+  margin-right: 20rpx;
+}
+
+.sale-del {
+  font-size: 24rpx;
+  color: var(--danger);
+}
+
+.sale-empty {
+  font-size: 24rpx;
+  color: var(--text-3);
+  padding: 20rpx 0;
+}
+
+.actions {
+  display: flex;
+}
+
+.actions .btn {
+  margin-right: 20rpx;
+}
+
+.actions .btn:last-child {
+  margin-right: 0;
+}

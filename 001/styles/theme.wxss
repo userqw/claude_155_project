@@ -1,0 +1,142 @@
+/**
+ * 主题令牌（CSS 变量）——二次元可爱风 · 樱花马卡龙。
+ *
+ * 为什么每个组件都要 @import 这份文件：
+ * 小程序自定义组件默认样式隔离，app.wxss 里的 `.theme-light` 规则
+ * 匹配不到组件内部的节点，于是组件里的 `var(--surface)` 取不到值，
+ * background 会退化成 transparent——也就是「弹层透明、文字看不清」。
+ *
+ * 组件根节点上带着 theme-{{theme}} 类，import 之后变量在组件内可用。
+ * 页面那边由 app.wxss 统一 import。
+ *
+ * 图表用的分类色不在这里，在 utils/constants.js 的 SHAPE_COLORS——
+ * 那套颜色必须过 dataviz 的色觉校验，不能凭好看随便换。
+ * 这里的令牌只管界面，界面不需要过色觉分离度那套门槛。
+ */
+
+.theme-light {
+  /* 底色：奶油 + 樱花粉调 */
+  --page: #FFF6F0;
+  --surface: #FFFFFF;
+  --surface-soft: #FFF0F6;
+  --sunken: #FFF2F6;
+
+  /* 文字：偏紫的深色，比纯黑柔和 */
+  --text: #4A3A52;
+  --text-2: #64536E;
+  --text-3: #7C6B85;
+
+  --grid: #F3E7EE;
+  --baseline: #E4D3E0;
+  --border: rgba(198, 150, 190, 0.26);
+
+  /* 主色 */
+  --accent: #F58BA8;
+  --accent-2: #B79CED;
+  --accent-grad: linear-gradient(135deg, #FFB0C8 0%, #CDB0F2 100%);
+  --on-accent: #3A2B45;
+
+  --danger: #E4687F;
+  --good: #4FBF95;
+
+  /* 粉色文字专用墨色：--accent (#F58BA8) 与 --pink-text (#B4506F)
+     当文字用对比度都偏低（粉色底上只有 4.4:1），
+     金额、统计数字这类要读得清的地方用这个 */
+  --accent-ink: #A84663;
+
+  --shadow: 0 8rpx 28rpx rgba(226, 150, 190, 0.16);
+  --shadow-sm: 0 4rpx 14rpx rgba(226, 150, 190, 0.12);
+
+  /* 日历热力图：单色相（樱花粉）由浅到深，0 件为空心格 */
+  --heat: #E5BAC1, #DB99A4, #B95362, #A04056;
+  --heat-empty: #FDF2F6;
+
+  /* -- 品牌色阶（半透明色调，页面里不再写死 rgba） -- */
+  --pink-10: rgba(245, 139, 168, 0.10);
+  --pink-14: rgba(245, 139, 168, 0.14);
+  --pink-18: rgba(245, 139, 168, 0.18);
+  --pink-26: rgba(245, 139, 168, 0.26);
+  --pink-16: rgba(245, 139, 168, 0.16);
+  --pink-28: rgba(245, 139, 168, 0.28);
+  --pink-30: rgba(245, 139, 168, 0.30);
+  --pink-32: rgba(245, 139, 168, 0.32);
+  --pink-text: #B4506F;
+  --green-16: rgba(79, 191, 149, 0.16);
+  --green-18: rgba(79, 191, 149, 0.18);
+  --green-text: #2F8A66;
+  --purple-20: rgba(183, 156, 237, 0.20);
+  --purple-text: #6B4EA8;
+
+  /* -- 悬浮 tab bar 的尺寸：内容占位和 dock 本身必须用同一组值 -- */
+  --tabbar-h: 116rpx;
+  --tabbar-gap: 16rpx;
+
+  /* -- 遮罩与玻璃层 -- */
+  --mask: rgba(58, 43, 69, 0.45);
+  --mask-strong: rgba(58, 43, 69, 0.55);
+  --ink-08: rgba(58, 43, 69, 0.08);
+  --glass: rgba(255, 255, 255, 0.92);
+  --glass-strong: rgba(255, 255, 255, 0.96);
+  --on-inverse: #FFFFFF;
+
+}
+
+.theme-dark {
+  --page: #171320;
+  --surface: #221B2E;
+  --surface-soft: #2A2139;
+  --sunken: #2C2339;
+
+  --text: #F4ECF7;
+  --text-2: #D6C8E0;
+  --text-3: #94859F;
+
+  --grid: #342A42;
+  --baseline: #4A3D5A;
+  --border: rgba(255, 255, 255, 0.10);
+
+  --accent: #F58BA8;
+  --accent-2: #B79CED;
+  --accent-grad: linear-gradient(135deg, #FFB0C8 0%, #CDB0F2 100%);
+  --on-accent: #3A2B45;
+
+  --danger: #F08A9E;
+  --good: #5FCFA6;
+
+  --accent-ink: #FFAFC6;
+
+  --shadow: 0 8rpx 28rpx rgba(0, 0, 0, 0.32);
+  --shadow-sm: 0 4rpx 14rpx rgba(0, 0, 0, 0.24);
+
+  --heat: #49282E, #73414B, #B05C6E, #E27A8F;
+  --heat-empty: #2C2339;
+
+  /* -- 品牌色阶 -- */
+  --pink-10: rgba(245, 139, 168, 0.16);
+  --pink-14: rgba(245, 139, 168, 0.20);
+  --pink-18: rgba(245, 139, 168, 0.24);
+  --pink-26: rgba(245, 139, 168, 0.30);
+  --pink-16: rgba(245, 139, 168, 0.22);
+  --pink-28: rgba(245, 139, 168, 0.34);
+  --pink-30: rgba(245, 139, 168, 0.36);
+  --pink-32: rgba(245, 139, 168, 0.38);
+  --pink-text: #FFAFC6;
+  --green-16: rgba(95, 207, 166, 0.18);
+  --green-18: rgba(95, 207, 166, 0.20);
+  --green-text: #6FDCB4;
+  --purple-20: rgba(183, 156, 237, 0.26);
+  --purple-text: #CDB4F7;
+
+  /* -- 悬浮 tab bar 的尺寸 -- */
+  --tabbar-h: 116rpx;
+  --tabbar-gap: 16rpx;
+
+  /* -- 遮罩与玻璃层 -- */
+  --mask: rgba(0, 0, 0, 0.55);
+  --mask-strong: rgba(0, 0, 0, 0.65);
+  --ink-08: rgba(255, 255, 255, 0.10);
+  --glass: rgba(36, 28, 46, 0.88);
+  --glass-strong: rgba(36, 28, 46, 0.96);
+  --on-inverse: #FFFFFF;
+
+}

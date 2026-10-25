@@ -1,0 +1,3 @@
+<view class="badge badge-{{tone}} badge-{{size}} {{outline ? 'badge-outline' : ''}} theme-{{theme}}">
+  <text class="badge-text">{{text}}</text>
+</view>

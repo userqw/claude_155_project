@@ -1,0 +1,291 @@
+<view class="page page-tabbed theme-{{theme}}">
+  <app-header
+    theme="{{theme}}"
+    title="捏土打卡"
+    badge="手作"
+    subtitle="手作统计"
+    avatar="🎨"
+  ></app-header>
+
+  <!-- 年份选择卡片 -->
+  <view class="year-card">
+    <view class="year-head">
+      <view class="year-nav">
+        <view class="year-arrow" bindtap="onPrevYear">‹</view>
+        <picker
+          mode="selector"
+          range="{{years}}"
+          value="{{yearIndex}}"
+          bindchange="onYearChange"
+        >
+          <view class="year-value">{{year}}年度手作年鉴 <text class="year-caret">▾</text></view>
+        </picker>
+        <view class="year-arrow" bindtap="onNextYear">›</view>
+      </view>
+
+      <!-- 与上一年的对比：没有上一年数据就隐藏 -->
+      <view class="year-compare" wx:if="{{compare.hasPrevious}}">
+        <text class="year-compare-arrow">{{compareArrow}}</text>
+        <view class="year-compare-body">
+          <text class="year-compare-text">对比{{compareYear}}年 {{compareRate}}</text>
+          <text class="year-compare-delta">产量 {{compareDeltaText}} 个</text>
+        </view>
+      </view>
+    </view>
+    <view class="year-sub">手作者的指尖时光胶囊 · 记录每一次揉捏、烘烤与落笔 ✨</view>
+  </view>
+
+  <empty-state
+    wx:if="{{!hasData}}"
+    theme="{{theme}}"
+    icon="📊"
+    title="这一年还没有记录"
+    sub="先去打个卡，这里就会长出你的年度曲线"
+    action-text="去打个卡"
+    bindaction="goCheckin"
+  ></empty-state>
+
+  <block wx:if="{{hasData}}">
+    <!-- 四宫格统计卡 -->
+    <view class="tiles-grid">
+      <view class="tile-cell">
+        <stat-tile
+          theme="{{theme}}"
+          icon="🏺"
+          label="今年累计捏制"
+          value="{{overview.production}}"
+          unit="个"
+          note="已记录 {{overview.recordCount}} 次打卡"
+          dot-tone="accent"
+        ></stat-tile>
+      </view>
+      <view class="tile-cell">
+        <stat-tile
+          theme="{{theme}}"
+          icon="🎨"
+          label="开工打卡天数"
+          value="{{overview.activeDays}}"
+          unit="天"
+          note="最长连开 {{longestStreak}} 天"
+          dot-tone="accent2"
+        ></stat-tile>
+      </view>
+      <view class="tile-cell">
+        <stat-tile
+          theme="{{theme}}"
+          icon="🌱"
+          label="开工日均产出"
+          value="{{overview.avgPerDay}}"
+          unit="个/打卡天"
+          note="按有记录的 {{overview.activeDays}} 天计"
+          dot-tone="good"
+        ></stat-tile>
+      </view>
+      <view class="tile-cell">
+        <stat-tile
+          theme="{{theme}}"
+          icon="📦"
+          label="现货待结缘"
+          value="{{overview.unsold}}"
+          unit="个"
+          note="售罄率 {{sellRate}}%"
+          dot-tone="danger"
+        ></stat-tile>
+      </view>
+    </view>
+
+    <!-- 售出数超过产量时提示（PRD §5.2：按 0 显示并给提示） -->
+    <view class="warn" wx:if="{{overview.oversold}}">
+      今年售出数量超过了当年产量（可能是跨年卖出或记录被删），未售出按 0 显示。
+    </view>
+
+    <!-- 造型偏好与品类分布 -->
+    <view class="card">
+      <view class="row-between">
+        <view>
+          <view class="section-title">🍰 造型偏好与品类分布</view>
+          <view class="section-sub">共 {{overview.byShape.length}} 种造型 · 按打卡日统计产量</view>
+        </view>
+        <text class="link" bindtap="toggleShapeTable">{{showShapeTable ? '看图表' : '切换表格'}}</text>
+      </view>
+
+      <chart-hbar
+        wx:if="{{!showShapeTable}}"
+        theme="{{theme}}"
+        items="{{shapeBars}}"
+        show-percent="{{true}}"
+        unit=" 个"
+        stacked="{{true}}"
+      ></chart-hbar>
+
+      <view wx:else class="table">
+        <view class="tr th">
+          <view class="td">造型</view>
+          <view class="td num">数量</view>
+          <view class="td num">占比</view>
+        </view>
+        <view class="tr" wx:for="{{shapeTable}}" wx:key="shapeId">
+          <view class="td">
+            <view class="swatch" style="background:{{item.color}}"></view>
+            <text class="td-shape">{{item.name}}</text>
+          </view>
+          <view class="td num tnum">{{item.count}}</view>
+          <view class="td num tnum">{{item.percentText}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 月度趋势 -->
+    <view class="card">
+      <view class="row-between">
+        <view>
+          <view class="section-title">📈 月度趋势</view>
+          <view class="section-sub" wx:if="{{overview.bestMonth}}">最高产是 {{overview.bestMonth.month}} 月（{{overview.bestMonth.count}} 个）</view>
+        </view>
+        <text class="link" bindtap="toggleTable">{{showTable ? '看图表' : '看数字'}}</text>
+      </view>
+
+      <view wx:if="{{!showTable}}">
+        <chart-bar
+          theme="{{theme}}"
+          items="{{monthlyBars}}"
+          height="200"
+          label-mode="extreme"
+          unit="个"
+        ></chart-bar>
+      </view>
+
+      <!-- 表格视图：每个数值都能读到，不依赖图表 -->
+      <view wx:else class="table">
+        <view class="tr th">
+          <view class="td">月份</view>
+          <view class="td num">产量</view>
+          <view class="td num">天数</view>
+        </view>
+        <view class="tr" wx:for="{{overview.monthly}}" wx:key="month">
+          <view class="td">{{item.month}} 月</view>
+          <view class="td num tnum">{{item.count}}</view>
+          <view class="td num tnum">{{item.days}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 作品结缘与营收 -->
+    <view class="card">
+      <view class="row-between">
+        <view>
+          <view class="section-title">🧿 作品结缘与营收</view>
+          <view class="section-sub">营收按售出日统计，与产量的打卡日口径不同</view>
+        </view>
+        <badge
+          theme="{{theme}}"
+          tone="soft"
+          text="已结缘 {{soldCount}} 个"
+        ></badge>
+      </view>
+
+      <view class="money-row">
+        <view class="money-cell">
+          <view class="money-label">累计结缘金</view>
+          <view class="money-value money-strong">{{revenueText}}</view>
+        </view>
+        <view class="money-cell">
+          <view class="money-label">已结缘数量</view>
+          <view class="money-value">{{soldCount}}<text class="money-unit">个</text></view>
+        </view>
+        <view class="money-cell">
+          <view class="money-label">单件平均价</view>
+          <view class="money-value">{{avgPriceText}}</view>
+        </view>
+      </view>
+
+      <view class="hero-shape" wx:if="{{bestPrice}}">
+        <view class="hero-shape-icon">
+          <shape-icon
+            theme="{{theme}}"
+            path="{{bestPrice.iconPath}}"
+            emoji="{{bestPrice.icon}}"
+            size="md"
+          ></shape-icon>
+        </view>
+        <view class="grow">
+          <view class="hero-shape-title">结缘溢价榜首：{{bestPrice.name}}</view>
+          <view class="hero-shape-sub">这一造型的单件均价最高，被偏爱是有原因的</view>
+        </view>
+        <view class="hero-shape-price">¥{{bestPrice.price}}<text class="hero-shape-unit">/个均价</text></view>
+      </view>
+
+      <view class="sub-block" wx:if="{{shapeRevenueBars.length}}">
+        <view class="section-title-sm">按造型的结缘金</view>
+        <chart-hbar
+          theme="{{theme}}"
+          items="{{shapeRevenueBars}}"
+          show-percent="{{true}}"
+          stacked="{{true}}"
+        ></chart-hbar>
+      </view>
+
+      <view class="sub-block" wx:if="{{channelBars.length}}">
+        <view class="section-title-sm">结缘渠道来源构成</view>
+        <chart-hbar
+          theme="{{theme}}"
+          items="{{channelBars}}"
+          show-percent="{{true}}"
+          stacked="{{true}}"
+        ></chart-hbar>
+      </view>
+    </view>
+
+    <!-- 年度代表作掠影 -->
+    <view class="card" wx:if="{{works.length}}">
+      <view class="row-between">
+        <view class="section-title">🌸 年度代表作掠影</view>
+        <view class="section-sub">产量 Top {{works.length}}</view>
+      </view>
+
+      <view class="work-grid">
+        <view class="work" wx:for="{{works}}" wx:key="id" data-id="{{item.id}}" bindtap="goWork">
+          <view class="work-cover">
+            <image wx:if="{{item.cover}}" class="work-img" src="{{item.cover}}" mode="aspectFill"></image>
+            <view wx:else class="work-img work-img-empty">
+              <shape-icon
+                theme="{{theme}}"
+                path="{{item.iconPath}}"
+                emoji="{{item.icon}}"
+                size="lg"
+              ></shape-icon>
+            </view>
+            <view class="work-flag" wx:if="{{item.rank === 1}}">年度之星</view>
+          </view>
+          <view class="work-title">{{item.title}}</view>
+          <view class="work-shape">
+            <view class="swatch" style="background:{{item.color}}"></view>
+            <text class="work-shape-name">{{item.shapeName}}</text>
+          </view>
+          <view class="work-meta">
+            <text class="work-count">{{item.count}} 个</text>
+            <text class="work-dot">·</text>
+            <text class="work-time">{{item.durationText}}</text>
+          </view>
+          <view class="work-state {{item.sold > 0 ? 'sold' : ''}}">
+            {{item.sold > 0 ? '已结缘 ' + item.sold + ' 个' : '在库中'}}
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 快捷入口 -->
+    <view class="card links">
+      <view class="link-item" bindtap="goCalendar">
+        <text class="link-icon">🗓</text>
+        <text class="link-text">日历热力图</text>
+        <text class="link-arrow">›</text>
+      </view>
+      <view class="link-item" bindtap="goRevenue">
+        <text class="link-icon">💰</text>
+        <text class="link-text">营收统计</text>
+        <text class="link-arrow">›</text>
+      </view>
+    </view>
+  </block>
+</view>

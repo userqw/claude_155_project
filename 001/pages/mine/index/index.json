@@ -1,0 +1,7 @@
+{
+  "usingComponents": {
+    "app-header": "../../../components/app-header/index",
+    "stat-tile": "../../../components/stat-tile/index"
+  },
+  "navigationBarTitleText": "我的"
+}

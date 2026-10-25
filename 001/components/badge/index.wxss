@@ -1,0 +1,69 @@
+@import "../../styles/theme.wxss";
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  height: 40rpx;
+  padding: 0 16rpx;
+  border-radius: 20rpx;
+  font-size: 20rpx;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.badge-text {
+  line-height: 1;
+}
+
+/* 大号：与 48rpx 的操作按钮对齐用 */
+.badge-lg {
+  height: 48rpx;
+  padding: 0 22rpx;
+  border-radius: 24rpx;
+  font-size: 24rpx;
+}
+
+/* 小号 */
+.badge-sm {
+  height: 32rpx;
+  padding: 0 12rpx;
+  border-radius: 16rpx;
+  font-size: 18rpx;
+}
+
+/* 在库 / 完成 / 正面状态 */
+.badge-stock {
+  background: var(--green-16);
+  color: var(--green-text);
+}
+
+/* 已售出 / 中性状态 */
+.badge-sold {
+  background: var(--ink-08);
+  color: var(--text-2);
+}
+
+/* 品牌粉，做标签、分类、精选 */
+.badge-pink {
+  background: var(--accent-grad);
+  color: var(--on-accent);
+}
+
+.badge-soft {
+  background: var(--pink-16);
+  color: var(--pink-text);
+}
+
+/* 紫色，稀有 / 限定 */
+.badge-purple {
+  background: var(--purple-20);
+  color: var(--purple-text);
+}
+
+/* 描边款，用在图片浮层上 */
+.badge-outline {
+  background: var(--glass);
+  color: var(--text);
+}
+

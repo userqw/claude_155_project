@@ -1,0 +1,78 @@
+<view class="page theme-{{theme}}">
+  <app-header
+    theme="{{theme}}"
+    title="捏土打卡"
+    badge="手作"
+    subtitle="手作热力日历"
+    avatar="🌸"
+  ></app-header>
+
+  <view class="card">
+    <view class="row-between">
+      <view>
+        <view class="section-title">🌸 手作热力日历</view>
+        <view class="section-sub">{{year}} 年 · {{activeDays}} 天有记录 · 共 {{total}} 个</view>
+      </view>
+      <picker
+        mode="selector"
+        range="{{years}}"
+        value="{{years.indexOf(year)}}"
+        bindchange="onYearChange"
+      >
+        <view class="year-pill">{{year}} 年 ⌄</view>
+      </picker>
+    </view>
+
+    <view class="legend">
+      <text class="legend-text">休养蓄力（0 件）</text>
+      <view class="legend-cell" style="background:{{emptyColor}}"></view>
+      <view class="legend-cell" wx:for="{{heatColors}}" wx:key="*this" style="background:{{item}}"></view>
+      <text class="legend-text">🔥 火力全开（3 件+）</text>
+    </view>
+
+    <view class="month" wx:for="{{months}}" wx:key="month">
+      <view class="month-head">
+        <text class="month-title">{{item.title}}</text>
+        <text class="month-meta">{{item.count}} 个 · {{item.days}} 天</text>
+      </view>
+      <view class="week-labels">
+        <view class="week-label" wx:for="{{weekLabels}}" wx:key="*this" wx:for-item="w">{{w}}</view>
+      </view>
+      <view class="week" wx:for="{{item.weeks}}" wx:key="index" wx:for-item="week">
+        <view
+          class="cell {{cell.empty ? 'cell-empty' : ''}} {{cell.future ? 'cell-future' : ''}} {{cell.selected ? 'cell-selected' : ''}}"
+          wx:for="{{week}}" wx:key="key" wx:for-item="cell"
+          style="{{cell.empty ? '' : 'background:' + cell.color}}"
+          data-date="{{cell.date}}"
+          bindtap="onTapDay"
+        >
+          <text class="cell-day" wx:if="{{!cell.empty}}" style="color:{{cell.textColor}}">{{cell.day}}</text>
+          <text class="cell-fire" wx:if="{{cell.fire}}">🔥</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 选中某天 -->
+  <view class="card" wx:if="{{selected}}">
+    <view class="row-between">
+      <view class="section-title">{{selected}}</view>
+      <text class="link" bindtap="onAddForDay">补记这天 ›</text>
+    </view>
+    <view wx:if="{{dayRecords.length}}" class="day-list">
+      <view class="day-item" wx:for="{{dayRecords}}" wx:key="id">
+        <shape-icon
+          theme="{{theme}}"
+          path="{{item.shape.iconPath}}"
+          emoji="{{item.shape.icon}}"
+          size="sm"
+        ></shape-icon>
+        <text class="day-shape">{{item.shape.name}}</text>
+        <text class="grow"></text>
+        <text class="day-count">× {{item.count}}</text>
+      </view>
+    </view>
+    <view wx:else class="day-empty">这天还没有记录</view>
+  </view>
+</view>
+

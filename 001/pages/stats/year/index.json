@@ -1,0 +1,12 @@
+{
+  "navigationBarTitleText": "年度统计", 
+  "usingComponents": {
+    "stat-tile": "../../../components/stat-tile/index", 
+    "chart-hbar": "../../../components/chart-hbar/index", 
+    "app-header": "../../../components/app-header/index", 
+    "shape-icon": "../../../components/shape-icon/index", 
+    "empty-state": "../../../components/empty-state/index", 
+    "chart-bar": "../../../components/chart-bar/index", 
+    "badge": "../../../components/badge/index"
+  }
+}

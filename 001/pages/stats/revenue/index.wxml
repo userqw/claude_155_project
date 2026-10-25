@@ -1,0 +1,92 @@
+<view class="page theme-{{theme}}">
+  <view class="head">
+    <view>
+      <view class="hero">¥{{overview.revenue}}</view>
+      <view class="section-sub">{{year}} 年营收（按售出日期统计）</view>
+    </view>
+    <picker
+      mode="selector"
+      range="{{years}}"
+      value="{{years.indexOf(year)}}"
+      bindchange="onYearChange"
+    >
+      <view class="year-pill">{{year}} 年 ›</view>
+    </picker>
+  </view>
+
+  <empty-state
+    wx:if="{{!hasData}}"
+    theme="{{theme}}"
+    icon="💰"
+    title="这一年还没有售出记录"
+    sub="作品卖出去后记一笔，营收曲线就会长出来"
+  ></empty-state>
+
+  <block wx:if="{{hasData}}">
+    <view class="card">
+      <view class="tiles">
+        <stat-tile
+          theme="{{theme}}"
+          label="售出"
+          value="{{overview.soldCount}}"
+          unit="个"
+        ></stat-tile>
+        <view class="tile-gap"></view>
+        <stat-tile
+          theme="{{theme}}"
+          label="单件均价"
+          value="{{overview.avgPrice}}"
+          unit="元"
+        ></stat-tile>
+        <view class="tile-gap"></view>
+        <stat-tile
+          theme="{{theme}}"
+          label="未售出"
+          value="{{overview.unsold}}"
+          unit="个"
+        ></stat-tile>
+      </view>
+      <view class="warn" wx:if="{{overview.oversold}}">
+        今年售出数量超过了当年产量（可能是跨年卖出或记录被删），未售出按 0 显示。
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="section-title">月度营收</view>
+      <view class="section-sub">单位：元</view>
+      <chart-line theme="{{theme}}" items="{{revenueBars}}" height="200" format="money"></chart-line>
+    </view>
+
+    <view class="card" wx:if="{{shapeBars.length}}">
+      <view class="section-title">哪种造型最赚钱</view>
+      <view class="section-sub">按营收排序</view>
+      <chart-hbar theme="{{theme}}" items="{{shapeBars}}" show-percent="{{false}}" unit=" 元"></chart-hbar>
+    </view>
+
+    <view class="card" wx:if="{{channelBars.length}}">
+      <view class="section-title">销售渠道</view>
+      <chart-hbar theme="{{theme}}" items="{{channelBars}}" show-percent="{{true}}" unit=" 元"></chart-hbar>
+    </view>
+
+    <view class="card">
+      <view class="section-title">售出明细</view>
+      <view class="sale" wx:for="{{sales}}" wx:key="id">
+        <view class="sale-main">
+          <shape-icon
+            theme="{{theme}}"
+            path="{{item.shape.iconPath}}"
+            emoji="{{item.shape.icon}}"
+            size="sm"
+          ></shape-icon>
+          <text class="sale-shape">{{item.shape.name}}</text>
+          <text class="sale-date">{{item.dateText}}</text>
+        </view>
+        <view class="sale-sub">
+          <text>{{item.quantity}} 个 × ¥{{item.unitPrice}}</text>
+          <text class="sale-channel">{{item.channel}}</text>
+        </view>
+        <text class="sale-total">¥{{item.total}}</text>
+      </view>
+    </view>
+  </block>
+</view>

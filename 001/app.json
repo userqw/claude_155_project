@@ -1,0 +1,46 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/stats/year/index",
+    "pages/stats/calendar/index",
+    "pages/stats/revenue/index",
+    "pages/library/list/index",
+    "pages/library/detail/index",
+    "pages/mine/index/index",
+    "pages/mine/shapes/index",
+    "pages/mine/tags/index",
+    "pages/mine/export/index",
+    "pages/login/index",
+    "pages/mine/account/index",
+    "pages/material/index",
+    "pages/material/list/index",
+    "pages/material/detail/index",
+    "pages/checkin/index"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#FFFFFF",
+    "navigationBarTitleText": "捏土打卡",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#FFF6F0",
+    "enablePullDownRefresh": false
+  },
+  "tabBar": {
+    "custom": true,
+    "color": "#B49AC0",
+    "selectedColor": "#F58BA8",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      { "pagePath": "pages/index/index", "text": "首页" },
+      { "pagePath": "pages/stats/year/index", "text": "统计" },
+      { "pagePath": "pages/library/list/index", "text": "作品库" },
+      { "pagePath": "pages/mine/index/index", "text": "我的" }
+    ]
+  },
+  "style": "v2",
+  "darkmode": true,
+  "themeLocation": "theme.json",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

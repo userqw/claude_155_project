@@ -1,0 +1,46 @@
+<view class="page theme-{{theme}}">
+  <view class="card">
+    <view class="section-title">标签</view>
+    <view class="section-sub">用来标记限定配色、送人、急单这类状态</view>
+
+    <view class="tag-row" wx:for="{{tags}}" wx:key="id" data-id="{{item.id}}" bindtap="onEdit">
+      <view class="tag-dot" style="background:{{item.color}}"></view>
+      <text class="tag-name">{{item.name}}</text>
+      <text class="tag-used">{{item.used}} 条</text>
+      <text class="mini danger" catchtap="onDelete" data-id="{{item.id}}">删除</text>
+    </view>
+  </view>
+
+  <view class="btn btn-primary" bindtap="onAdd">+ 新标签</view>
+</view>
+
+<view wx:if="{{showEditor}}" class="mask" bindtap="onClose">
+  <view class="sheet theme-{{theme}}" catchtap="onClose">
+    <view class="sheet-body">
+      <view class="field">
+        <view class="field-label">名称</view>
+        <input class="input" placeholder="例如：限定配色" value="{{form.name}}" bindinput="onName" />
+      </view>
+
+      <view class="field">
+        <view class="field-label">颜色</view>
+        <view class="colors">
+          <view
+            class="color {{form.color === item ? 'color-active' : ''}}"
+            wx:for="{{palette}}"
+            wx:key="*this"
+            wx:for-item="item"
+            style="background:{{item}}"
+            data-color="{{item}}"
+            bindtap="onColor"
+          ></view>
+        </view>
+      </view>
+
+      <view class="footer">
+        <view class="btn btn-ghost grow" bindtap="onClose">取消</view>
+        <view class="btn btn-primary grow" bindtap="onSave">保存</view>
+      </view>
+    </view>
+  </view>
+</view>

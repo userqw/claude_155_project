@@ -1,0 +1,66 @@
+@import "../../styles/theme.wxss";
+
+.uploader {
+  width: 100%;
+}
+
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.cell {
+  position: relative;
+  width: 150rpx;
+  height: 150rpx;
+  margin: 0 16rpx 16rpx 0;
+  border-radius: 12rpx;
+  overflow: hidden;
+  background: var(--sunken);
+}
+
+.thumb {
+  width: 100%;
+  height: 100%;
+}
+
+.remove {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 40rpx;
+  height: 40rpx;
+  line-height: 38rpx;
+  text-align: center;
+  font-size: 22rpx;
+  color: var(--on-inverse);
+  background: var(--mask-strong);
+  border-bottom-left-radius: 12rpx;
+}
+
+.add {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2rpx dashed var(--baseline);
+  background: transparent;
+}
+
+.add-icon {
+  font-size: 44rpx;
+  color: var(--text-3);
+  line-height: 1;
+  margin-bottom: 8rpx;
+}
+
+.add-text {
+  font-size: 22rpx;
+  color: var(--text-3);
+}
+
+.hint {
+  font-size: 22rpx;
+  color: var(--text-3);
+  margin-top: 4rpx;
+}

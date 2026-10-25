@@ -1,0 +1,102 @@
+<view class="page checkin-page theme-{{theme}}">
+  <app-header
+    theme="{{theme}}"
+    title="{{editing ? '编辑打卡' : '捏土打卡'}}"
+    badge="手作"
+    subtitle="{{editing ? '改一改这条记录' : '今天捏了吗？'}}"
+    avatar="🎀"
+  ></app-header>
+
+  <view class="card">
+    <!-- 日期：首页新建固定今天；补录与编辑时可改 -->
+    <view class="field" wx:if="{{showDate}}">
+      <view class="field-label">日期</view>
+      <picker mode="date" value="{{form.date}}" start="{{minDate}}" end="{{maxDate}}" bindchange="onDateChange">
+        <view class="picker-value">{{form.date}} <text class="arrow">›</text></view>
+      </picker>
+    </view>
+
+    <!-- 作品类型 -->
+    <view class="field">
+      <view class="field-label">作品类型</view>
+      <shape-picker shapes="{{shapes}}" value="{{form.shapeId}}" theme="{{theme}}" bindchange="onShapeChange" />
+    </view>
+
+    <!-- 捏制件数 -->
+    <view class="field">
+      <view class="row-between">
+        <view class="field-label">捏制件数</view>
+        <text class="field-hint">单位：件 / 个</text>
+      </view>
+      <view class="counter">
+        <view class="counter-btn {{form.count <= 1 ? 'disabled' : ''}}" bindtap="onMinus">−</view>
+        <view class="counter-value">{{form.count}}<text class="counter-unit">个</text></view>
+        <view class="counter-btn" bindtap="onPlus">＋</view>
+      </view>
+      <view class="quick">
+        <text class="quick-label">快捷：</text>
+        <view
+          class="quick-item {{form.count === item ? 'quick-active' : ''}}"
+          wx:for="{{quickCounts}}"
+          wx:key="*this"
+          wx:for-item="item"
+          data-n="{{item}}"
+          bindtap="onQuickCount"
+        >{{item}}</view>
+      </view>
+    </view>
+
+    <!-- 作品快照 -->
+    <view class="field">
+      <view class="row-between">
+        <view class="field-label">作品快照</view>
+        <text class="field-hint">✨ 支持高清细节</text>
+      </view>
+      <photo-uploader photos="{{form.photos}}" max="{{maxPhotos}}" theme="{{theme}}" bindchange="onPhotosChange" />
+    </view>
+
+    <!-- 打卡笔记 -->
+    <view class="field">
+      <view class="row-between">
+        <view class="field-label">打卡笔记</view>
+        <text class="field-hint">{{form.note.length}}/{{maxNote}}</text>
+      </view>
+      <textarea
+        class="note-input"
+        placeholder="今天的配色、灵感、翻车点…"
+        maxlength="{{maxNote}}"
+        value="{{form.note}}"
+        bindinput="onNoteInput"
+      ></textarea>
+    </view>
+
+    <!-- 标签 -->
+    <view class="field" wx:if="{{tags.length}}">
+      <view class="field-label">标签<text class="optional">选填</text></view>
+      <view class="tags">
+        <view
+          class="tag {{form.tagIds.indexOf(tag.id) > -1 ? 'tag-active' : ''}}"
+          wx:for="{{tags}}"
+          wx:key="id"
+          data-id="{{tag.id}}"
+          bindtap="onTagToggle"
+        >{{item.name}}</view>
+      </view>
+    </view>
+
+    <!-- 耗时 -->
+    <view class="field">
+      <view class="field-label">耗时<text class="optional">选填，分钟</text></view>
+      <input class="input" type="number" placeholder="例如 90" value="{{form.durationMin}}" bindinput="onDurationInput" />
+    </view>
+  </view>
+
+  <!-- 提交区：常驻底部 -->
+  <view class="submit-bar">
+    <view class="btn btn-ghost submit-delete" wx:if="{{editing}}" bindtap="onDelete">删除</view>
+    <view
+      class="btn btn-primary grow {{saving ? 'btn-disabled' : ''}}"
+      bindtap="onSave"
+    >{{saving ? '保存中…' : (editing ? '保存修改' : '✨ 保存今日打卡（共 ' + form.count + ' 个）')}}</view>
+  </view>
+</view>
