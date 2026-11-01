@@ -69,20 +69,24 @@ Page({
     const soldCount = sales.reduce((s, x) => s + x.quantity, 0)
     const revenue = sales.reduce((s, x) => s + x.totalAmount, 0)
 
-    // 素材库概览
-    const folders = db.listFolders()
-    const counts = db.materialCounts()
+    // 素材库概览。素材库是私有内容：没登录时数量与预览图都不给看，
+    // 免得「我的」页把私有内容泄露出去。
+    const loggedIn = auth.isLoggedIn()
+    const folders = loggedIn ? db.listFolders() : []
+    const counts = loggedIn ? db.materialCounts() : { counts: {}, unfiled: 0, total: 0 }
     const folderRows = folders.map((f) => ({
       id: f.id,
       name: f.name,
       count: counts.counts[f.id] || 0
     }))
     // 预览图上标的是素材自己的名字，不写死分类标签
-    const previews = db.listMaterials({}).slice(0, 3).map((m) => ({
-      id: m.id,
-      url: m.url,
-      name: m.name || '未命名素材'
-    }))
+    const previews = loggedIn
+      ? db.listMaterials({}).slice(0, 3).map((m) => ({
+        id: m.id,
+        url: m.url,
+        name: m.name || '未命名素材'
+      }))
+      : []
 
     // 工匠编号：按累计产量生成一个稳定的编号
     const year = date.yearOf(date.today())

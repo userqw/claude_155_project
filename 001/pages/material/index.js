@@ -1,6 +1,7 @@
 const app = getApp()
 const db = require('../../utils/db')
 const photos = require('../../utils/photos')
+const auth = require('../../utils/auth')
 
 Page({
   data: {
@@ -9,7 +10,9 @@ Page({
     folders: [],
     materials: [],
     counts: { counts: {}, unfiled: 0, total: 0 },
-    keyword: ''
+    keyword: '',
+    // 未登录：素材库是私有内容，当空的看
+    locked: false
   },
 
   onLoad() {
@@ -32,6 +35,19 @@ Page({
   },
 
   load() {
+    // 素材库是用户的私有内容，没登录就当是空的。
+    // 连写入入口也要一起藏起来——不然游客加了素材却看不到，
+    // 会以为东西丢了。
+    if (!auth.isLoggedIn()) {
+      this.setData({
+        locked: true,
+        folders: [],
+        materials: [],
+        counts: { counts: {}, unfiled: 0, total: 0 }
+      })
+      return
+    }
+
     const counts = db.materialCounts()
     const folders = db.listFolders().map((f) => {
       const list = db.listMaterials({ folderId: f.id })
@@ -50,6 +66,7 @@ Page({
     }))
 
     this.setData({
+      locked: false,
       folders: folders,
       materials: materials,
       counts: counts
@@ -60,9 +77,17 @@ Page({
     this.setData({ tab: e.currentTarget.dataset.t })
   },
 
+  /** 未登录时挡住写入：素材库是私有内容，不能出现「加了却看不见」 */
+  guardLocked() {
+    if (auth.isLoggedIn()) return false
+    wx.showToast({ title: '登录后才能使用素材库', icon: 'none' })
+    return true
+  },
+
   // -- 文件夹 ---------------------------------------------------------------
 
   onCreateFolder() {
+    if (this.guardLocked()) return
     wx.showModal({
       title: '新建文件夹',
       editable: true,
@@ -111,6 +136,7 @@ Page({
   // -- 添加素材 -------------------------------------------------------------
 
   async onAddMaterial() {
+    if (this.guardLocked()) return
     const paths = await photos.pickImages(9)
     if (!paths.length) return
     const items = paths.map((url, i) => ({ url: url, name: '素材 ' + (db.listMaterials().length + i + 1) }))

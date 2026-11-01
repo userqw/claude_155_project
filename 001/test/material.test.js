@@ -130,6 +130,61 @@ check('清空关键词恢复全部', () => {
   assert.strictEqual(db.listMaterials({ keyword: '不存在的词' }).length, 0)
 })
 
+console.log('\n素材库是私有内容（未登录看不到）')
+
+const auth = require(path.join(root, 'utils/auth.js'))
+auth.init()
+
+let pageDef = null
+global.Page = (def) => { pageDef = def }
+global.getApp = () => ({ globalData: { theme: 'light' } })
+require(path.join(root, 'pages/material/index.js'))
+
+function makeMaterialPage() {
+  const inst = Object.assign({}, pageDef, { data: Object.assign({}, pageDef.data) })
+  inst.setData = (patch) => Object.assign(inst.data, patch)
+  return inst
+}
+
+check('未登录时素材库是空的：文件夹、素材、数量都不露', () => {
+  auth.logout()
+  const page = makeMaterialPage()
+  page.load()
+  assert.strictEqual(page.data.locked, true, '应当处于「私有」状态')
+  assert.strictEqual(page.data.folders.length, 0, '文件夹不该露出来')
+  assert.strictEqual(page.data.materials.length, 0, '素材不该露出来')
+  assert.strictEqual(page.data.counts.total, 0, '数量不该露出来')
+})
+
+check('未登录时不能新增素材或文件夹（不然加了却看不见）', () => {
+  auth.logout()
+  const page = makeMaterialPage()
+  page.load()
+  const foldersBefore = db.listFolders().length
+  const materialsBefore = db.listMaterials({}).length
+  page.onCreateFolder()
+  page.onAddMaterial()
+  assert.strictEqual(db.listFolders().length, foldersBefore, '不该建出文件夹')
+  assert.strictEqual(db.listMaterials({}).length, materialsBefore, '不该加出素材')
+})
+
+check('登录后素材库内容照常可见', () => {
+  auth.devLogin()
+  const page = makeMaterialPage()
+  page.load()
+  assert.strictEqual(page.data.locked, false)
+  assert.ok(page.data.counts.total > 0, '登录后应能看到素材数量')
+  assert.ok(page.data.folders.length > 0, '登录后应能看到文件夹')
+})
+
+check('退出登录后素材库重新变空（退出不删数据，只是藏起来）', () => {
+  auth.logout()
+  const page = makeMaterialPage()
+  page.load()
+  assert.strictEqual(page.data.locked, true)
+  assert.strictEqual(db.listMaterials({}).length, 3, '本机数据一条不少')
+})
+
 console.log('\n清理')
 
 check('注销账号时素材与文件夹一并清空', () => {

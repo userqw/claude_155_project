@@ -1,6 +1,7 @@
 const app = getApp()
 const db = require('../../../utils/db')
 const photos = require('../../../utils/photos')
+const auth = require('../../../utils/auth')
 
 Page({
   data: {
@@ -9,7 +10,9 @@ Page({
     folder: null,
     title: '全部素材',
     materials: [],
-    showFolder: false
+    showFolder: false,
+    // 未登录：素材库是私有内容，当空的看
+    locked: false
   },
 
   onLoad(options) {
@@ -39,6 +42,14 @@ Page({
 
   load() {
     const folderId = this.data.folderId
+
+    // 素材库是私有内容：没登录就当是空的，连文件夹名都不露
+    if (!auth.isLoggedIn()) {
+      this.setData({ locked: true, folder: null, materials: [], title: '素材' })
+      wx.setNavigationBarTitle({ title: '素材' })
+      return
+    }
+
     const folder = folderId ? db.getFolder(folderId) : null
     const folderMap = {}
     db.listFolders().forEach((f) => {
@@ -56,6 +67,7 @@ Page({
     }))
 
     this.setData({
+      locked: false,
       folder: folder,
       title: folder ? folder.name : (folderId === null ? '全部素材' : '未分类'),
       materials: materials
@@ -69,6 +81,10 @@ Page({
   },
 
   async onAddMaterial() {
+    if (!auth.isLoggedIn()) {
+      wx.showToast({ title: '登录后才能使用素材库', icon: 'none' })
+      return
+    }
     const folderId = this.data.folderId || ''
     const paths = await photos.pickImages(9)
     if (!paths.length) return

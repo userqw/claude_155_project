@@ -56,13 +56,13 @@
         <text class="preview-tag">{{item.name}}</text>
       </view>
       <view class="preview preview-empty" wx:if="{{!materialPreviews.length}}">
-        <text class="preview-empty-text">还没有素材</text>
+        <text class="preview-empty-text">{{loggedIn ? '还没有素材' : '登录后查看'}}</text>
       </view>
     </view>
 
     <view class="material-stats">
       <text class="material-stats-label">已收纳</text>
-      <text class="material-stats-value">{{folderCount}} 个文件夹 · {{materialCount}} 张素材</text>
+      <text class="material-stats-value">{{loggedIn ? (folderCount + ' 个文件夹 · ' + materialCount + ' 张素材') : '登录后可见'}}</text>
     </view>
 
     <view class="folder-chips">

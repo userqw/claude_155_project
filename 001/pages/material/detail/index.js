@@ -1,6 +1,7 @@
 const app = getApp()
 const db = require('../../../utils/db')
 const date = require('../../../utils/date')
+const auth = require('../../../utils/auth')
 
 Page({
   data: {
@@ -10,7 +11,9 @@ Page({
     name: '',
     note: '',
     folderNames: ['未分类'],
-    folderIndex: 0
+    folderIndex: 0,
+    // 未登录：素材库是私有内容，当空的看
+    locked: false
   },
 
   onLoad(options) {
@@ -34,6 +37,11 @@ Page({
   },
 
   load() {
+    // 素材库是私有内容：没登录时连详情都不给看
+    if (!auth.isLoggedIn()) {
+      this.setData({ locked: true, material: null })
+      return
+    }
     const m = db.getMaterial(this.data.id)
     if (!m) {
       this.setData({ material: null })

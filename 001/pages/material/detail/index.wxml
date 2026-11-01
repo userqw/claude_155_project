@@ -29,5 +29,12 @@
 </view>
 
 <view class="page theme-{{theme}}" wx:else>
-  <empty-state theme="{{theme}}" icon="🔍" title="素材不存在" sub="它可能已经被删除了"></empty-state>
+  <empty-state
+    wx:if="{{locked}}"
+    theme="{{theme}}"
+    icon="🔒"
+    title="素材库是私有的"
+    sub="登录后可以查看和整理你的素材"
+  ></empty-state>
+  <empty-state wx:else theme="{{theme}}" icon="🔍" title="素材不存在" sub="它可能已经被删除了"></empty-state>
 </view>

@@ -39,20 +39,20 @@
       </view>
     </view>
 
-    <view class="btn btn-primary add-btn" bindtap="onCreateFolder">+ 新建文件夹</view>
+    <view class="btn btn-primary add-btn" wx:if="{{!locked}}" bindtap="onCreateFolder">+ 新建文件夹</view>
 
     <empty-state
-      wx:if="{{!folders.length && !counts.total}}"
+      wx:if="{{locked || (!folders.length && !counts.total)}}"
       theme="{{theme}}"
-      icon="📁"
-      title="素材库还是空的"
-      sub="新建一个文件夹，把配色参考、工具照片存进来"
+      icon="{{locked ? '🔒' : '📁'}}"
+      title="{{locked ? '素材库是私有的' : '素材库还是空的'}}"
+      sub="{{locked ? '登录后可以查看和整理你的素材' : '新建一个文件夹，把配色参考、工具照片存进来'}}"
     ></empty-state>
   </block>
 
   <!-- 全部素材 -->
   <block wx:else>
-    <view class="search">
+    <view class="search" wx:if="{{!locked}}">
       <input
         class="search-input"
         placeholder="搜索素材名称或备注"
@@ -70,14 +70,14 @@
       </view>
     </view>
 
-    <view class="btn btn-primary add-btn" bindtap="onAddMaterial">+ 添加素材</view>
+    <view class="btn btn-primary add-btn" wx:if="{{!locked}}" bindtap="onAddMaterial">+ 添加素材</view>
 
     <empty-state
-      wx:if="{{!materials.length}}"
+      wx:if="{{locked || !materials.length}}"
       theme="{{theme}}"
-      icon="🖼"
-      title="{{keyword ? '没有匹配的素材' : '还没有素材'}}"
-      sub="{{keyword ? '换个关键词试试' : '把参考图存进来，做的时候随手翻'}}"
+      icon="{{locked ? '🔒' : '🖼'}}"
+      title="{{locked ? '素材库是私有的' : (keyword ? '没有匹配的素材' : '还没有素材')}}"
+      sub="{{locked ? '登录后可以查看和整理你的素材' : (keyword ? '换个关键词试试' : '把参考图存进来，做的时候随手翻')}}"
     ></empty-state>
   </block>
 </view>
