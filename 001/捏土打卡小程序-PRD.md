@@ -614,7 +614,7 @@ MaterialFolder 1 ── N Material（素材；folder_id 为空表示未分类）
 | unit_price | decimal(10,2) | 单价 |
 | total_amount | decimal(10,2) | = quantity × unit_price（冗余存储，便于统计） |
 | sold_date | date | 售出日期 |
-| channel | enum | `xiaohongshu` / `xianyu` / `wechat` / `offline` / `other` |
+| channel | enum | `xhs` / `xianyu` / `wechat` / `offline` / `other`（与 `utils/constants.js` 的 `CHANNELS[].id` 一致） |
 | note | string | 备注 |
 | created_at | datetime | — |
 

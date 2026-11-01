@@ -147,20 +147,30 @@ function request(path, data) {
     })
   }
   return new Promise((resolve, reject) => {
+    const header = { 'content-type': 'application/json' }
+    // 后端从 Authorization 头取 token（不放 body），登录接口本身不需要
+    if (path !== CONFIG.paths.login) {
+      const t = getState().token
+      if (t) {
+        header.Authorization = 'Bearer ' + t
+      }
+    }
     wx.request({
       url: CONFIG.apiBase + path,
       method: 'POST',
-      header: { 'content-type': 'application/json' },
+      header: header,
       data: data,
       timeout: 10000,
       success: (res) => {
         const body = res.data || {}
-        if (res.statusCode >= 200 && res.statusCode < 300 && !body.error) {
-          resolve(body.data || body)
+        // 后端统一返回 HTTP 200 + {code, message, data}，业务错误靠 code 区分。
+        // 只看 statusCode 会把失败当成功——登录失败会表现成「拿到一个没有 token 的对象」。
+        if (body.code !== undefined && body.code !== 0) {
+          reject({ code: body.code, message: body.message || ERROR.SERVER })
           return
         }
-        if (body.code === 'DELETED') {
-          reject({ code: 'DELETED', message: ERROR.DELETED })
+        if (res.statusCode >= 200 && res.statusCode < 300 && !body.error) {
+          resolve(body.data || body)
           return
         }
         reject({ code: 'SERVER', message: body.message || ERROR.SERVER })
@@ -232,7 +242,6 @@ async function updateProfile(profile) {
   }
   try {
     const res = await request(CONFIG.paths.profile, {
-      token: getState().token,
       nickname: patch.nickname,
       avatarUrl: patch.avatarUrl
     })
@@ -255,6 +264,29 @@ async function updateProfile(profile) {
 }
 
 /**
+ * 本地时间戳转 ISO 字符串。
+ *
+ * 本地存储用的是 Date.now()（毫秒数），而后端 DTO 是 LocalDateTime——
+ * Jackson 不接受裸数字（会报 "raw timestamp not allowed"），
+ * 所以上传前统一转成 ISO-8601（UTC）。
+ */
+function iso(value) {
+  if (value === null || value === undefined || value === '') return null
+  if (typeof value === 'number') return new Date(value).toISOString()
+  return value
+}
+
+function toWire(list, fields) {
+  return (list || []).map((row) => {
+    const copy = Object.assign({}, row)
+    fields.forEach((f) => {
+      if (f in copy) copy[f] = iso(copy[f])
+    })
+    return copy
+  })
+}
+
+/**
  * 把本机数据合并到账号：上传本地记录与售出，按记录 id 幂等去重。
  * 后端未配置时返回 {ok:true, skipped:true}，本地数据原样保留，不算失败。
  */
@@ -266,13 +298,15 @@ async function mergeLocalToAccount() {
     return { ok: true, merged: 0, skipped: true }
   }
   try {
+    // 后端 SyncPushRequest 的字段：deviceId / checkIns / sales / photos / folders / materials。
+    // 照片、文件夹、素材在本地是独立集合，这里平铺上传；token 由 Authorization 头带，不放 body。
     await request(CONFIG.paths.push, {
-      token: getState().token,
       deviceId: getState().deviceId,
-      checkIns: all.checkIns,
-      sales: all.sales,
-      shapes: all.shapes,
-      tags: all.tags
+      checkIns: toWire(all.checkIns, ['createdAt', 'updatedAt', 'deletedAt']),
+      sales: toWire(all.sales, ['createdAt', 'updatedAt', 'deletedAt']),
+      photos: toWire(all.photos, ['createdAt', 'updatedAt', 'deletedAt']),
+      folders: toWire(all.folders, ['createdAt', 'updatedAt', 'deletedAt']),
+      materials: toWire(all.materials, ['createdAt', 'updatedAt', 'deletedAt'])
     })
     return { ok: true, merged: count }
   } catch (e) {
@@ -301,7 +335,7 @@ async function deleteAccount() {
   if (!isLoggedIn()) return { ok: false, error: 'GUEST', message: '尚未登录' }
   const s = getState()
   try {
-    await request(CONFIG.paths.delete, { token: s.token })
+    await request(CONFIG.paths.delete, {})
   } catch (e) {
     if (e.code === 'DELETED') {
       // 服务端已经没有这个账号了，继续清本地

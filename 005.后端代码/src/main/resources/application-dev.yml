@@ -1,0 +1,8 @@
+# 开发环境：本地 MySQL + 假 code2session
+app:
+  wechat:
+    mock: true
+
+logging:
+  level:
+    com.nietu.daka: debug

@@ -4,17 +4,27 @@ This file provides guidance to Claude Code (claude.ai/claude) when working with 
 
 ## Repository status
 
-`001/` holds the 捏土打卡 project — a WeChat mini-program for tracking daily clay-craft output.
+One product, four layers:
 
-- `001/捏土打卡小程序-PRD.md` — the product requirements document (source of truth)
-- `001/` root — the mini-program itself, openable directly in 微信开发者工具 (no build step, no npm)
-- `001/test/` — node-based tests, run with plain `node`
+- `001/` — the WeChat mini-program (捏土打卡): openable directly in 微信开发者工具 (no build step, no npm)
+  - `001/捏土打卡小程序-PRD.md` — the product requirements document (source of truth)
+  - `001/test/` — node-based tests, run with plain `node`
+- `002.产品UI原型（美术设计）/` — Stitch 生成的原型（HTML + 截图）
+- `003.前端代码/` — Stitch 原型代码 + `sakura_clay_studio/DESIGN.md`（**视觉规范来源**）
+- `004数据库脚本/` — MySQL 8 表结构 / 视图 / 种子数据 / 同步语句（已在本地 MySQL 实跑验证）
+- `005.后端代码/` — Spring Boot 3 服务端 API（Maven + JDK 21）
 
-**There is no git repo, no npm, and no lint setup.** Don't invent npm scripts for them.
+**There is a git repo (remote: GitHub) and there is no npm and no lint setup.** Don't invent npm scripts.
 
 ### Commands
 
 ```bash
+# 后端集成测试（跑真实 MySQL，需要先建好 004 的库 + 配好 application-local.yml）
+cd 005.后端代码 && mvn test
+
+# 启动后端（默认 profile = dev,local：假 code2session + 本机数据库密码）
+cd 005.后端代码 && mvn spring-boot:run
+
 # 结构一致性检查：页面/组件路径、require 路径、事件绑定、跳转目标
 node 001/test/structure.test.js
 
@@ -26,6 +36,9 @@ node 001/test/auth.test.js
 
 # 素材库验收测试（对照 PRD §12 的 AC-13~AC-15）
 node 001/test/material.test.js
+
+# 样式与配色校验
+node 001/test/style.test.js && node 001/test/theme.test.js
 ```
 
 Open the app in 微信开发者工具 by importing the `001/` directory (appid 见 `001/project.config.json`, 基础库 3.0.0+).
@@ -40,6 +53,7 @@ Canvas charts use the Canvas 2D API (`type="2d"`), which needs 基础库 ≥ 2.9
 ├── styles/
 │   ├── theme.wxss    主题令牌（.theme-light / .theme-dark）——组件必须各自 import
 │   └── common.wxss   跨页面跨组件的公共类（.card / .btn / .row / .page-tabbed …）
+                     所有色值只写在 theme.wxss，页面里一律 var(--…)
 ├── utils/
 │   ├── db.js        本地优先数据层：wx Storage + 软删除 + 每日备份 + 变更广播
 │   ├── stat.js      统计引擎（PRD §6.3 口径），全项目只有这一处算数
@@ -60,6 +74,25 @@ Canvas charts use the Canvas 2D API (`type="2d"`), which needs 基础库 ≥ 2.9
 ```
 
 `001/` is the working directory for this project; the numeric prefix suggests the repo may hold multiple projects side by side, so keep new project files under `001/` unless the user says otherwise.
+
+## Frontend ↔ backend wiring
+
+`001/utils/config.js` 的 `apiBase` 指向 `005.后端代码` 跑起来的服务（默认 `http://127.0.0.1:8080`）。
+微信开发者工具要勾「不校验合法域名…」才能连本机；真机预览要换成电脑的局域网 IP。
+
+**「点击没反应」几乎都是这几条之一坏了**，改任何一边都要同时改另一边：
+
+| 约定 | 说明 |
+| --- | --- |
+| 响应包裹 | HTTP 200 + `{ code, message, data }`；`code !== 0` 是**业务失败**，前端必须当错误处理 |
+| token 位置 | 只在 `Authorization: Bearer <token>` 头，**不放 body**；登录接口本身不带 |
+| 登录返回 | `{ token, account: { openid, … }, newUser, expireSeconds }`——`account` 是对象，不是扁平字段 |
+| 时间戳 | 一律 ISO-8601；服务端按 UTC 存和比 |
+| 未知字段 | 前端多传字段不该 500——DTO 都有 `@JsonIgnoreProperties(ignoreUnknown = true)` |
+| 软删除 | 客户端发 `deleted: true` **或** `deletedAt` 非空，任一成立即视为删除 |
+
+`utils/auth.js` 是这条链路的唯一实现——它既要带 token，又要判业务码，还要把裸毫秒时间戳转成 ISO 字符串。
+这三个职责都在同一个 `request()` 里，改的时候一起改。
 
 ## Source of truth
 
@@ -89,6 +122,8 @@ These are the recurring traps; follow them even when a change looks locally reas
 10. **Deleting a material folder must not delete its materials.** `removeFolder` moves them to 未分类 (`folder_id = ''`). Material deletion is soft (30-day trash) like check-ins.
 11. **Every `bindtap`/`bindchange` in a wxml must have a handler in the matching js.** WeChat does not error on a missing handler — the tap just silently does nothing. `test/structure.test.js` checks pages *and* components for this; it is the guard behind "点击没反应".
 12. **Component styles must import the theme themselves.** Custom components are style-isolated: `app.wxss` rules do not match nodes inside a component, so `var(--surface)` resolves to nothing and the background silently becomes transparent. Every component's wxss starts with `@import "../../styles/theme.wxss";` (plus `styles/common.wxss` if it uses `.btn`/`.card`/`.row`). Theme tokens live in `styles/theme.wxss` only — `test/structure.test.js` enforces both rules.
+13. **Everything time-related is UTC.** The client uploads ISO-8601 UTC timestamps; the server stores and compares them as UTC. The JVM default timezone is forced to UTC by `config/TimeZoneConfig.java` — *not* only in `main()`, because `@SpringBootTest` never calls `main()` and the tests would otherwise run in local time. If client and server disagree by 8 hours, the "后写覆盖先写" merge silently keeps the wrong version.
+14. **Credentials never enter the repo.** The MySQL password lives in `005.后端代码/src/main/resources/application-local.yml` (gitignored; a tracked `application-local.template.yml` sits next to it). The appid lives in `001/project.config.json` (gitignored; `001/project.config.template.json` is tracked). Don't move either into a tracked file, and don't paste a live token or password into a commit message, a log, or the transcript.
 
 ## Design system
 

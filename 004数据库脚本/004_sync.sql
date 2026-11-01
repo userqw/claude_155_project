@@ -1,0 +1,153 @@
+-- =============================================================================
+-- 捏土打卡 · 云端同步语句
+--
+-- 对应 PRD §5.6.2 的接口契约：
+--   POST /api/sync/push  { deviceId, checkIns, sales, ... }
+--   POST /api/sync/pull  ?since=...
+-- token 走请求头 Authorization: Bearer <token>，不放 body。
+--
+-- 同步模型（关键，PRD §8.2）：
+--   1. 主键由【客户端生成】，服务端不生成主键 —— 保证离线产生的记录也能上传
+--   2. 冲突策略：以 updated_at 时间戳为准，【后写覆盖先写】，且是字段级合并
+--   3. 售出记录是【追加型】：只插入，不做覆盖合并
+--   4. 软删除用 deleted_at 做墓碑：删除动作本身也要同步，否则
+--      另一台设备会把这条记录「复活」
+--
+-- 实现要点（MySQL）：
+--   ON DUPLICATE KEY UPDATE 里每一列用
+--     IF(VALUES(updated_at) > updated_at, VALUES(col), col)
+--   判断「谁更新」，而 updated_at 自己的赋值放在【最后】，
+--   否则前面的比较会用到已经被改写过的 updated_at。
+-- =============================================================================
+
+USE `nietu_daka`;
+
+-- =============================================================================
+-- 1. 推送：打卡记录（字段级合并，后写覆盖先写）
+-- =============================================================================
+-- INSERT INTO `check_in`
+--   (`id`,`openid`,`date`,`shape_id`,`count`,`cover_photo_id`,`note`,`duration_min`,
+--    `device_id`,`created_at`,`updated_at`,`deleted_at`)
+-- VALUES
+--   (?,?,?,?,?,?,?,?,?,?,?,?)
+-- ON DUPLICATE KEY UPDATE
+--   `date`           = IF(VALUES(`updated_at`) > `updated_at`, VALUES(`date`),           `date`),
+--   `shape_id`       = IF(VALUES(`updated_at`) > `updated_at`, VALUES(`shape_id`),       `shape_id`),
+--   `count`          = IF(VALUES(`updated_at`) > `updated_at`, VALUES(`count`),          `count`),
+--   `cover_photo_id` = IF(VALUES(`updated_at`) > `updated_at`, VALUES(`cover_photo_id`), `cover_photo_id`),
+--   `note`           = IF(VALUES(`updated_at`) > `updated_at`, VALUES(`note`),           `note`),
+--   `duration_min`   = IF(VALUES(`updated_at`) > `updated_at`, VALUES(`duration_min`),   `duration_min`),
+--   `deleted_at`     = IF(VALUES(`updated_at`) > `updated_at`, VALUES(`deleted_at`),     `deleted_at`),
+--   `device_id`      = IF(VALUES(`updated_at`) > `updated_at`, VALUES(`device_id`),      `device_id`),
+--   `updated_at`     = GREATEST(`updated_at`, VALUES(`updated_at`));
+
+-- =============================================================================
+-- 2. 推送：照片（追加型；同一张图重复推送靠主键幂等）
+-- =============================================================================
+-- INSERT INTO `photo`
+--   (`id`,`openid`,`check_in_id`,`url`,`local_path`,`width`,`height`,`sort`,`created_at`,`updated_at`,`deleted_at`)
+-- VALUES (?,?,?,?,?,?,?,?,?,?,?)
+-- ON DUPLICATE KEY UPDATE
+--   `url`        = IF(VALUES(`updated_at`) > `updated_at`, VALUES(`url`),        `url`),
+--   `sort`       = IF(VALUES(`updated_at`) > `updated_at`, VALUES(`sort`),       `sort`),
+--   `deleted_at` = IF(VALUES(`updated_at`) > `updated_at`, VALUES(`deleted_at`), `deleted_at`),
+--   `updated_at` = GREATEST(`updated_at`, VALUES(`updated_at`));
+
+-- =============================================================================
+-- 3. 推送：售出记录（追加型，只插入不做覆盖合并）
+--    同一 id 重复推送时 IGNORE，保证幂等且不改动已统计的金额
+-- =============================================================================
+-- INSERT IGNORE INTO `sale`
+--   (`id`,`openid`,`check_in_id`,`quantity`,`unit_price`,`total_amount`,
+--    `sold_date`,`channel`,`note`,`device_id`,`created_at`,`updated_at`,`deleted_at`)
+-- VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?);
+
+-- =============================================================================
+-- 4. 推送：素材文件夹
+-- =============================================================================
+-- INSERT INTO `material_folder`
+--   (`id`,`openid`,`name`,`cover_material_id`,`sort`,`created_at`,`updated_at`,`deleted_at`)
+-- VALUES (?,?,?,?,?,?,?,?)
+-- ON DUPLICATE KEY UPDATE
+--   `name`              = IF(VALUES(`updated_at`) > `updated_at`, VALUES(`name`),              `name`),
+--   `cover_material_id` = IF(VALUES(`updated_at`) > `updated_at`, VALUES(`cover_material_id`), `cover_material_id`),
+--   `sort`              = IF(VALUES(`updated_at`) > `updated_at`, VALUES(`sort`),              `sort`),
+--   `deleted_at`        = IF(VALUES(`updated_at`) > `updated_at`, VALUES(`deleted_at`),        `deleted_at`),
+--   `updated_at`        = GREATEST(`updated_at`, VALUES(`updated_at`));
+
+-- =============================================================================
+-- 5. 推送：素材（folder_id 空字符串 → NULL 表示未分类）
+-- =============================================================================
+-- INSERT INTO `material`
+--   (`id`,`openid`,`folder_id`,`url`,`local_path`,`name`,`note`,`created_at`,`updated_at`,`deleted_at`)
+-- VALUES (?,?,NULLIF(?,''),?,?,?,?,?,?)
+-- ON DUPLICATE KEY UPDATE
+--   `folder_id`  = IF(VALUES(`updated_at`) > `updated_at`, VALUES(`folder_id`),  `folder_id`),
+--   `url`        = IF(VALUES(`updated_at`) > `updated_at`, VALUES(`url`),        `url`),
+--   `name`       = IF(VALUES(`updated_at`) > `updated_at`, VALUES(`name`),       `name`),
+--   `note`       = IF(VALUES(`updated_at`) > `updated_at`, VALUES(`note`),       `note`),
+--   `deleted_at` = IF(VALUES(`updated_at`) > `updated_at`, VALUES(`deleted_at`), `deleted_at`),
+--   `updated_at` = GREATEST(`updated_at`, VALUES(`updated_at`));
+
+-- =============================================================================
+-- 6. 推送：打卡 × 标签关联
+--    客户端存的是 tagIds 数组，推送时展开成多行
+-- =============================================================================
+-- INSERT IGNORE INTO `check_in_tag`
+--   (`check_in_id`,`tag_id`,`openid`,`created_at`)
+-- VALUES (?,?,?,?);
+
+-- =============================================================================
+-- 7. 拉取：增量（since = 上次同步时间）
+--    按 updated_at 过滤，软删除的墓碑也要拉走，否则删除动作同步不过去
+-- =============================================================================
+-- SELECT `id`,`date`,`shape_id`,`count`,`cover_photo_id`,`note`,`duration_min`,
+--        `created_at`,`updated_at`,`deleted_at`
+-- FROM `check_in`
+-- WHERE `openid` = ? AND `updated_at` > ?
+-- ORDER BY `updated_at`;
+--
+-- SELECT `id`,`check_in_id`,`url`,`local_path`,`width`,`height`,`sort`,
+--        `created_at`,`updated_at`,`deleted_at`
+-- FROM `photo`
+-- WHERE `openid` = ? AND `updated_at` > ?
+-- ORDER BY `updated_at`;
+--
+-- SELECT `id`,`check_in_id`,`quantity`,`unit_price`,`total_amount`,`sold_date`,
+--        `channel`,`note`,`created_at`,`updated_at`,`deleted_at`
+-- FROM `sale`
+-- WHERE `openid` = ? AND `updated_at` > ?
+-- ORDER BY `updated_at`;
+--
+-- SELECT `id`,`name`,`cover_material_id`,`sort`,`created_at`,`updated_at`,`deleted_at`
+-- FROM `material_folder`
+-- WHERE `openid` = ? AND `updated_at` > ?
+-- ORDER BY `updated_at`;
+--
+-- SELECT `id`,`folder_id`,`url`,`local_path`,`name`,`note`,`created_at`,`updated_at`,`deleted_at`
+-- FROM `material`
+-- WHERE `openid` = ? AND `updated_at` > ?
+-- ORDER BY `updated_at`;
+
+-- =============================================================================
+-- 8. 清理：超过 30 天的软删除记录物理删除
+--    对应「我的 → 清空回收站」
+-- =============================================================================
+-- DELETE FROM `check_in`
+-- WHERE `deleted_at` IS NOT NULL
+--   AND `deleted_at` < DATE_SUB(NOW(3), INTERVAL 30 DAY);
+--
+-- DELETE FROM `material`
+-- WHERE `deleted_at` IS NOT NULL
+--   AND `deleted_at` < DATE_SUB(NOW(3), INTERVAL 30 DAY);
+--
+-- DELETE FROM `sale`
+-- WHERE `deleted_at` IS NOT NULL
+--   AND `deleted_at` < DATE_SUB(NOW(3), INTERVAL 30 DAY);
+
+-- =============================================================================
+-- 9. 清理：删除文件夹但保留素材（PRD §5.7：删文件夹不删素材）
+-- =============================================================================
+-- UPDATE `material`
+-- SET `folder_id` = NULL
+-- WHERE `folder_id` = ?;

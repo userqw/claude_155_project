@@ -1,0 +1,56 @@
+spring:
+  application:
+    name: nietu-daka-server
+  profiles:
+    # 默认 = 本机开发：dev（假 code2session）+ local（本机数据库密码，已 gitignore）
+    # 上线用 SPRING_PROFILES_ACTIVE=prod 覆盖，不要带 local
+    active: dev,local
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # 凭据一律走环境变量；本机开发密码写在 application-local.yml（已 gitignore）
+    url: jdbc:mysql://${DB_HOST:127.0.0.1}:${DB_PORT:3306}/${DB_NAME:nietu_daka}?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false
+    username: ${DB_USER:root}
+    password: ${DB_PASSWORD:}
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 10000
+  jackson:
+    # 时间戳一律 ISO-8601（LocalDateTime 不带时区，值本身按 UTC 理解）
+    time-zone: UTC
+    default-property-inclusion: always
+
+mybatis-plus:
+  configuration:
+    # 下划线转驼峰：视图列名 record_count -> recordCount
+    map-underscore-to-camel-case: true
+    default-enum-type-handler: com.baomidou.mybatisplus.core.handlers.MybatisEnumTypeHandler
+  global-config:
+    banner: false
+    db-config:
+      id-type: input
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    path: /v3/api-docs
+
+app:
+  jwt:
+    # 生产环境用环境变量覆盖：APP_JWT_SECRET
+    secret: ${APP_JWT_SECRET:change-me-to-a-random-string-at-least-32-bytes-long}
+    expire-hours: 720
+    header: Authorization
+    prefix: "Bearer "
+    wechat-app-id: ${WECHAT_APP_ID:}
+    wechat-secret: ${WECHAT_SECRET:}
+  wechat:
+    # 本地联调用的假 code2session，生产必须是 false
+    mock: ${WECHAT_MOCK:false}
+
+logging:
+  level:
+    com.nietu.daka: info

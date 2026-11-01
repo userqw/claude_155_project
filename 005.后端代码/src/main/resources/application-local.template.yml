@@ -1,0 +1,7 @@
+# 复制成 application-local.yml 后按本机情况填写（application-local.yml 已被 .gitignore 忽略）。
+#   cp src/main/resources/application-local.template.yml src/main/resources/application-local.yml
+# 本机数据库密码等私有信息只写在这里，不要提交。
+spring:
+  datasource:
+    username: root
+    password: 填你本机的 MySQL 密码

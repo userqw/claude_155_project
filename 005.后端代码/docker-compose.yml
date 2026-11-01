@@ -1,0 +1,47 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: nietu-daka-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:?请设置 DB_PASSWORD，容器端口是发布到宿主机的}
+      MYSQL_DATABASE: nietu_daka
+      TZ: Asia/Shanghai
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_0900_ai_ci
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      # 首次启动自动建表 + 建视图
+      - ../004数据库脚本:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  server:
+    build: .
+    container_name: nietu-daka-server
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      DB_NAME: nietu_daka
+      DB_USER: root
+      DB_PASSWORD: ${DB_PASSWORD:?请设置 DB_PASSWORD}
+      # JWT 密钥与小程序凭据都从环境变量注入，不写进镜像
+      APP_JWT_SECRET: ${APP_JWT_SECRET:?请设置 APP_JWT_SECRET，至少 32 字节}
+      WECHAT_APP_ID: ${WECHAT_APP_ID:-}
+      WECHAT_SECRET: ${WECHAT_SECRET:-}
+    ports:
+      - "8080:8080"
+
+volumes:
+  mysql-data:

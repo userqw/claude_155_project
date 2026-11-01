@@ -1,0 +1,16 @@
+# 生产环境：所有敏感配置走环境变量，不写死在仓库里
+app:
+  wechat:
+    mock: false
+
+spring:
+  datasource:
+    url: jdbc:mysql://${DB_HOST:127.0.0.1}:${DB_PORT:3306}/${DB_NAME:nietu_daka}?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC&useSSL=false
+    username: ${DB_USER:root}
+    password: ${DB_PASSWORD:}
+
+logging:
+  level:
+    com.nietu.daka: info
+  file:
+    name: /var/log/nietu-daka/app.log
