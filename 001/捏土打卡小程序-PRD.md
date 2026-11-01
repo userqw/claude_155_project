@@ -377,14 +377,33 @@
 
 | 接口 | 入参 | 返回 |
 | --- | --- | --- |
-| `POST /api/login` | `{ code }` | `{ token, account: { openid, nickname, avatarUrl, createdAt } }` |
-| `POST /api/profile` | `{ token, nickname, avatarUrl }` | `{ account }` |
-| `POST /api/sync/push` | `{ token, deviceId, records, sales, shapes, tags, photos }` | `{ serverTime, merged }` |
-| `POST /api/sync/pull` | `{ token, since }` | `{ serverTime, records, sales, photos }` |
-| `POST /api/account/delete` | `{ token }` | `{ deleted: true }` |
+| `POST /api/login` | `{ code, nickname?, avatarUrl? }` | `{ token, account: { openid, unionid, nickname, avatarUrl, createdAt }, newUser, expireSeconds, mock }` |
+| `GET /api/profile` | — | `{ account, mock }` |
+| `POST /api/profile` | `{ nickname, avatarUrl }` | `{ account, mock }` |
+| `POST /api/sync/push` | `{ deviceId, records, sales, shapes, tags, photos }` | `{ serverTime, merged }` |
+| `POST /api/sync/pull` | `?since=…` | `{ serverTime, records, sales, photos }` |
+| `POST /api/account/delete` | — | `{ deleted: true }` |
 
-> 服务端只存 `openid`，不存 `session_key`；`token` 自签并可撤销。
+> `token` 走请求头 `Authorization: Bearer <token>`，不放 body。
+> 服务端只存 `openid`（与 `unionid`），不存 `session_key`；`token` 自签并可撤销。
 > 记录归属以 `openid` 为准，客户端本地 `deviceId` 只用于冲突合并。
+
+**关于昵称头像随登录一起提交**
+
+`POST /api/login` 除 `code` 外还接受可选的 `nickname` / `avatarUrl`。
+这两个字段**不是微信给的**——`jscode2session` 只返回 `openid` / `session_key` / `unionid`，
+昵称与头像只能由用户在小程序的 `<input type="nickname">` 与
+`<button open-type="chooseAvatar">` 里主动触发。放在同一次登录请求里，
+是为了避免「登录成功但昵称没存上」——补一次 `POST /api/profile` 是第二次请求，
+它失败就只剩一个没有昵称的空账号。用户跳过这两项时，账号依然可用。
+
+**`mock` 标记**
+
+服务端未配置小程序 `appid` / `secret` 时，只能用 `md5(code)` 当 `openid`——
+此时返回的 `mock` 为 `true`。客户端据此提示用户「当前是本地联调模式，
+登录拿到的是模拟账号，不是你的真实微信号」，避免用户去数据库里找自己的账号而找不到。
+后端补齐 `appid` / `secret` 后，`mock` 变为 `false`；客户端启动时拉一次
+`GET /api/profile` 同步这个状态。
 
 #### 5.6.3 状态机
 

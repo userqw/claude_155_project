@@ -42,7 +42,8 @@ public class AuthController {
     @GetMapping("/profile")
     public Result<ProfileResponse> profile() {
         return Result.ok(new ProfileResponse(
-                authService.profileView(AuthContext.require())));
+                authService.profileView(AuthContext.require()),
+                authService.isMockMode()));
     }
 
     @Operation(summary = "修改昵称头像")
@@ -50,7 +51,8 @@ public class AuthController {
     public Result<ProfileResponse> updateProfile(@RequestBody ProfileRequest request) {
         String openid = AuthContext.require();
         authService.updateProfile(openid, request);
-        return Result.ok(new ProfileResponse(authService.profileView(openid)));
+        return Result.ok(new ProfileResponse(authService.profileView(openid),
+                authService.isMockMode()));
     }
 
     @Operation(summary = "注销账号并清除该账号全部数据")

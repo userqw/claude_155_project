@@ -37,7 +37,10 @@ function fakeBackend(pathname, body) {
           createdAt: '2026-01-01T00:00:00'
         },
         newUser: true,
-        expireSeconds: 3600
+        expireSeconds: 3600,
+        // 后端没配 appid/secret 时会带这个标记：
+        // openid 是 md5(code) 编的，不是用户的真实微信号
+        mock: true
       }
     }
   }
@@ -235,6 +238,25 @@ async function main() {
     const res = await auth.updateProfile({ nickname: '小陶', avatarUrl: 'https://x/a.png' })
     assert.strictEqual(res.ok, true)
     assert.strictEqual(auth.getState().account.nickname, '小陶')
+  })
+
+  console.log('\n昵称随登录一起提交')
+
+  await check('登录请求就带上昵称头像（不用登录完再补一次）', async () => {
+    const res = await auth.login({ nickname: '小陶酱', avatarUrl: 'https://x/b.png' })
+    assert.strictEqual(res.ok, true)
+    assert.strictEqual(lastRequest.data.nickname, '小陶酱')
+    assert.strictEqual(lastRequest.data.avatarUrl, 'https://x/b.png')
+  })
+
+  await check('登录后本地就拿到了昵称', () => {
+    assert.strictEqual(auth.getState().account.nickname, '小陶酱')
+  })
+
+  await check('后端在 mock 模式时会把标记带回来（openid 不是真实微信号）', async () => {
+    assert.strictEqual(auth.getState().mock, true)
+    const res = await auth.login()
+    assert.strictEqual(res.mock, true)
   })
 
   console.log('\nAC-11 退出与注销')

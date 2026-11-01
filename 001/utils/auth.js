@@ -52,6 +52,8 @@ function defaultState() {
     mode: 'guest', // 'guest' | 'account'
     account: null, // { openid, nickname, avatarUrl, createdAt }
     token: '',
+    // 后端是否在 mock 模式（没配小程序 appid/secret，openid 是假的）
+    mock: false,
     deviceId: '',
     // 用户是否已主动选择「先随便看看」
     skippedLogin: false,
@@ -259,10 +261,11 @@ function resetBackendStatus() {
   }
 }
 
-function request(path, data) {
+function request(path, data, method) {
   if (!backendReady()) {
     return Promise.reject({ code: 'NOT_CONFIGURED', message: ERROR.NOT_CONFIGURED })
   }
+  const verb = method || 'POST'
   if (CONFIG.cloudFunction) {
     return new Promise((resolve, reject) => {
       wx.cloud.callFunction({
@@ -291,7 +294,7 @@ function request(path, data) {
     }
     wx.request({
       url: activeBase() + path,
-      method: 'POST',
+      method: verb,
       header: header,
       data: data,
       timeout: 10000,
@@ -335,9 +338,15 @@ function wxLoginCode() {
 
 /**
  * 微信一键登录。注册是隐式的：服务端第一次见到 openid 就创建账号。
+ *
+ * @param {object} [profile] { nickname, avatarUrl }
+ *   昵称头像随登录一起发过去，不要等登录完再补一次 updateProfile——
+ *   补的那次是第二次请求，失败就只剩一个没有昵称的空账号。
+ *   注意：微信的 code2session **不返回昵称**，昵称只能由用户在小程序的
+ *   `<input type="nickname">` 里自己点一下授权。
  * @returns {Promise<{ok:boolean, account?:object, error?:string, message?:string}>}
  */
-async function login() {
+async function login(profile) {
   let code
   try {
     code = await wxLoginCode()
@@ -347,7 +356,11 @@ async function login() {
 
   let res
   try {
-    res = await request(CONFIG.paths.login, { code: code })
+    res = await request(CONFIG.paths.login, {
+      code: code,
+      nickname: (profile && profile.nickname) || '',
+      avatarUrl: (profile && profile.avatarUrl) || ''
+    })
   } catch (e) {
     return { ok: false, error: e.code || 'SERVER', message: e.message || ERROR.SERVER }
   }
@@ -360,11 +373,14 @@ async function login() {
   s.mode = 'account'
   s.token = res.token
   s.account = res.account
+  // 后端在没配 appid/secret 时跑 mock，openid 是假的。
+  // 记下来，界面上要告诉用户「你的真实微信号并没有连上」。
+  s.mock = !!res.mock
   s.skippedLogin = true
   s.promptDismissed = true
   s.localRecordsAtLogin = db.aliveCheckIns().length
   persist()
-  return { ok: true, account: res.account }
+  return { ok: true, account: res.account, mock: s.mock }
 }
 
 /** 更新昵称与头像（均为用户主动提供，可为空） */
@@ -381,11 +397,13 @@ async function updateProfile(profile) {
     })
     if (res && res.account) {
       getState().account = res.account
+      // 后端顺手报了一下自己是不是还在 mock 模式
+      if (typeof res.mock === 'boolean') getState().mock = res.mock
     } else {
       getState().account = Object.assign({}, getState().account, patch)
     }
     persist()
-    return { ok: true, account: getState().account }
+    return { ok: true, account: getState().account, mock: getState().mock }
   } catch (e) {
     // 后端未配置时，本地先记下，服务端接入后再同步
     if (e.code === 'NOT_CONFIGURED') {
@@ -393,6 +411,28 @@ async function updateProfile(profile) {
       persist()
       return { ok: true, localOnly: true, account: getState().account }
     }
+    return { ok: false, error: e.code || 'SERVER', message: e.message || ERROR.SERVER }
+  }
+}
+
+/**
+ * 从后端拉一次账号资料。
+ *
+ * 用途不是「拿昵称」——昵称在登录时就已经存上去了——而是同步**后端的模式**：
+ * 后端可能在你登录之后才配好 appid/secret，这时 openid 才变成真的。
+ * 只看登录那次的 mock 标记会一直停留在旧状态。
+ */
+async function fetchProfile() {
+  if (!isLoggedIn()) return { ok: false, error: 'GUEST', message: '尚未登录' }
+  try {
+    const res = await request(CONFIG.paths.profile, null, 'GET')
+    const s = getState()
+    if (res && res.account) s.account = res.account
+    if (typeof res.mock === 'boolean') s.mock = res.mock
+    persist()
+    return { ok: true, account: s.account, mock: s.mock }
+  } catch (e) {
+    if (e.code === 'NOT_CONFIGURED') return { ok: true, localOnly: true }
     return { ok: false, error: e.code || 'SERVER', message: e.message || ERROR.SERVER }
   }
 }
@@ -523,6 +563,7 @@ module.exports = {
   skipLogin,
   login,
   updateProfile,
+  fetchProfile,
   mergeLocalToAccount,
   logout,
   deleteAccount,

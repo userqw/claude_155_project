@@ -9,7 +9,8 @@ Page({
     account: null,
     localCount: 0,
     statusText: '',
-    devVisible: false
+    devVisible: false,
+    mockMode: false
   },
 
   onLoad() {
@@ -35,14 +36,20 @@ Page({
     const loggedIn = auth.isLoggedIn()
     const account = auth.getState().account
     const localCount = db.aliveCheckIns().length
+    // 后端没配小程序 appid/secret 时跑的是 mock，openid 是 md5(code) 编的，
+    // 不是用户的真实微信号——不说明白，用户会去数据库里找自己的账号然后找不到。
+    const mockMode = loggedIn && !!auth.getState().mock
     this.setData({
       loggedIn: loggedIn,
       account: account,
       localCount: localCount,
       devVisible: !auth.backendReady(),
-      statusText: loggedIn
-        ? '微信账号已绑定 · 数据可备份到云端'
-        : '数据只存在这台设备上 · 清理缓存会丢失'
+      mockMode: mockMode,
+      statusText: mockMode
+        ? '本地联调模式 · 还没连上真实微信号'
+        : loggedIn
+          ? '微信账号已绑定 · 数据可备份到云端'
+          : '数据只存在这台设备上 · 清理缓存会丢失'
     })
   },
 

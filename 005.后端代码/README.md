@@ -46,6 +46,38 @@ cp src/main/resources/application-local.template.yml src/main/resources/applicat
 
 > `app.jwt.secret` 不足 32 字节时服务**启动即失败**——这是有意的，避免用弱密钥上线。
 
+### 3. 接真实微信号（本地 mock 与真实账号的区别）
+
+本地 `dev` profile 跑的是 **mock 模式**：没配 `WECHAT_APP_ID` / `WECHAT_SECRET` 时，
+服务端用 `md5(code)` 当 openid。所以：
+
+- 数据库里能看到 `mock_xxxx` 开头的账号，**但那不是你的真实微信号**
+- 登录响应里的 `mock: true` 就是这个意思，小程序会把它显示出来
+- **微信昵称后端拿不到**——`code2session` 只返回 `openid` / `session_key` / `unionid`，
+  没有昵称。昵称只能由用户在小程序的 `<input type="nickname">` 里点一下授权，
+  前端会把它随登录请求一起发过来
+
+要换成真实账号，三步：
+
+1. **小程序要有真实 AppID。** `001/project.config.json` 里现在是 `touristappid`
+   （游客 AppID），它换不到 openid。去微信公众平台 → 开发管理 → 开发设置，
+   拿到自己的 AppID 填进去（这个文件已 gitignore，不会入库）。
+2. **后端拿到 AppID 与 Secret。** 同一页面的「AppSecret」，
+   配成环境变量启动：
+
+   ```bash
+   export WECHAT_APP_ID=wx1234567890abcdef
+   export WECHAT_SECRET=你的AppSecret
+   export WECHAT_MOCK=false
+   ```
+
+   `WECHAT_MOCK=false` 是必须的——`dev` profile 默认把它打开，
+   不关掉的话后端仍然会用假 openid。
+3. **重启后端**。登录一次，数据库里就该出现你的真实 openid，
+   且 `login` 响应里的 `mock` 变成 `false`。
+
+> AppSecret 等同于密码，不要提交进仓库、也不要用微信官方文档以外的渠道传递。
+
 ### 3. 跑起来
 
 ```bash

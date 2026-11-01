@@ -105,7 +105,9 @@ Page({
       loggedIn: auth.isLoggedIn(),
       account: auth.getState().account,
       accountSub: auth.isLoggedIn()
-        ? '微信账号已绑定 · 数据可备份到云端'
+        ? (auth.getState().mock
+            ? '本地联调模式 · 还没连上真实微信号'
+            : '微信账号已绑定 · 数据可备份到云端')
         : '数据只存在这台设备上 · 登录后自动备份',
       displayName: auth.isLoggedIn()
         ? (auth.getState().account.nickname || '微信用户')

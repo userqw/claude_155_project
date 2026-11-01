@@ -80,6 +80,17 @@
   margin: 16rpx 0 24rpx;
 }
 
+.mock-note {
+  border-color: var(--pink-28);
+}
+
+.mock-openid {
+  font-family: monospace;
+  font-size: 22rpx;
+  color: var(--text-3);
+  word-break: break-all;
+}
+
 .dev-entry {
   margin-top: 24rpx;
   text-align: center;

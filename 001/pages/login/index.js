@@ -10,6 +10,7 @@ Page({
     loading: false,
     errorMessage: '',
     backendNote: '',
+    mockNote: '',
     devVisible: false,
     alreadyLoggedIn: false
   },
@@ -22,6 +23,9 @@ Page({
       nickname: account ? account.nickname || '' : '',
       avatarUrl: account ? account.avatarUrl || '' : '',
       alreadyLoggedIn: auth.isLoggedIn(),
+      mockNote: auth.getState().mock
+        ? '后端还在本地联调模式（没配小程序 appid/secret），登录拿到的是模拟账号，不是你的真实微信号。'
+        : '',
       // 后端没配时提示一句，并开放开发者模式预览已登录界面
       devVisible: !backendReady,
       errorMessage: backendReady ? '' : '登录服务还未配置，现在只能以游客身份使用；不影响记录和统计。'
@@ -43,6 +47,16 @@ Page({
       backendNote: ''
     })
     return false
+  },
+
+  /**
+   * 后端在 mock 模式时要讲清楚：此时登录拿到的是**假的 openid**，
+   * 不是用户的真实微信号，数据库里也查不到自己的账号。
+   */
+  mockHint() {
+    return auth.getState().mock
+      ? '后端还在本地联调模式（没配小程序 appid/secret），登录拿到的是模拟账号，不是你的真实微信号。'
+      : ''
   },
 
   onAppThemeChange(theme) {
@@ -108,6 +122,7 @@ Page({
         this.setData({ errorMessage: res.message || '保存失败' })
         return
       }
+      this.setData({ mockNote: this.mockHint() })
       wx.showToast({ title: '已保存', icon: 'success' })
       setTimeout(() => this.back(), 600)
       return
@@ -126,7 +141,10 @@ Page({
       return
     }
 
-    const res = await auth.login()
+    const res = await auth.login({
+      nickname: this.data.nickname,
+      avatarUrl: this.data.avatarUrl
+    })
     if (!res.ok) {
       this.setData({ loading: false, errorMessage: (res.message || '登录失败') + '，你仍然可以先随便看看。' })
       return
@@ -134,7 +152,7 @@ Page({
 
     // 登录成功后把本机数据合并到账号（默认行为，见 PRD §5.6.6）
     const merge = await auth.mergeLocalToAccount()
-    this.setData({ loading: false })
+    this.setData({ loading: false, mockNote: this.mockHint() })
 
     if (merge.ok && merge.merged > 0) {
       wx.showToast({ title: '已合并 ' + merge.merged + ' 条记录', icon: 'none' })
@@ -144,10 +162,7 @@ Page({
       wx.showToast({ title: '登录成功，但数据同步失败', icon: 'none' })
     }
 
-    // 昵称与头像为可选补充
-    if (this.data.nickname || this.data.avatarUrl) {
-      auth.updateProfile({ nickname: this.data.nickname, avatarUrl: this.data.avatarUrl })
-    }
+    // 昵称与头像已经随登录请求一起发过去了，不用再补一次 updateProfile
 
     setTimeout(() => this.back(), 800)
   },

@@ -1,13 +1,12 @@
 package com.nietu.daka.service;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nietu.daka.common.BizException;
 import com.nietu.daka.dto.LoginRequest;
 import com.nietu.daka.dto.AccountView;
 import com.nietu.daka.dto.LoginResponse;
 import com.nietu.daka.dto.ProfileRequest;
+import com.nietu.daka.dto.WechatSession;
 import com.nietu.daka.entity.Account;
 import com.nietu.daka.entity.Shape;
 import com.nietu.daka.entity.Tag;
@@ -17,22 +16,13 @@ import com.nietu.daka.mapper.DeviceMapper;
 import com.nietu.daka.mapper.ShapeMapper;
 import com.nietu.daka.mapper.TagMapper;
 import com.nietu.daka.mapper.SyncMapper;
-import com.nietu.daka.security.JwtProperties;
 import com.nietu.daka.security.JwtTokenProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.time.LocalDateTime;
-import java.util.HexFormat;
 
 /**
  * 登录与账号。
@@ -51,17 +41,11 @@ public class AuthService {
     private final DeviceMapper deviceMapper;
     private final SyncMapper syncMapper;
     private final JwtTokenProvider tokenProvider;
-    private final JwtProperties jwtProperties;
-    private final ObjectMapper objectMapper;
-    private final HttpClient httpClient = HttpClient.newHttpClient();
-
-    /** 本地联调用的假 code2session；生产环境必须是 false */
-    @Value("${app.wechat.mock:false}")
-    private boolean mockEnabled;
+    private final WechatAuthService wechatAuthService;
 
     public AuthService(AccountMapper accountMapper, ShapeMapper shapeMapper, TagMapper tagMapper,
                        CheckInMapper checkInMapper, DeviceMapper deviceMapper, SyncMapper syncMapper,
-                       JwtTokenProvider tokenProvider, JwtProperties jwtProperties, ObjectMapper objectMapper) {
+                       JwtTokenProvider tokenProvider, WechatAuthService wechatAuthService) {
         this.accountMapper = accountMapper;
         this.shapeMapper = shapeMapper;
         this.tagMapper = tagMapper;
@@ -69,8 +53,7 @@ public class AuthService {
         this.deviceMapper = deviceMapper;
         this.syncMapper = syncMapper;
         this.tokenProvider = tokenProvider;
-        this.jwtProperties = jwtProperties;
-        this.objectMapper = objectMapper;
+        this.wechatAuthService = wechatAuthService;
     }
 
     @Transactional
@@ -78,7 +61,8 @@ public class AuthService {
         if (request.code() == null || request.code().isBlank()) {
             throw new BizException("缺少 wx.login 的 code");
         }
-        String openid = exchangeCode(request.code());
+        WechatSession session = wechatAuthService.exchange(request.code());
+        String openid = session.openid();
 
         Account account = accountMapper.selectById(openid);
         boolean newUser = account == null;
@@ -92,6 +76,7 @@ public class AuthService {
             account.setLastLoginAt(now);
             account.setNickname(request.nickname());
             account.setAvatarUrl(request.avatarUrl());
+            account.setUnionid(session.unionid());
             accountMapper.insert(account);
             seedBuiltins(openid, now);
         } else {
@@ -102,11 +87,16 @@ public class AuthService {
             if (request.avatarUrl() != null && !request.avatarUrl().isBlank()) {
                 account.setAvatarUrl(request.avatarUrl());
             }
+            // unionid 后台才能给齐，补上但不覆盖已有的
+            if (session.unionid() != null && !session.unionid().isBlank()) {
+                account.setUnionid(session.unionid());
+            }
             accountMapper.updateById(account);
         }
 
         String token = tokenProvider.createToken(openid);
-        return new LoginResponse(token, toView(account), newUser, tokenProvider.getExpireSeconds());
+        return new LoginResponse(token, toView(account), newUser, tokenProvider.getExpireSeconds(),
+                wechatAuthService.isMockMode());
     }
 
     /** 账号实体 -> 给客户端的视图对象 */
@@ -118,6 +108,11 @@ public class AuthService {
     /** 账号视图对象 */
     public AccountView profileView(String openid) {
         return toView(profile(openid));
+    }
+
+    /** 服务端是否还在 mock 模式（没配 appid/secret，openid 是假的） */
+    public boolean isMockMode() {
+        return wechatAuthService.isMockMode();
     }
 
     /** 新用户建号时复制一份内置造型与标签 */
@@ -193,52 +188,6 @@ public class AuthService {
         // 4) 最后删账号
         accountMapper.deleteById(openid);
         log.info("账号已注销: {}", openid);
-    }
-
-    /**
-     * code 换 openid。
-     *
-     * <p>真机联调需要配置小程序 appid/secret；本地没配时走 mock，
-     * 用 code 的 md5 当 openid，保证流程能跑通（仅开发环境）。
-     */
-    private String exchangeCode(String code) {
-        String appId = jwtProperties.getWechatAppId();
-        String secret = jwtProperties.getWechatSecret();
-        if (appId.isBlank() || secret.isBlank()) {
-            if (!mockEnabled) {
-                throw new BizException("服务端未配置小程序 appid/secret");
-            }
-            log.warn("未配置小程序 appid/secret，使用 mock 模式解析 code（仅限本地联调）");
-            return "mock_" + md5(code).substring(0, 24);
-        }
-        String url = "https://api.weixin.qq.com/sns/jscode2session"
-                + "?appid=" + appId
-                + "&secret=" + secret
-                + "&js_code=" + code
-                + "&grant_type=authorization_code";
-        try {
-            HttpRequest request = HttpRequest.newBuilder(URI.create(url)).GET().build();
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
-            JsonNode node = objectMapper.readTree(response.body());
-            if (node.has("openid")) {
-                return node.get("openid").asText();
-            }
-            String message = node.has("errmsg") ? node.get("errmsg").asText() : response.body();
-            throw new BizException("微信登录失败: " + message);
-        } catch (BizException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new BizException("调用微信登录接口失败: " + e.getMessage());
-        }
-    }
-
-    private String md5(String text) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("MD5");
-            return HexFormat.of().formatHex(digest.digest(text.getBytes(StandardCharsets.UTF_8)));
-        } catch (Exception e) {
-            return Integer.toHexString(text.hashCode());
-        }
     }
 
     /** 账号列表（给运营/后台用） */

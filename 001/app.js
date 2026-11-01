@@ -22,6 +22,11 @@ App({
     auth.subscribe((s) => {
       this.globalData.authMode = s.mode
     })
+    // 已登录时同步一次账号资料。后端可能在你登录之后才配好 appid/secret，
+    // 那时 openid 才从假的变成真的——只看登录那一刻的结果会一直停在旧状态。
+    if (auth.isLoggedIn()) {
+      auth.fetchProfile()
+    }
   },
 
   initTheme() {

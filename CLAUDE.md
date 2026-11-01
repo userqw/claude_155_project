@@ -89,7 +89,7 @@ Canvas charts use the Canvas 2D API (`type="2d"`), which needs 基础库 ≥ 2.9
 | --- | --- |
 | 响应包裹 | HTTP 200 + `{ code, message, data }`；`code !== 0` 是**业务失败**，前端必须当错误处理 |
 | token 位置 | 只在 `Authorization: Bearer <token>` 头，**不放 body**；登录接口本身不带 |
-| 登录返回 | `{ token, account: { openid, … }, newUser, expireSeconds }`——`account` 是对象，不是扁平字段 |
+| 登录返回 | `{ token, account: { openid, unionid, … }, newUser, expireSeconds, mock }`——`account` 是对象，不是扁平字段 |
 | 时间戳 | 一律 ISO-8601；服务端按 UTC 存和比 |
 | 未知字段 | 前端多传字段不该 500——DTO 都有 `@JsonIgnoreProperties(ignoreUnknown = true)` |
 | 软删除 | 客户端发 `deleted: true` **或** `deletedAt` 非空，任一成立即视为删除 |
@@ -111,6 +111,24 @@ Canvas charts use the Canvas 2D API (`type="2d"`), which needs 基础库 ≥ 2.9
   `url not in domain list` / `timeout` / 连接被拒——
   这些长得完全不一样，`describeNetworkError()` 负责翻译成人话。
   一律吞成「网络连接失败」等于让人对着黑盒猜。
+
+### 真实微信登录的三件事
+
+**一、昵称不是微信给的。** `jscode2session` 只返回 `openid` / `session_key` / `unionid`，
+没有昵称。昵称只能由用户在小程序的 `<input type="nickname">` 里点一下昵称建议，
+所以那个输入框要同时接 `bindinput` / `bindchange` / `bindblur`——点昵称建议触发的是 `change`。
+昵称头像随 `POST /api/login` 一起提交，不要等登录完再补一次 `updateProfile`：
+补的那次是第二次请求，失败就只剩一个没有昵称的空账号。
+
+**二、没配 appid/secret 时后端跑 mock。** openid 是 `md5(code)` 编出来的，
+**不是用户的真实微信号**，数据库里自然查不到。登录与资料接口都会返回 `mock: true`，
+客户端要把它显示出来（`我的 → 账号设置` 有专门的一块说明），
+别让用户对着数据库找自己的账号。补齐 `WECHAT_APP_ID` / `WECHAT_SECRET`
+并把 `WECHAT_MOCK=false` 之后，`mock` 变 `false`——客户端启动时拉一次
+`GET /api/profile` 同步这个状态。
+
+**三、`session_key` 不落库。** PRD §5.6.2 明确「服务端只存 openid，不存 session_key」，
+拿到就丢，不要加字段。
 
 ### 「底部导航栏点了没反应」
 
@@ -156,7 +174,8 @@ These are the recurring traps; follow them even when a change looks locally reas
 11. **Every `bindtap`/`bindchange` in a wxml must have a handler in the matching js.** WeChat does not error on a missing handler — the tap just silently does nothing. `test/structure.test.js` checks pages *and* components for this; it is the guard behind "点击没反应".
 12. **Component styles must import the theme themselves.** Custom components are style-isolated: `app.wxss` rules do not match nodes inside a component, so `var(--surface)` resolves to nothing and the background silently becomes transparent. Every component's wxss starts with `@import "../../styles/theme.wxss";` (plus `styles/common.wxss` if it uses `.btn`/`.card`/`.row`). Theme tokens live in `styles/theme.wxss` only — `test/structure.test.js` enforces both rules.
 13. **Everything time-related is UTC.** The client uploads ISO-8601 UTC timestamps; the server stores and compares them as UTC. The JVM default timezone is forced to UTC by `config/TimeZoneConfig.java` — *not* only in `main()`, because `@SpringBootTest` never calls `main()` and the tests would otherwise run in local time. If client and server disagree by 8 hours, the "后写覆盖先写" merge silently keeps the wrong version.
-14. **Credentials never enter the repo.** The MySQL password lives in `005.后端代码/src/main/resources/application-local.yml` (gitignored; a tracked `application-local.template.yml` sits next to it). The appid lives in `001/project.config.json` (gitignored; `001/project.config.template.json` is tracked). Don't move either into a tracked file, and don't paste a live token or password into a commit message, a log, or the transcript.
+14. **Credentials never enter the repo.** The MySQL password lives in `005.后端代码/src/main/resources/application-local.yml` (gitignored; a tracked `application-local.template.yml` sits next to it). The appid lives in `001/project.config.json` (gitignored; `001/project.config.template.json` is tracked). The AppSecret goes in the `WECHAT_SECRET` env var. Don't move any of them into a tracked file, and don't paste a live token or password into a commit message, a log, or the transcript.
+15. **The WeChat nickname never comes from the backend.** `jscode2session` returns only `openid` / `session_key` / `unionid`. Nickname and avatar come from the user tapping `<input type="nickname">` / `<button open-type="chooseAvatar">` in the mini-program. Anyone who expects the backend to hand back a nickname is designing against a WeChat API that doesn't exist.
 
 ## Design system
 
