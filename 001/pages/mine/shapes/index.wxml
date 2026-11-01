@@ -1,8 +1,8 @@
 <view class="page theme-{{theme}}">
   <view class="card">
     <view class="row-between">
-      <view class="section-title">分类</view>
-      <text class="section-sub">内置分类可改名，不能删除</text>
+      <view class="section-title">品类</view>
+      <text class="section-sub">内置的可改名不能删，自定义的可以随便增删</text>
     </view>
 
     <view class="shape" wx:for="{{shapes}}" wx:key="id">
@@ -29,12 +29,13 @@
       <view class="shape-actions">
         <text class="mini" catchtap="onMoveUp" data-id="{{item.id}}">↑</text>
         <text class="mini" catchtap="onMoveDown" data-id="{{item.id}}">↓</text>
-        <text class="mini danger" catchtap="onDelete" data-id="{{item.id}}">删除</text>
+        <!-- 内置的四个品类不能删，连按钮都不给 -->
+        <text class="mini danger" wx:if="{{!item.isBuiltin}}" catchtap="onDelete" data-id="{{item.id}}">删除</text>
       </view>
     </view>
   </view>
 
-  <view class="btn btn-primary" bindtap="onAdd">+ 新造型</view>
+  <view class="btn btn-primary" bindtap="onAdd">+ 新建品类</view>
 </view>
 
 <!-- 编辑弹层 -->

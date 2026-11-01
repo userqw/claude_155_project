@@ -169,7 +169,7 @@ function saveShape(shape) {
     const item = Object.assign(
       {
         id: uid('shape'),
-        name: '新造型',
+        name: '新品类',
         icon: '🎨',
         slot: state.shapes.length % 8,
         isBuiltin: false,

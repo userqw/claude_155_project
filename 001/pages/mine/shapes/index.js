@@ -4,6 +4,16 @@ const { SHAPE_COLORS } = require('../../../utils/constants')
 
 const ICONS = ['🎨', '🧸', '🙂', '🧍', '🐻', '🐰', '🐱', '🐶', '🦊', '🐼', '✨', '🌸', '🍀', '⭐', '💫', '🎀']
 
+/**
+ * 自定义品类专用的色槽。
+ *
+ * <p>内置四个品类占了 0~3，剩下的 4~7 给自定义品类，
+ * **固定顺序、不循环**——设计规范里就是这么定的：分类颜色按实体固定，
+ * 不能按排名重新分配，否则一个品类的颜色会随别人增删而变。
+ * 所以自定义品类最多 4 个，第 5 个直接不给了，而不是复用色槽。
+ */
+const USER_SLOTS = [4, 5, 6, 7]
+
 Page({
   data: {
     theme: 'light',
@@ -14,6 +24,7 @@ Page({
     form: {
       name: '',
       icon: '🎨',
+      iconPath: '',
       slot: 0
     },
     palette: []
@@ -56,12 +67,15 @@ Page({
 
   onAdd() {
     const usedSlots = db.listShapes().map((s) => s.slot)
-    let slot = 0
-    while (usedSlots.indexOf(slot) > -1 && slot < 8) slot += 1
+    const free = USER_SLOTS.filter((s) => usedSlots.indexOf(s) === -1)
+    if (!free.length) {
+      wx.showToast({ title: '自定义品类最多 4 个', icon: 'none' })
+      return
+    }
     this.setData({
       showEditor: true,
       editingId: '',
-      form: { name: '', icon: '🎨', slot: slot % 8 }
+      form: { name: '', icon: '🎨', iconPath: '', slot: free[0] }
     })
   },
 
@@ -75,6 +89,9 @@ Page({
       form: {
         name: s.name,
         icon: s.icon || '🎨',
+        // 内置品类的 svg 只是默认图标：没动图标就原样留着，
+        // 用户自己挑了图标才换成他的选择（见 onIcon）
+        iconPath: s.iconPath || '',
         slot: s.slot || 0
       }
     })
@@ -89,7 +106,12 @@ Page({
   },
 
   onIcon(e) {
-    this.setData({ 'form.icon': e.currentTarget.dataset.icon })
+    // 用户自己挑了图标，就用他的选择——内置品类默认的 svg 让位。
+    // 不挑图标时 svg 保留（form.iconPath 原样带着）。
+    this.setData({
+      'form.icon': e.currentTarget.dataset.icon,
+      'form.iconPath': ''
+    })
   },
 
   onSlot(e) {
@@ -107,6 +129,7 @@ Page({
     const payload = {
       name: name,
       icon: this.data.form.icon,
+      iconPath: this.data.form.iconPath || '',
       slot: this.data.form.slot
     }
     if (this.data.editingId) {

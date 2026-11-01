@@ -43,6 +43,9 @@ node 001/test/nav.test.js
 # 图片持久化（选照片/选头像不能静默卡住）
 node 001/test/photos.test.js
 
+# 品类管理（自定义品类的增删改查 + 内置四个的边界）
+node 001/test/shapes.test.js
+
 # 样式与配色校验
 node 001/test/style.test.js && node 001/test/theme.test.js
 ```
