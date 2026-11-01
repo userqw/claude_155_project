@@ -57,12 +57,47 @@ function salesOfYear(year) {
 }
 
 /**
+ * 空的年度总览：给未登录时用。
+ *
+ * <p>形状和 yearlyOverview 完全一致，只是数值全为 0——
+ * 界面直接渲染它就行，不用到处判空。近 6 个月的节奏图也因此自动藏起来
+ * （首页那张卡片的显示条件是 production > 0）。
+ *
+ * @param {string} year
+ */
+function emptyOverview(year) {
+  const monthly = []
+  for (let m = 1; m <= 12; m++) monthly.push({ month: m, count: 0, days: 0 })
+  const soldMonthly = []
+  for (let m = 1; m <= 12; m++) soldMonthly.push({ month: m, amount: 0, quantity: 0 })
+
+  return {
+    year: String(year),
+    production: 0,
+    activeDays: 0,
+    avgPerDay: 0,
+    recordCount: 0,
+    byShape: [],
+    monthly: monthly,
+    bestMonth: null,
+    revenue: 0,
+    soldCount: 0,
+    unsold: 0,
+    unsoldRaw: 0,
+    oversold: false,
+    avgPrice: 0,
+    soldByShape: [],
+    byChannel: [],
+    soldMonthly: soldMonthly
+  }
+}
+
+/**
  * 年度总览。
  * @param {string} year
  * @param {string} theme 'light' | 'dark'
  */
-function yearlyOverview(year, theme) {
-  const y = String(year)
+function yearlyOverview(year, theme) {  const y = String(year)
   const shapes = db.listShapes()
   const shapeMap = {}
   shapes.forEach((s) => {
@@ -264,6 +299,7 @@ module.exports = {
   shapeColor,
   shapeView,
   yearlyOverview,
+  emptyOverview,
   yearCompare,
   dailyMap,
   inventory,

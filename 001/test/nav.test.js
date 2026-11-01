@@ -257,6 +257,36 @@ async function main() {
     )
   })
 
+  console.log('\n首页的数字是私有的（未登录不给看）')
+
+  await check('未登录：累计捏制、已售总额、最近记录都是空的', () => {
+    const db = require(path.join(root, 'utils/db.js'))
+    db.addCheckIn({ date: '2026-06-01', shapeId: 'shape_qq', count: 7 })
+    db.addSale({
+      checkInId: db.listCheckIns()[0].id,
+      quantity: 1,
+      unitPrice: 30,
+      soldDate: '2026-06-02'
+    })
+
+    auth.logout()
+    home.load()
+    assert.strictEqual(home.data.overview.production, 0, '累计捏制不该露')
+    assert.strictEqual(home.data.overview.revenue, 0, '已售总额不该露')
+    assert.strictEqual(home.data.recent.length, 0, '最近记录不该露')
+    assert.ok(
+      !/[0-9]/.test(home.data.statusText),
+      '状态条里也不该有数字：' + home.data.statusText
+    )
+  })
+
+  await check('登录后：数字照常显示', () => {
+    auth.devLogin()
+    home.load()
+    assert.ok(home.data.overview.production > 0, '登录后应能看到累计捏制')
+    assert.ok(home.data.recent.length > 0, '登录后应能看到最近记录')
+  })
+
   console.log('\n登录页不会卡在「处理中…」')
 
   await check('请求挂起不回调时，loading 会被清掉并给出提示', async () => {

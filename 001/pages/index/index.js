@@ -23,7 +23,9 @@ Page({
     showSale: false,
     saleTarget: null,
     saleMax: 1,
-    showLoginBar: false
+    showLoginBar: false,
+    // 未登录时首页的数字不给看（PRD §5.6.1）
+    loggedIn: false
   },
 
   onLoad() {
@@ -66,9 +68,14 @@ Page({
     const today = date.today()
     const year = date.yearOf(today)
 
-    const all = db.listCheckIns()
+    // 未登录：累计捏制、已售总额、最近手作记录都不给看（PRD §5.6.1）。
+    // 用一份形状相同的空总览，界面不用到处判空；
+    // 近 6 个月节奏图也会自动藏起来（它的显示条件是 production > 0）。
+    const loggedIn = auth.isLoggedIn()
+
+    const all = loggedIn ? db.listCheckIns() : []
     const todayRecords = all.filter((c) => c.date === today)
-    const overview = stat.yearlyOverview(year, theme)
+    const overview = loggedIn ? stat.yearlyOverview(year, theme) : stat.emptyOverview(year)
 
     const shapeMap = {}
     db.listShapes().forEach((s) => {
@@ -104,7 +111,7 @@ Page({
       }
     })
 
-    const streak = stat.streak()
+    const streak = loggedIn ? stat.streak() : 0
 
     this.setData({
       today: today,
@@ -126,9 +133,13 @@ Page({
         count: c.count,
         shape: shapeMap[c.shapeId] || stat.shapeView(null, theme)
       })),
-      statusText: streak > 0 ? '连续 ' + streak + ' 天' : '今天还没开工',
+      statusText: loggedIn
+        ? (streak > 0 ? '连续 ' + streak + ' 天' : '今天还没开工')
+        // 未登录时连续天数也是私有数字，不给看
+        : '登录后可见',
       // 游客优先：只在用户从未做过选择时提示一次浏览，不拦截任何内容
-      showLoginBar: auth.shouldShowPrompt()
+      showLoginBar: auth.shouldShowPrompt(),
+      loggedIn: loggedIn
     })
   },
 

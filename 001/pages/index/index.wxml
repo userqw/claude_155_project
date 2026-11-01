@@ -11,7 +11,7 @@
   <view class="login-bar" wx:if="{{showLoginBar}}">
     <view class="grow">
       <view class="login-bar-title">✨ 登录后云端备份，换手机不丢记录</view>
-      <view class="login-bar-sub">不登录也能完整记录</view>
+      <view class="login-bar-sub">登录后才能打卡与记录</view>
     </view>
     <view class="btn btn-primary btn-sm" bindtap="goLogin">一键登录</view>
     <text class="login-bar-close" bindtap="onCloseLoginBar">✕</text>
@@ -98,9 +98,9 @@
     <empty-state
       wx:if="{{!recent.length}}"
       theme="{{theme}}"
-      icon="🎨"
-      title="还没有记录"
-      sub="捏完第一个，就从这儿开始"
+      icon="{{loggedIn ? '🎨' : '🔒'}}"
+      title="{{loggedIn ? '还没有记录' : '登录后可见'}}"
+      sub="{{loggedIn ? '捏完第一个，就从这儿开始' : '登录后能看到你的手作记录'}}"
     ></empty-state>
 
     <view class="record" wx:for="{{recent}}" wx:key="id" data-id="{{item.id}}" bindtap="goDetail">
