@@ -23,12 +23,16 @@
       <input
         class="input"
         type="nickname"
-        placeholder="点一下微信昵称建议，或自己输入"
+        placeholder="点一下输入框，选微信昵称"
         value="{{nickname}}"
         bindinput="onNicknameInput"
         bindchange="onNicknameInput"
         bindblur="onNicknameInput"
       />
+      <view class="field-hint" wx:if="{{!nickname}}">
+        微信的昵称不会自动带过来（后端换不到）。点一下上面的输入框，
+        微信会弹出昵称建议，选中就填上了；不选也能用，只是「我的」里会显示「微信用户」。
+      </view>
     </view>
 
     <view class="warn" wx:if="{{errorMessage}}">{{errorMessage}}</view>

@@ -59,7 +59,15 @@ Page({
 
   async onMerge() {
     wx.showLoading({ title: '备份中…' })
-    const res = await auth.mergeLocalToAccount()
+    let res
+    try {
+      res = await auth.mergeLocalToAccount()
+    } catch (e) {
+      // 一定要 hideLoading：漏掉的话整个界面被 loading 遮罩挡住，什么都点不了
+      wx.hideLoading()
+      wx.showToast({ title: (e && e.message) || '备份失败', icon: 'none' })
+      return
+    }
     wx.hideLoading()
     if (!res.ok) {
       wx.showToast({ title: res.message || '备份失败', icon: 'none' })
@@ -120,7 +128,13 @@ Page({
           confirmText: '确定注销',
           success: async (r2) => {
             if (!r2.confirm) return
-            const res2 = await auth.deleteAccount()
+            let res2
+            try {
+              res2 = await auth.deleteAccount()
+            } catch (e) {
+              wx.showToast({ title: (e && e.message) || '注销失败', icon: 'none' })
+              return
+            }
             if (!res2.ok) {
               wx.showToast({ title: res2.message || '注销失败', icon: 'none' })
               return

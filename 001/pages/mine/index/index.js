@@ -164,6 +164,17 @@ Page({
     wx.navigateTo({ url: '/pages/login/index' })
   },
 
+  /**
+   * 已登录但没有昵称时，直接进登录页改资料。
+   *
+   * <p>微信的昵称只能由用户点一下 `<input type="nickname">` 的昵称建议才有，
+   * 后端拿不到（code2session 不返回昵称）。所以要给一条直达的入口，
+   * 让人自己点一下，而不是永远停在「微信用户」。
+   */
+  goSetName() {
+    wx.navigateTo({ url: '/pages/login/index' })
+  },
+
   // -- 回收站 -------------------------------------------------------------
 
   onRestoreTrash() {

@@ -152,6 +152,56 @@ function backendReady() {
   return !!(CONFIG.apiBase || CONFIG.cloudFunction)
 }
 
+/**
+ * 给 Promise 加一道自己的超时。
+ *
+ * <p>不能只靠 wx.request 的 timeout：真机上连接被挂起时（比如手机上没有
+ * 东西监听 127.0.0.1），微信的 timeout 并不保证会回调 fail，
+ * 于是 Promise 永远不 settle，界面就卡在「处理中…」。
+ * 自己起个定时器才靠得住。
+ */
+function withTimeout(promise, ms, onTimeout) {
+  return new Promise((resolve, reject) => {
+    let settled = false
+    const timer = setTimeout(() => {
+      if (settled) return
+      settled = true
+      if (onTimeout) onTimeout()
+      reject({ code: 'TIMEOUT', message: '请求超时（' + ms / 1000 + ' 秒没响应）' })
+    }, ms)
+    promise.then(
+      (v) => {
+        if (settled) return
+        settled = true
+        clearTimeout(timer)
+        resolve(v)
+      },
+      (e) => {
+        if (settled) return
+        settled = true
+        clearTimeout(timer)
+        reject(e)
+      }
+    )
+  })
+}
+
+/** 真机？真机上 127.0.0.1 指的是手机自己，探活时直接跳过，别浪费一轮超时 */
+function isRealDevice() {
+  try {
+    const info = wx.getSystemInfoSync()
+    const platform = (info.platform || '').toLowerCase()
+    return platform === 'ios' || platform === 'android' || platform === 'harmony'
+  } catch (e) {
+    return false
+  }
+}
+
+/** 地址指向本机回环？真机上没用 */
+function isLoopback(base) {
+  return /^https?:\/\/(127\.0\.0\.1|localhost)(:|\/|$)/i.test(base || '')
+}
+
 // -- 后端地址探活 -------------------------------------------------------------
 
 const BASE_CACHE_KEY = 'nt_api_base_v1'
@@ -206,35 +256,47 @@ function probeBackend() {
   push(CONFIG.apiBase)
   ;(CONFIG.apiCandidates || []).forEach(push)
 
-  if (!candidates.length) {
-    baseStatus = { ok: false, base: '', message: ERROR.NOT_CONFIGURED }
+  // 真机上 127.0.0.1 指的是手机自己，探它纯属浪费一轮超时
+  const realDevice = isRealDevice()
+  const usable = realDevice ? candidates.filter((b) => !isLoopback(b)) : candidates
+
+  if (!usable.length) {
+    baseStatus = {
+      ok: false,
+      base: '',
+      message: '没有可用的后端地址。真机预览要用电脑的局域网 IP，'
+        + '把它填进 utils/config.js 的 apiCandidates。'
+    }
     return Promise.resolve(baseStatus)
   }
 
   const tryOne = (base) =>
-    new Promise((resolve) => {
-      wx.request({
-        url: base + CONFIG.healthPath,
-        method: 'GET',
-        timeout: 4000,
-        success: (res) => {
-          const body = res.data || {}
-          resolve(res.statusCode >= 200 && res.statusCode < 300 && body.code === 0 ? base : null)
-        },
-        fail: () => resolve(null)
-      })
-    })
+    withTimeout(
+      new Promise((resolve) => {
+        wx.request({
+          url: base + CONFIG.healthPath,
+          method: 'GET',
+          timeout: 4000,
+          success: (res) => {
+            const body = res.data || {}
+            resolve(res.statusCode >= 200 && res.statusCode < 300 && body.code === 0 ? base : null)
+          },
+          fail: () => resolve(null)
+        })
+      }),
+      5000
+    ).catch(() => null)
 
   const walk = (i) => {
-    if (i >= candidates.length) {
+    if (i >= usable.length) {
       baseStatus = {
         ok: false,
         base: '',
-        message: '连不上后端（试过：' + candidates.join('、') + '）。后端起了吗？真机预览要用电脑的局域网 IP。'
+        message: '连不上后端（试过：' + usable.join('、') + '）。后端起了吗？真机预览要用电脑的局域网 IP。'
       }
       return Promise.resolve(baseStatus)
     }
-    return tryOne(candidates[i]).then((hit) => {
+    return tryOne(usable[i]).then((hit) => {
       if (hit) {
         rememberBase(hit)
         return baseStatus
@@ -284,55 +346,58 @@ function request(path, data, method, opts) {
       })
     })
   }
-  return new Promise((resolve, reject) => {
-    const header = { 'content-type': 'application/json' }
-    // 后端从 Authorization 头取 token（不放 body），登录接口本身不需要
-    if (path !== CONFIG.paths.login) {
-      const t = getState().token
-      if (t) {
-        header.Authorization = 'Bearer ' + t
+  return withTimeout(
+    new Promise((resolve, reject) => {
+      const header = { 'content-type': 'application/json' }
+      // 后端从 Authorization 头取 token（不放 body），登录接口本身不需要
+      if (path !== CONFIG.paths.login) {
+        const t = getState().token
+        if (t) {
+          header.Authorization = 'Bearer ' + t
+        }
       }
-    }
-    wx.request({
-      url: activeBase() + path,
-      method: verb,
-      header: header,
-      data: data,
-      timeout: 10000,
-      success: (res) => {
-        const body = res.data || {}
-        // 后端统一返回 HTTP 200 + {code, message, data}，业务错误靠 code 区分。
-        // 只看 statusCode 会把失败当成功——登录失败会表现成「拿到一个没有 token 的对象」。
-        if (body.code !== undefined && body.code !== 0) {
-          // token 过期：静默续登一次再重试，用户不该被弹回登录页
-          if (body.code === 401 && !options.noRetry && path !== CONFIG.paths.login) {
-            if (isAccountGone(body.message)) {
-              // 账号被注销了，不能靠续登把它「复活」——回退到游客模式
-              logout()
-              reject({ code: 401, message: body.message || '账号已注销' })
+      wx.request({
+        url: activeBase() + path,
+        method: verb,
+        header: header,
+        data: data,
+        timeout: 10000,
+        success: (res) => {
+          const body = res.data || {}
+          // 后端统一返回 HTTP 200 + {code, message, data}，业务错误靠 code 区分。
+          // 只看 statusCode 会把失败当成功——登录失败会表现成「拿到一个没有 token 的对象」。
+          if (body.code !== undefined && body.code !== 0) {
+            // token 过期：静默续登一次再重试，用户不该被弹回登录页
+            if (body.code === 401 && !options.noRetry && path !== CONFIG.paths.login) {
+              if (isAccountGone(body.message)) {
+                // 账号被注销了，不能靠续登把它「复活」——回退到游客模式
+                logout()
+                reject({ code: 401, message: body.message || '账号已注销' })
+                return
+              }
+              refreshToken().then((ok) => {
+                if (ok) {
+                  resolve(request(path, data, verb, { noRetry: true }))
+                } else {
+                  reject({ code: 401, message: body.message || '登录已过期，请重新登录' })
+                }
+              }).catch(reject)
               return
             }
-            refreshToken().then((ok) => {
-              if (ok) {
-                resolve(request(path, data, verb, { noRetry: true }))
-              } else {
-                reject({ code: 401, message: body.message || '登录已过期，请重新登录' })
-              }
-            }).catch(reject)
+            reject({ code: body.code, message: body.message || ERROR.SERVER })
             return
           }
-          reject({ code: body.code, message: body.message || ERROR.SERVER })
-          return
-        }
-        if (res.statusCode >= 200 && res.statusCode < 300 && !body.error) {
-          resolve(body.data || body)
-          return
-        }
-        reject({ code: 'SERVER', message: body.message || ERROR.SERVER })
-      },
-      fail: (err) => reject({ code: 'NETWORK', message: describeNetworkError(err && err.errMsg) })
-    })
-  })
+          if (res.statusCode >= 200 && res.statusCode < 300 && !body.error) {
+            resolve(body.data || body)
+            return
+          }
+          reject({ code: 'SERVER', message: body.message || ERROR.SERVER })
+        },
+        fail: (err) => reject({ code: 'NETWORK', message: describeNetworkError(err && err.errMsg) })
+      })
+    }),
+    15000
+  )
 }
 
 /** 后端说「账号不存在或已注销」——这种不能靠续登复活 */
@@ -377,7 +442,7 @@ function refreshToken() {
 
 /** 取 wx.login 的 code */
 function wxLoginCode() {
-  return new Promise((resolve, reject) => {
+  const p = new Promise((resolve, reject) => {
     if (typeof wx.login !== 'function') {
       reject({ code: 'SERVER', message: ERROR.SERVER })
       return
@@ -389,6 +454,10 @@ function wxLoginCode() {
       },
       fail: () => reject({ code: 'NETWORK', message: ERROR.NETWORK })
     })
+  })
+  // wx.login 偶尔不回调（会话异常时），不能让它把界面永久卡在「处理中…」
+  return withTimeout(p, 10000).catch((e) => {
+    throw { code: e.code === 'TIMEOUT' ? 'TIMEOUT' : 'NETWORK', message: e.message || ERROR.NETWORK }
   })
 }
 

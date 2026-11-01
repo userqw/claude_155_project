@@ -114,18 +114,23 @@ Page({
     // 已登录时进来是改资料，不需要重复登录，也不必再同意协议
     if (this.data.alreadyLoggedIn) {
       this.setData({ loading: true, errorMessage: '' })
-      const res = await auth.updateProfile({
-        nickname: this.data.nickname,
-        avatarUrl: this.data.avatarUrl
-      })
-      this.setData({ loading: false })
-      if (!res.ok) {
-        this.setData({ errorMessage: res.message || '保存失败' })
-        return
+      try {
+        const res = await auth.updateProfile({
+          nickname: this.data.nickname,
+          avatarUrl: this.data.avatarUrl
+        })
+        if (!res.ok) {
+          this.setData({ errorMessage: res.message || '保存失败' })
+          return
+        }
+        this.setData({ mockNote: this.mockHint() })
+        wx.showToast({ title: '已保存', icon: 'success' })
+        setTimeout(() => this.back(), 600)
+      } catch (e) {
+        this.setData({ errorMessage: (e && e.message) || '保存失败' })
+      } finally {
+        this.setData({ loading: false })
       }
-      this.setData({ mockNote: this.mockHint() })
-      wx.showToast({ title: '已保存', icon: 'success' })
-      setTimeout(() => this.back(), 600)
       return
     }
 
@@ -135,37 +140,46 @@ Page({
     }
     this.setData({ loading: true, errorMessage: '' })
 
-    // 登录前先探活：连不上就别让用户对着一个没有意义的失败发呆
-    const alive = await this.checkBackend()
-    if (!alive) {
+    // 整段包在 try 里：任何一个 await 抛出异常都必须把 loading 清掉，
+    // 否则界面会永远停在「处理中…」，用户只能杀进程重启。
+    try {
+      // 登录前先探活：连不上就别让用户对着一个没有意义的失败发呆
+      const alive = await this.checkBackend()
+      if (!alive) {
+        return
+      }
+
+      const res = await auth.login({
+        nickname: this.data.nickname,
+        avatarUrl: this.data.avatarUrl
+      })
+      if (!res.ok) {
+        this.setData({ errorMessage: (res.message || '登录失败') + '，你仍然可以先随便看看。' })
+        return
+      }
+
+      // 登录成功后把本机数据合并到账号（默认行为，见 PRD §5.6.6）
+      const merge = await auth.mergeLocalToAccount()
+      this.setData({ mockNote: this.mockHint() })
+
+      if (merge.ok && merge.merged > 0) {
+        wx.showToast({ title: '已合并 ' + merge.merged + ' 条记录', icon: 'none' })
+      } else if (merge.ok) {
+        wx.showToast({ title: '登录成功', icon: 'success' })
+      } else {
+        wx.showToast({ title: '登录成功，但数据同步失败', icon: 'none' })
+      }
+
+      // 昵称与头像已经随登录请求一起发过去了，不用再补一次 updateProfile
+
+      setTimeout(() => this.back(), 800)
+    } catch (e) {
+      this.setData({
+        errorMessage: ((e && e.message) || '登录失败') + '，你仍然可以先随便看看。'
+      })
+    } finally {
       this.setData({ loading: false })
-      return
     }
-
-    const res = await auth.login({
-      nickname: this.data.nickname,
-      avatarUrl: this.data.avatarUrl
-    })
-    if (!res.ok) {
-      this.setData({ loading: false, errorMessage: (res.message || '登录失败') + '，你仍然可以先随便看看。' })
-      return
-    }
-
-    // 登录成功后把本机数据合并到账号（默认行为，见 PRD §5.6.6）
-    const merge = await auth.mergeLocalToAccount()
-    this.setData({ loading: false, mockNote: this.mockHint() })
-
-    if (merge.ok && merge.merged > 0) {
-      wx.showToast({ title: '已合并 ' + merge.merged + ' 条记录', icon: 'none' })
-    } else if (merge.ok) {
-      wx.showToast({ title: '登录成功', icon: 'success' })
-    } else {
-      wx.showToast({ title: '登录成功，但数据同步失败', icon: 'none' })
-    }
-
-    // 昵称与头像已经随登录请求一起发过去了，不用再补一次 updateProfile
-
-    setTimeout(() => this.back(), 800)
   },
 
   onDevLogin() {

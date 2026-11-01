@@ -20,6 +20,11 @@
           <text class="profile-pill">{{loggedIn ? '微信账号' : '未登录访客'}}</text>
         </view>
         <view class="profile-code">工匠编号 #{{craftCode}}</view>
+        <!-- 登录了但没昵称：微信的昵称要用户自己点一下才有，
+             这里给一条能点的入口，别停在「微信用户」这种看不出状态的文案上 -->
+        <view class="profile-setname" wx:if="{{loggedIn && !account.nickname}}" bindtap="goSetName">
+          还没设置昵称，点这里用微信昵称 ›>
+        </view>
       </view>
     </view>
 

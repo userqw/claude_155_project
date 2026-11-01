@@ -54,6 +54,13 @@
   margin-top: 8rpx;
 }
 
+.profile-setname {
+  font-size: 22rpx;
+  /* --accent 当文字用对比度偏低，文字要用 --pink-text */
+  color: var(--pink-text);
+  margin-top: 8rpx;
+}
+
 .profile-strip {
   display: flex;
   flex-wrap: wrap;
