@@ -4,6 +4,7 @@ const stat = require('../../../utils/stat')
 const date = require('../../../utils/date')
 const { THEME } = require('../../../utils/constants')
 const { pickTextColor } = require('../../../utils/color')
+const auth = require('../../../utils/auth')
 
 const WEEK_LABELS = ['一', '二', '三', '四', '五', '六', '日']
 
@@ -20,7 +21,9 @@ Page({
     total: 0,
     activeDays: 0,
     selected: null,
-    dayRecords: []
+    dayRecords: [],
+    // 未登录：日历是私有内容，按空处理
+    locked: false
   },
 
   onLoad(options) {
@@ -48,6 +51,37 @@ Page({
     const years = stat.availableYears()
     const current = date.yearOf(date.today())
     const year = this.data.year && years.indexOf(this.data.year) > -1 ? this.data.year : current
+
+    // 未登录：日历热力图是私有内容，按空处理（PRD §5.6.1）
+    if (!auth.isLoggedIn()) {
+      const months = []
+      for (let m = 1; m <= 12; m++) {
+        const first = new Date(Number(year), m - 1, 1)
+        const offset = (first.getDay() + 6) % 7
+        const total = date.daysInMonth(Number(year), m)
+        const cells = []
+        for (let i = 0; i < offset; i++) cells.push({ key: 'pad' + m + '_' + i, empty: true })
+        for (let d = 1; d <= total; d++) {
+          const ds = year + '-' + (m < 10 ? '0' + m : m) + '-' + (d < 10 ? '0' + d : d)
+          cells.push({ key: ds, date: ds, day: d, count: 0, level: 0, empty: true })
+        }
+        months.push({ month: m, cells: cells })
+      }
+      this.setData({
+        locked: true,
+        years: [current],
+        year: current,
+        months: months,
+        maxCount: 0,
+        total: 0,
+        activeDays: 0,
+        selected: null,
+        dayRecords: [],
+        heatColors: THEME[theme].heat,
+        emptyColor: THEME[theme].heatEmpty
+      })
+      return
+    }
 
     const daily = stat.dailyMap(year)
     const counts = Object.keys(daily).map((k) => daily[k])
@@ -100,6 +134,7 @@ Page({
     }
 
     this.setData({
+      locked: false,
       years: years.length ? years : [current],
       year: year,
       months: months,
@@ -125,6 +160,8 @@ Page({
   onTapDay(e) {
     const ds = e.currentTarget.dataset.date
     if (!ds) return
+    // 未登录时看不到任何一天的记录
+    if (!auth.isLoggedIn()) return
     const records = db.listCheckIns({ date: ds })
     const shapeMap = {}
     db.listShapes().forEach((s) => {

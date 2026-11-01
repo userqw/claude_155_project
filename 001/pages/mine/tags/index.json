@@ -1,4 +1,6 @@
 {
-  "usingComponents": {},
+  "usingComponents": {
+    "empty-state": "../../../components/empty-state/index"
+  },
   "navigationBarTitleText": "标签管理"
 }

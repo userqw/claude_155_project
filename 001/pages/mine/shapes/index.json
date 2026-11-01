@@ -1,6 +1,7 @@
 {
   "navigationBarTitleText": "品类管理",
   "usingComponents": {
-    "shape-icon": "../../../components/shape-icon/index"
+    "shape-icon": "../../../components/shape-icon/index",
+    "empty-state": "../../../components/empty-state/index"
   }
 }

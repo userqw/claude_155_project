@@ -3,6 +3,7 @@ const db = require('../../../utils/db')
 const stat = require('../../../utils/stat')
 const date = require('../../../utils/date')
 const { money } = require('../../../utils/format')
+const auth = require('../../../utils/auth')
 
 Page({
   data: {
@@ -16,7 +17,9 @@ Page({
     totalAmount: 0,
     showSale: false,
     saleTarget: null,
-    saleMax: 1
+    saleMax: 1,
+    // 未登录：作品详情是私有内容，按空处理
+    locked: false
   },
 
   onLoad(options) {
@@ -40,6 +43,11 @@ Page({
 
   load() {
     const id = this.data.id
+    // 未登录：作品详情是私有内容，按空处理（PRD §5.6.1）
+    if (!auth.isLoggedIn()) {
+      this.setData({ locked: true, record: null, photos: [], sales: [] })
+      return
+    }
     const rec = db.getCheckIn(id)
     if (!rec) {
       this.setData({ record: null })

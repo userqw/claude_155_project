@@ -11,7 +11,15 @@
     </view>
   </view>
 
-  <view class="btn btn-primary" bindtap="onAdd">+ 新标签</view>
+  <view class="btn btn-primary" wx:if="{{!locked}}" bindtap="onAdd">+ 新标签</view>
+
+  <empty-state
+    wx:if="{{locked}}"
+    theme="{{theme}}"
+    icon="🔒"
+    title="标签是私有的"
+    sub="登录后能看到并管理你的标签"
+  ></empty-state>
 </view>
 
 <view wx:if="{{showEditor}}" class="mask" bindtap="onClose">

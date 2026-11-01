@@ -61,17 +61,19 @@ Page({
 
   load() {
     const theme = this.data.theme
-    const checkIns = db.aliveCheckIns()
-    const sales = db.listSales()
-    const soldMap = db.soldCountByCheckIn()
+
+    // 未登录：累计、售出、营收、库存、回收站数量都是私有数字，一律按空处理
+    // （PRD §5.6.1）。素材库概览同理。
+    const loggedIn = auth.isLoggedIn()
+
+    const checkIns = loggedIn ? db.aliveCheckIns() : []
+    const sales = loggedIn ? db.listSales() : []
+    const soldMap = loggedIn ? db.soldCountByCheckIn() : {}
 
     const production = checkIns.reduce((s, c) => s + c.count, 0)
     const soldCount = sales.reduce((s, x) => s + x.quantity, 0)
     const revenue = sales.reduce((s, x) => s + x.totalAmount, 0)
 
-    // 素材库概览。素材库是私有内容：没登录时数量与预览图都不给看，
-    // 免得「我的」页把私有内容泄露出去。
-    const loggedIn = auth.isLoggedIn()
     const folders = loggedIn ? db.listFolders() : []
     const counts = loggedIn ? db.materialCounts() : { counts: {}, unfiled: 0, total: 0 }
     const folderRows = folders.map((f) => ({
@@ -101,25 +103,25 @@ Page({
         records: checkIns.length,
         days: new Set(checkIns.map((c) => c.date)).size
       },
-      inventory: stat.inventory(theme),
-      trashCount: db.listTrash().length + db.listMaterialTrash().length,
+      inventory: loggedIn ? stat.inventory(theme) : [],
+      trashCount: loggedIn ? db.listTrash().length + db.listMaterialTrash().length : 0,
       cloudEnabled: app.globalData.cloudEnabled,
-      shapeCount: db.listShapes().length,
-      tagCount: db.listTags().length,
-      loggedIn: auth.isLoggedIn(),
+      shapeCount: loggedIn ? db.listShapes().length : 0,
+      tagCount: loggedIn ? db.listTags().length : 0,
+      loggedIn: loggedIn,
       account: auth.getState().account,
       // 本机持久化的头像优先：服务端存的是选头像当时的路径，换台设备就没了
       avatarUrl: auth.avatarPath(),
-      accountSub: auth.isLoggedIn()
+      accountSub: loggedIn
         ? (auth.getState().mock
             ? '本地联调模式 · 还没连上真实微信号'
             : '微信账号已绑定 · 数据可备份到云端')
         : '数据只存在这台设备上 · 登录后自动备份',
-      displayName: auth.isLoggedIn()
+      displayName: loggedIn
         ? (auth.getState().account.nickname || '微信用户')
         : '手作工坊访客',
       craftCode: craftCode,
-      tagNames: db.listTags().slice(0, 3).map((t) => t.name).join(' · '),
+      tagNames: loggedIn ? db.listTags().slice(0, 3).map((t) => t.name).join(' · ') : '',
       materialCount: counts.total,
       folderCount: folders.length,
       folders: folderRows,

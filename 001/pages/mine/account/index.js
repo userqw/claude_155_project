@@ -36,7 +36,7 @@ Page({
   load() {
     const loggedIn = auth.isLoggedIn()
     const account = auth.getState().account
-    const localCount = db.aliveCheckIns().length
+    const localCount = auth.isLoggedIn() ? db.aliveCheckIns().length : 0
     // 后端没配小程序 appid/secret 时跑的是 mock，openid 是 md5(code) 编的，
     // 不是用户的真实微信号——不说明白，用户会去数据库里找自己的账号然后找不到。
     const mockMode = loggedIn && !!auth.getState().mock

@@ -35,7 +35,15 @@
     </view>
   </view>
 
-  <view class="btn btn-primary" bindtap="onAdd">+ 新建品类</view>
+  <view class="btn btn-primary" wx:if="{{!locked}}" bindtap="onAdd">+ 新建品类</view>
+
+  <empty-state
+    wx:if="{{locked}}"
+    theme="{{theme}}"
+    icon="🔒"
+    title="品类是私有的"
+    sub="登录后能看到并管理你的品类"
+  ></empty-state>
 </view>
 
 <!-- 编辑弹层 -->

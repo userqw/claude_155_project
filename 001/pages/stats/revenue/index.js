@@ -3,6 +3,7 @@ const db = require('../../../utils/db')
 const stat = require('../../../utils/stat')
 const date = require('../../../utils/date')
 const { money } = require('../../../utils/format')
+const auth = require('../../../utils/auth')
 
 Page({
   data: {
@@ -14,7 +15,9 @@ Page({
     shapeBars: [],
     channelBars: [],
     sales: [],
-    hasData: false
+    hasData: false,
+    // 未登录：营收是私有内容，按空处理
+    locked: false
   },
 
   onLoad(options) {
@@ -42,6 +45,22 @@ Page({
     const years = stat.availableYears()
     const current = date.yearOf(date.today())
     const year = this.data.year && years.indexOf(this.data.year) > -1 ? this.data.year : current
+
+    // 未登录：营收是私有内容，按空处理（PRD §5.6.1）
+    if (!auth.isLoggedIn()) {
+      this.setData({
+        locked: true,
+        years: [current],
+        year: current,
+        overview: stat.emptyOverview(year),
+        revenueBars: [],
+        shapeBars: [],
+        channelBars: [],
+        sales: [],
+        hasData: false
+      })
+      return
+    }
 
     const overview = stat.yearlyOverview(year, theme)
 
@@ -86,6 +105,7 @@ Page({
     })
 
     this.setData({
+      locked: false,
       years: years.length ? years : [current],
       year: year,
       overview: overview,

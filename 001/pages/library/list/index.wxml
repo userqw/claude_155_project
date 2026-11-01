@@ -70,9 +70,9 @@
   <empty-state
     wx:if="{{!left.length && !right.length}}"
     theme="{{theme}}"
-    icon="🖼"
-    title="这里还空空的"
-    sub="换个筛选条件，或者去补录第一件作品"
+    icon="{{locked ? '🔒' : '🖼'}}"
+    title="{{locked ? '作品库是私有的' : '这里还空空的'}}"
+    sub="{{locked ? '登录后能看到你的全部作品' : '换个筛选条件，或者去补录第一件作品'}}"
   ></empty-state>
 
   <!-- 瀑布流 -->

@@ -38,7 +38,8 @@
   <!-- 云端备份 -->
   <view class="card" wx:if="{{loggedIn}}">
     <view class="section-title">云端备份</view>
-    <view class="section-sub">本机共 {{localCount}} 条记录</view>
+    <view class="section-sub" wx:if="{{loggedIn}}">本机共 {{localCount}} 条记录</view>
+    <view class="section-sub" wx:else>登录后可见你的记录数</view>
 
     <view class="opt" bindtap="onMerge">
       <view class="opt-icon">☁️</view>

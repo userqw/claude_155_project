@@ -1,5 +1,6 @@
 const db = require('../../../utils/db')
 const stat = require('../../../utils/stat')
+const auth = require('../../../utils/auth')
 const { SHAPE_COLORS } = require('../../../utils/constants')
 
 const ICONS = ['🎨', '🧸', '🙂', '🧍', '🐻', '🐰', '🐱', '🐶', '🦊', '🐼', '✨', '🌸', '🍀', '⭐', '💫', '🎀']
@@ -27,7 +28,9 @@ Page({
       iconPath: '',
       slot: 0
     },
-    palette: []
+    palette: [],
+    // 未登录：品类名与「已记录 N 个」都是私有内容，按空处理
+    locked: false
   },
 
   onLoad() {
@@ -48,6 +51,13 @@ Page({
 
   load() {
     const theme = this.data.theme
+
+    // 未登录：品类名与「已记录 N 个」都是私有内容，按空处理（PRD §5.6.1）
+    if (!auth.isLoggedIn()) {
+      this.setData({ locked: true, shapes: [] })
+      return
+    }
+
     const used = {}
     db.aliveCheckIns().forEach((c) => {
       used[c.shapeId] = (used[c.shapeId] || 0) + c.count
@@ -62,7 +72,7 @@ Page({
       color: stat.shapeColor(s, theme),
       used: used[s.id] || 0
     }))
-    this.setData({ shapes: shapes })
+    this.setData({ locked: false, shapes: shapes })
   },
 
   onAdd() {

@@ -46,6 +46,9 @@ node 001/test/photos.test.js
 # 品类管理（自定义品类的增删改查 + 内置四个的边界）
 node 001/test/shapes.test.js
 
+# 隐私（未登录时各页面都不能露出用户内容）
+node 001/test/privacy.test.js
+
 # 样式与配色校验
 node 001/test/style.test.js && node 001/test/theme.test.js
 ```
@@ -194,7 +197,7 @@ These are the recurring traps; follow them even when a change looks locally reas
 5. **Record deletion is soft** — `status = 'deleted'`, recoverable from a 30-day trash, with statistics rolled back immediately on delete and restore.
 6. **Shape categories** (造型): `OB11娃头`, `QQ人`, `正比` are built-in — renameable and re-orderable, but not deletable. `其他` is a catch-all. User-defined shapes may be added. These three are the fixed taxonomy that all yearly statistics aggregate over.
 7. **Local-first storage**: write to local storage first, then sync to the cloud; a check-in must succeed offline and upload later.
-8. **Guest-first login (PRD §5.6)**: browsing is never forced to log in. Reading stats, browsing the library, and reading the material library's shell all work while logged out. **写操作要登录**：打卡（PRD §5.6.1）必须登录，未登录点「去打卡」直接带去登录页，**登录完接着进打卡页**（用 `redirect` 参数），不用让用户再点一次。素材库是私有内容，未登录一律按空处理。`utils/auth.js` deliberately contains no `navigateTo` / `showModal` — don't add any, or AC-8/AC-12 break; the page-jumping guard lives in `utils/require-login.js` instead. Logging out must never delete local records; only "注销账号" clears both sides.
+8. **Data is private, but nothing is blocked (PRD §5.6)**: logged out, the UI shows **no** user content — counts, records, works, materials, categories, tags are all rendered empty ("登录后可见"). Nothing is intercepted though: no full-screen login page, no forced redirect, no overlay. Check-ins need a login: tapping 「去打卡」 goes straight to the login page and **continues to the check-in page afterwards** (the `redirect` parameter) instead of making the user tap twice. `utils/auth.js` deliberately contains no `navigateTo` / `showModal` — don't add any, or AC-8/AC-12 break; the page-jumping guard lives in `utils/require-login.js` instead. Logging out must never delete local records — it only hides them; only "注销账号" clears both sides.
 9. **No hardcoded colors in page/component styles.** Every color comes from `styles/theme.wxss` via `var(--…)`; `test/style.test.js` fails otherwise. The theme file is the single place to change a color — including the pink/green/purple tints, which are tokens (`--pink-16`, `--green-16`, `--purple-20`, …), not inline rgba().
 10. **Deleting a material folder must not delete its materials.** `removeFolder` moves them to 未分类 (`folder_id = ''`). Material deletion is soft (30-day trash) like check-ins.
 11. **Every `bindtap`/`bindchange` in a wxml must have a handler in the matching js.** WeChat does not error on a missing handler — the tap just silently does nothing. `test/structure.test.js` checks pages *and* components for this; it is the guard behind "点击没反应".

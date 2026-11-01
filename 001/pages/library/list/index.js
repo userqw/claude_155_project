@@ -2,6 +2,7 @@ const app = getApp()
 const db = require('../../../utils/db')
 const stat = require('../../../utils/stat')
 const date = require('../../../utils/date')
+const auth = require('../../../utils/auth')
 
 const SORTS = [
   { key: 'time', text: '时间倒序' },
@@ -22,7 +23,9 @@ Page({
     sortText: SORTS[0].text,
     left: [],
     right: [],
-    counts: { total: 0, sold: 0, unsold: 0 }
+    counts: { total: 0, sold: 0, unsold: 0 },
+    // 未登录：作品库是私有内容，按空处理
+    locked: false
   },
 
   onLoad() {
@@ -55,6 +58,19 @@ Page({
 
   load() {
     const theme = this.data.theme
+
+    // 未登录：作品库是私有内容，按空处理（PRD §5.6.1）
+    if (!auth.isLoggedIn()) {
+      this.setData({
+        locked: true,
+        shapes: [],
+        left: [],
+        right: [],
+        counts: { total: 0, sold: 0, unsold: 0 }
+      })
+      return
+    }
+
     const all = db.listCheckIns()
     const soldMap = db.soldCountByCheckIn()
     const salesByCheckIn = {}
@@ -156,6 +172,7 @@ Page({
     })
 
     this.setData({
+      locked: false,
       shapes: shapes,
       left: left,
       right: right,

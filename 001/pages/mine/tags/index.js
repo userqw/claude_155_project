@@ -1,4 +1,5 @@
 const db = require('../../../utils/db')
+const auth = require('../../../utils/auth')
 const { SHAPE_COLORS } = require('../../../utils/constants')
 
 Page({
@@ -8,7 +9,9 @@ Page({
     palette: SHAPE_COLORS.light,
     showEditor: false,
     editingId: '',
-    form: { name: '', color: '#898781' }
+    form: { name: '', color: '#898781' },
+    // 未登录：标签是私有的，按空处理
+    locked: false
   },
 
   onLoad() {
@@ -25,6 +28,11 @@ Page({
   },
 
   load() {
+    // 未登录：标签是私有的（「用了多少条记录」也是），按空处理（PRD §5.6.1）
+    if (!auth.isLoggedIn()) {
+      this.setData({ locked: true, tags: [] })
+      return
+    }
     const used = {}
     db.aliveCheckIns().forEach((c) => {
       (c.tagIds || []).forEach((t) => {
@@ -38,7 +46,7 @@ Page({
       isBuiltin: t.isBuiltin,
       used: used[t.id] || 0
     }))
-    this.setData({ tags: tags })
+    this.setData({ locked: false, tags: tags })
   },
 
   onAdd() {

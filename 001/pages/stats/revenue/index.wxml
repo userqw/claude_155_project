@@ -17,9 +17,9 @@
   <empty-state
     wx:if="{{!hasData}}"
     theme="{{theme}}"
-    icon="💰"
-    title="这一年还没有售出记录"
-    sub="作品卖出去后记一笔，营收曲线就会长出来"
+    icon="{{locked ? '🔒' : '💰'}}"
+    title="{{locked ? '营收是私有的' : '这一年还没有售出记录'}}"
+    sub="{{locked ? '登录后能看到你的营收曲线' : '作品卖出去后记一笔，营收曲线就会长出来'}}"
   ></empty-state>
 
   <block wx:if="{{hasData}}">

@@ -3,6 +3,7 @@ const db = require('../../../utils/db')
 const stat = require('../../../utils/stat')
 const date = require('../../../utils/date')
 const { money } = require('../../../utils/format')
+const auth = require('../../../utils/auth')
 
 /** 耗时文案：分钟 -> '8.5h' / '45min' */
 function durationText(min) {
@@ -30,6 +31,8 @@ Page({
     monthlyBars: [],
     showTable: false,
     hasData: false,
+    // 未登录：统计是私有内容，按空处理
+    locked: false,
     // -- 展示用的派生数据 --
     longestStreak: 0,
     sellRate: '0.0',
@@ -80,6 +83,37 @@ Page({
     if (years.indexOf(current) === -1) years.push(current)
     years.sort((a, b) => Number(b) - Number(a))
     const year = this.data.year && years.indexOf(this.data.year) > -1 ? this.data.year : current
+
+    // 未登录：统计是私有内容，按空处理（PRD §5.6.1）
+    if (!auth.isLoggedIn()) {
+      const empty = stat.emptyOverview(year)
+      this.setData({
+        locked: true,
+        years: [current],
+        year: current,
+        yearIndex: 0,
+        overview: empty,
+        compare: { delta: 0, rate: null },
+        shapeBars: [],
+        shapeTable: [],
+        shapeRevenueBars: [],
+        channelBars: [],
+        monthlyBars: [],
+        hasData: false,
+        longestStreak: 0,
+        sellRate: '0.0',
+        compareArrow: '＝',
+        compareYear: String(Number(current) - 1).slice(2),
+        compareRate: '',
+        compareDeltaText: 0,
+        revenueText: '¥' + money(0),
+        soldCount: 0,
+        avgPriceText: '¥' + money(0),
+        bestPrice: null,
+        works: []
+      })
+      return
+    }
 
     const overview = stat.yearlyOverview(year, theme)
     const compare = stat.yearCompare(year)
@@ -206,6 +240,7 @@ Page({
       : '0.0'
 
     this.setData({
+      locked: false,
       years: years,
       year: year,
       yearIndex: years.indexOf(year),
@@ -262,6 +297,11 @@ Page({
 
   goCheckin() {
     wx.switchTab({ url: '/pages/index/index' })
+  },
+
+  /** 未登录时统计是空的，给一个去登录的入口 */
+  goLogin() {
+    wx.navigateTo({ url: '/pages/login/index?intent=login' })
   },
 
   goRevenue() {

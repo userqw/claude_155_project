@@ -38,11 +38,11 @@
   <empty-state
     wx:if="{{!hasData}}"
     theme="{{theme}}"
-    icon="📊"
-    title="这一年还没有记录"
-    sub="先去打个卡，这里就会长出你的年度曲线"
-    action-text="去打个卡"
-    bindaction="goCheckin"
+    icon="{{locked ? '🔒' : '📊'}}"
+    title="{{locked ? '统计是私有的' : '这一年还没有记录'}}"
+    sub="{{locked ? '登录后能看到你的年度曲线' : '先去打个卡，这里就会长出你的年度曲线'}}"
+    action-text="{{locked ? '去登录' : '去打个卡'}}"
+    bindaction="{{locked ? 'goLogin' : 'goCheckin'}}"
   ></empty-state>
 
   <block wx:if="{{hasData}}">

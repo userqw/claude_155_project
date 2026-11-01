@@ -89,7 +89,14 @@
 </view>
 
 <view class="page theme-{{theme}}" wx:else>
-  <empty-state theme="{{theme}}" icon="🔍" title="记录不存在" sub="它可能已经被删除了"></empty-state>
+  <empty-state
+    wx:if="{{locked}}"
+    theme="{{theme}}"
+    icon="🔒"
+    title="作品是私有的"
+    sub="登录后能看到这条记录"
+  ></empty-state>
+  <empty-state wx:else theme="{{theme}}" icon="🔍" title="记录不存在" sub="它可能已经被删除了"></empty-state>
 </view>
 
 

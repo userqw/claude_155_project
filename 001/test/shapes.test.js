@@ -27,6 +27,12 @@ const root = path.resolve(process.argv[2] || path.join(__dirname, '..'))
 const db = require(path.join(root, 'utils/db.js'))
 db.init()
 
+// 品类管理是账号内的内容，未登录时整页按空处理（PRD §5.6.1），
+// 所以这一组用例从登录态开始
+const auth = require(path.join(root, 'utils/auth.js'))
+auth.init()
+auth.devLogin()
+
 let passed = 0
 let failed = 0
 
@@ -198,6 +204,15 @@ async function main() {
     const page = makePage()
     page.load()
     assert.strictEqual(page.data.shapes.some((s) => s.name === '小摆件'), false)
+  })
+
+  await check('未登录时品类页是空的（品类名与「已记录 N 个」都是私有内容）', () => {
+    auth.logout()
+    const page = makePage()
+    page.load()
+    assert.strictEqual(page.data.locked, true)
+    assert.strictEqual(page.data.shapes.length, 0, '品类不该露出来')
+    auth.devLogin()
   })
 
   console.log('\n' + (failed ? failed + ' 个用例失败' : passed + ' 个用例全部通过') + '\n')
