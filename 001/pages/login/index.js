@@ -9,6 +9,7 @@ Page({
     agreed: false,
     loading: false,
     errorMessage: '',
+    backendNote: '',
     devVisible: false,
     alreadyLoggedIn: false
   },
@@ -25,6 +26,23 @@ Page({
       devVisible: !backendReady,
       errorMessage: backendReady ? '' : '登录服务还未配置，现在只能以游客身份使用；不影响记录和统计。'
     })
+    // 先探活：登录失败时能直接告诉用户是「地址不对」还是「后端没起」，
+    // 而不是只丢一句「网络连接失败」。
+    if (backendReady) this.checkBackend()
+  },
+
+  /** 探活并把结果写进页面；连不通就把原因说清楚 */
+  async checkBackend() {
+    const status = await auth.probeBackend()
+    if (status.ok) {
+      this.setData({ errorMessage: '', backendNote: '后端已连接：' + status.base })
+      return true
+    }
+    this.setData({
+      errorMessage: status.message || '连不上后端，现在只能以游客身份使用；不影响记录和统计。',
+      backendNote: ''
+    })
+    return false
   },
 
   onAppThemeChange(theme) {
@@ -101,6 +119,13 @@ Page({
     }
     this.setData({ loading: true, errorMessage: '' })
 
+    // 登录前先探活：连不上就别让用户对着一个没有意义的失败发呆
+    const alive = await this.checkBackend()
+    if (!alive) {
+      this.setData({ loading: false })
+      return
+    }
+
     const res = await auth.login()
     if (!res.ok) {
       this.setData({ loading: false, errorMessage: (res.message || '登录失败') + '，你仍然可以先随便看看。' })
@@ -136,7 +161,10 @@ Page({
   back() {
     const pages = getCurrentPages()
     if (pages.length > 1) {
-      wx.navigateBack()
+      // 返回失败就回首页——登录页不是 tab 页，卡在这儿就看不到底部导航栏
+      wx.navigateBack({
+        fail: () => wx.switchTab({ url: '/pages/index/index' })
+      })
       return
     }
     wx.switchTab({ url: '/pages/index/index' })

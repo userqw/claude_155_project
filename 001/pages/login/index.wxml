@@ -30,6 +30,8 @@
 
     <view class="warn" wx:if="{{errorMessage}}">{{errorMessage}}</view>
 
+    <view class="backend-note" wx:if="{{backendNote}}">{{backendNote}}</view>
+
     <view class="btn btn-primary login-btn {{loading ? 'btn-disabled' : ''}}" bindtap="onLogin">
       {{loading ? '处理中…' : (alreadyLoggedIn ? '保存资料' : '微信一键登录')}}
     </view>

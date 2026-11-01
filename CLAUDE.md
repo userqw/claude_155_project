@@ -37,6 +37,9 @@ node 001/test/auth.test.js
 # 素材库验收测试（对照 PRD §12 的 AC-13~AC-15）
 node 001/test/material.test.js
 
+# 导航栏验收测试（底部 tab bar 的每个 tab 都能跳、登录页不会把人困住）
+node 001/test/nav.test.js
+
 # 样式与配色校验
 node 001/test/style.test.js && node 001/test/theme.test.js
 ```
@@ -93,6 +96,36 @@ Canvas charts use the Canvas 2D API (`type="2d"`), which needs 基础库 ≥ 2.9
 
 `utils/auth.js` 是这条链路的唯一实现——它既要带 token，又要判业务码，还要把裸毫秒时间戳转成 ISO 字符串。
 这三个职责都在同一个 `request()` 里，改的时候一起改。
+
+### 「登录了但数据库里没这个账号」
+
+先看**后端日志有没有收到 `/api/login`**。没有的话，问题在小程序和后端之间，
+不在后端：
+
+- **模拟器 vs 真机用的是不同地址。** 模拟器里 `127.0.0.1` 是你的电脑；
+  真机预览时 `127.0.0.1` 指的是**手机自己**，必然连不上。
+  `config.js` 的 `apiCandidates` 存了电脑的局域网 IP（`ipconfig` 看 IPv4），
+  登录前会挨个探活 `GET /api/health`，谁通用谁。
+- **合法域名校验。** 开发者工具：详情 → 本地设置 → 勾「不校验合法域名…」。
+- **别把微信的 errMsg 吞掉。** `request()` 的 `fail` 会给出
+  `url not in domain list` / `timeout` / 连接被拒——
+  这些长得完全不一样，`describeNetworkError()` 负责翻译成人话。
+  一律吞成「网络连接失败」等于让人对着黑盒猜。
+
+### 「底部导航栏点了没反应」
+
+自定义 tab bar 的每个 `pagePath` 必须同时出现在两处：
+
+1. `custom-tab-bar/index.js` 的 `list`
+2. `app.json` 的 `tabBar.list`
+
+少一处，`wx.switchTab` 会**静默失败**——不报错，点了就是没反应。
+`test/nav.test.js` 盯着这件事，也盯着 `wx:key` 指向的字段是不是真的存在。
+
+另外：`custom-tab-bar` 由框架注入，**不要**在各 tab 页面的 `usingComponents`
+里重复声明；也不要开 `lazyCodeLoading: "requiredComponents"`——
+自定义 tab bar 与「按需注入」的组合会让 tab bar 变得不可靠，
+而十几个页面的启动收益本来就可以忽略。
 
 ## Source of truth
 

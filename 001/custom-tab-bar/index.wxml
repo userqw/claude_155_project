@@ -2,7 +2,7 @@
   <view
     class="tabbar-item {{selected === index ? 'tabbar-item-active' : ''}}"
     wx:for="{{list}}"
-    wx:key="path"
+    wx:key="pagePath"
     wx:for-index="index"
     data-index="{{index}}"
     data-path="{{item.pagePath}}"

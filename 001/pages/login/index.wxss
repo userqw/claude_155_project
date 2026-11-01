@@ -116,6 +116,14 @@
   margin-bottom: 24rpx;
 }
 
+.backend-note {
+  font-size: 22rpx;
+  color: var(--text-3);
+  line-height: 1.6;
+  margin: -12rpx 0 24rpx;
+  word-break: break-all;
+}
+
 .login-btn {
   margin-top: 8rpx;
 }

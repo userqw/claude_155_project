@@ -16,6 +16,10 @@ const store = {}
 let loginCodeCalls = 0
 let backendUp = false
 let lastRequest = null
+// 失败时微信给的原始 errMsg（不同原因长得完全不一样，不能一律吞成「网络连接失败」）
+let failErrMsg = 'request:fail'
+// 只让这些主机有响应；为空表示跟随 backendUp。用来测多地址探活。
+let upHosts = null
 
 /** 内存假后端：够前端跑通登录/资料/推送三条链路 */
 function fakeBackend(pathname, body) {
@@ -55,6 +59,9 @@ function fakeBackend(pathname, body) {
   if (pathname === '/api/sync/push') {
     return { code: 0, message: 'ok', data: { checkIns: 1, photos: 0, sales: 0, folders: 0, materials: 0 } }
   }
+  if (pathname === '/api/health') {
+    return { code: 0, message: 'ok', data: 'ok' }
+  }
   return { code: 0, message: 'ok', data: {} }
 }
 
@@ -80,9 +87,11 @@ global.wx = {
   },
   request: (opt) => {
     lastRequest = opt
-    if (!backendUp) {
+    const host = opt.url.replace(/^https?:\/\//, '').split('/')[0]
+    const alive = upHosts && upHosts.size ? upHosts.has(host) : backendUp
+    if (!alive) {
       // 后端不可达
-      opt.fail({ errMsg: 'request:fail' })
+      opt.fail({ errMsg: failErrMsg })
       return
     }
     const pathname = opt.url.replace(/^https?:\/\/[^/]+/, '')
@@ -234,6 +243,46 @@ async function main() {
     auth.logout()
     assert.strictEqual(auth.getState().mode, 'guest')
     assert.strictEqual(db.aliveCheckIns().length, 2)
+  })
+
+  console.log('\n连不上后端时的诊断信息')
+
+  await check('失败原因会翻译成人话，不再只有「网络连接失败」', async () => {
+    // 微信在地址不合法时给的是 url not in domain list，
+    // 之前被一律吞成「网络连接失败」，用户根本看不出该改什么。
+    backendUp = false
+    failErrMsg = 'request:fail url not in domain list'
+    const res = await auth.login()
+    assert.strictEqual(res.ok, false)
+    assert.strictEqual(res.error, 'NETWORK')
+    assert.ok(res.message.indexOf('合法域名') > -1, '应提示合法域名问题：' + res.message)
+    failErrMsg = 'request:fail'
+  })
+
+  await check('探活：第一个地址不通时自动改用第二个', async () => {
+    auth.resetBackendStatus()
+    // 只有局域网地址有响应（模拟真机预览：127.0.0.1 连的是手机自己）
+    upHosts = new Set(['192.168.1.100:8080'])
+    const status = await auth.probeBackend()
+    assert.strictEqual(status.ok, true)
+    assert.strictEqual(status.base, 'http://192.168.1.100:8080')
+    assert.strictEqual(auth.activeBase(), 'http://192.168.1.100:8080')
+  })
+
+  await check('探活成功后记住这个地址，下次直接用', async () => {
+    const res = await auth.login()
+    assert.strictEqual(res.ok, true)
+    assert.ok(lastRequest.url.indexOf('192.168.1.100:8080') > -1, lastRequest.url)
+  })
+
+  await check('探活：一个都连不上时报错里要列出试过的地址', async () => {
+    auth.resetBackendStatus()
+    upHosts = new Set()
+    const status = await auth.probeBackend()
+    assert.strictEqual(status.ok, false)
+    assert.ok(status.message.indexOf('127.0.0.1:8080') > -1, '应列出试过的地址：' + status.message)
+    assert.ok(status.message.indexOf('192.168.1.100:8080') > -1, '应列出试过的地址：' + status.message)
+    upHosts = null
   })
 
   console.log('\n' + (failed ? failed + ' 个用例失败' : passed + ' 个用例全部通过') + '\n')

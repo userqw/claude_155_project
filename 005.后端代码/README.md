@@ -107,6 +107,7 @@ Authorization: Bearer <token>
 
 | 方法 | 路径 | 说明 |
 | --- | --- | --- |
+| GET | `/api/health` | 探活，免鉴权。小程序用它判断「后端到底通不通」 |
 | POST | `/api/login` | 微信一键登录，首次登录自动注册，返回 token |
 | GET | `/api/profile` | 当前账号资料 |
 | POST | `/api/profile` | 改昵称头像 |

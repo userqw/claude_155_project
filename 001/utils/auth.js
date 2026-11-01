@@ -19,6 +19,31 @@ const ERROR = {
   DELETED: '该账号已注销'
 }
 
+/**
+ * 把微信的 errMsg 翻译成人能看懂的话。
+ *
+ * 之前这里一律返回「网络连接失败」，把 wx.request 给的真话全吞了——
+ * 最常见的两条（不在合法域名列表、真机连不上电脑的 127.0.0.1）
+ * 长得完全不一样，猜不出来，只能靠日志猜。
+ */
+function describeNetworkError(errMsg) {
+  const raw = (errMsg || '').toString()
+  if (!raw) return ERROR.NETWORK
+  if (/not in domain list|不在.*合法域名|url not in domain/i.test(raw)) {
+    return '请求地址不在小程序合法域名列表里（开发者工具：详情 → 本地设置 → 勾选「不校验合法域名…」）'
+  }
+  if (/timeout/i.test(raw)) {
+    return '连接后端超时，后端没起来或地址不对'
+  }
+  if (/ECONNREFUSED|connect.*refused|无法连接/i.test(raw)) {
+    return '连不上后端。真机预览时 127.0.0.1 指的是手机自己，要用电脑的局域网 IP'
+  }
+  if (/ssl|certificate|https/i.test(raw)) {
+    return 'HTTPS 证书或 TLS 版本不通过（开发者工具可勾「不校验合法域名…」绕过）'
+  }
+  return ERROR.NETWORK + '（' + raw + '）'
+}
+
 let state = null
 let listeners = []
 
@@ -125,6 +150,115 @@ function backendReady() {
   return !!(CONFIG.apiBase || CONFIG.cloudFunction)
 }
 
+// -- 后端地址探活 -------------------------------------------------------------
+
+const BASE_CACHE_KEY = 'nt_api_base_v1'
+// 探活结果：{ ok, base, message }。base 为空表示没连上任何一个地址。
+let baseStatus = { ok: false, base: '', message: '' }
+// 上次探活成功的地址。只存在这里和 storage 里，
+// **不要回写 CONFIG.apiBase** —— 那会把候选地址列表塌缩成一个，
+// 下次探活就再也试不到别的地址了。
+let resolvedBase = ''
+
+/** 当前实际使用的后端地址：优先用上次探活成功的那个 */
+function activeBase() {
+  if (resolvedBase) return resolvedBase
+  try {
+    const cached = wx.getStorageSync(BASE_CACHE_KEY)
+    if (cached) {
+      resolvedBase = cached
+      return cached
+    }
+  } catch (e) {
+    // 读不到就用配置里的
+  }
+  return CONFIG.apiBase
+}
+
+/** 把探活成功的地址记下来，下次直接用，省掉一次探测 */
+function rememberBase(base) {
+  baseStatus = { ok: true, base: base, message: '' }
+  resolvedBase = base
+  try {
+    wx.setStorageSync(BASE_CACHE_KEY, base)
+  } catch (e) {
+    // 存不住也不影响用
+  }
+}
+
+/**
+ * 挨个探活候选地址，返回第一个能通的。
+ *
+ * 为什么需要：模拟器能用 127.0.0.1，真机不行（手机上 127.0.0.1 是手机自己）。
+ * 与其让用户自己猜该填哪个地址，不如挨个试——哪个通用哪个。
+ */
+function probeBackend() {
+  if (CONFIG.cloudFunction) {
+    return Promise.resolve({ ok: true, base: 'cloud:' + CONFIG.cloudFunction, message: '' })
+  }
+  const candidates = []
+  const push = (b) => {
+    if (b && candidates.indexOf(b) === -1) candidates.push(b)
+  }
+  push(activeBase())
+  push(CONFIG.apiBase)
+  ;(CONFIG.apiCandidates || []).forEach(push)
+
+  if (!candidates.length) {
+    baseStatus = { ok: false, base: '', message: ERROR.NOT_CONFIGURED }
+    return Promise.resolve(baseStatus)
+  }
+
+  const tryOne = (base) =>
+    new Promise((resolve) => {
+      wx.request({
+        url: base + CONFIG.healthPath,
+        method: 'GET',
+        timeout: 4000,
+        success: (res) => {
+          const body = res.data || {}
+          resolve(res.statusCode >= 200 && res.statusCode < 300 && body.code === 0 ? base : null)
+        },
+        fail: () => resolve(null)
+      })
+    })
+
+  const walk = (i) => {
+    if (i >= candidates.length) {
+      baseStatus = {
+        ok: false,
+        base: '',
+        message: '连不上后端（试过：' + candidates.join('、') + '）。后端起了吗？真机预览要用电脑的局域网 IP。'
+      }
+      return Promise.resolve(baseStatus)
+    }
+    return tryOne(candidates[i]).then((hit) => {
+      if (hit) {
+        rememberBase(hit)
+        return baseStatus
+      }
+      return walk(i + 1)
+    })
+  }
+  return walk(0)
+}
+
+/** 后端连通状态（供页面展示诊断信息） */
+function backendStatus() {
+  return baseStatus
+}
+
+/** 强制下次请求重新探活 */
+function resetBackendStatus() {
+  baseStatus = { ok: false, base: '', message: '' }
+  resolvedBase = ''
+  try {
+    wx.removeStorageSync(BASE_CACHE_KEY)
+  } catch (e) {
+    // 忽略
+  }
+}
+
 function request(path, data) {
   if (!backendReady()) {
     return Promise.reject({ code: 'NOT_CONFIGURED', message: ERROR.NOT_CONFIGURED })
@@ -142,7 +276,7 @@ function request(path, data) {
           }
           resolve(body.data || body)
         },
-        fail: () => reject({ code: 'NETWORK', message: ERROR.NETWORK })
+        fail: (err) => reject({ code: 'NETWORK', message: describeNetworkError(err && err.errMsg) })
       })
     })
   }
@@ -156,7 +290,7 @@ function request(path, data) {
       }
     }
     wx.request({
-      url: CONFIG.apiBase + path,
+      url: activeBase() + path,
       method: 'POST',
       header: header,
       data: data,
@@ -175,7 +309,7 @@ function request(path, data) {
         }
         reject({ code: 'SERVER', message: body.message || ERROR.SERVER })
       },
-      fail: () => reject({ code: 'NETWORK', message: ERROR.NETWORK })
+      fail: (err) => reject({ code: 'NETWORK', message: describeNetworkError(err && err.errMsg) })
     })
   })
 }
@@ -393,5 +527,9 @@ module.exports = {
   logout,
   deleteAccount,
   devLogin,
-  backendReady
+  backendReady,
+  backendStatus,
+  probeBackend,
+  resetBackendStatus,
+  activeBase
 }

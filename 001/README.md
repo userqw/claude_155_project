@@ -87,14 +87,16 @@ pages/
 
 ### 接入后端
 
-客户端只依赖这几个接口（PRD §5.6.2 有完整契约）：
+客户端只依赖这几个接口（PRD §5.6.2 有完整契约）。token 走请求头
+`Authorization: Bearer <token>`，**不放 body**：
 
 ```
+GET  /api/health                                     → { code: 0, data: 'ok' }   （免鉴权，用于探活）
 POST /api/login          { code }                        → { token, account }
-POST /api/profile        { token, nickname, avatarUrl }  → { account }
-POST /api/sync/push      { token, deviceId, records… }   → { serverTime }
-POST /api/sync/pull      { token, since }                → { serverTime, records… }
-POST /api/account/delete { token }                       → { deleted }
+POST /api/profile        { nickname, avatarUrl }         → { account }
+POST /api/sync/push      { deviceId, records… }          → { serverTime }
+GET  /api/sync/pull      ?since=…                        → { serverTime, records… }
+POST /api/account/delete { }                             → { deleted }
 ```
 
 在 `utils/config.js` 里二选一配置：
@@ -103,6 +105,26 @@ POST /api/account/delete { token }                       → { deleted }
 apiBase: 'https://api.example.com',   // 直连 HTTP
 // cloudFunction: 'login',             // 或走云开发云函数
 ```
+
+**模拟器和真机用的是不同的地址**：模拟器里 `127.0.0.1` 就是你的电脑；
+真机预览时 `127.0.0.1` 指的是**手机自己**，必须换成电脑的局域网 IP
+（`cmd` 里 `ipconfig` 看 IPv4）。
+
+为此 `config.js` 留了一个候选地址列表，登录前会挨个探活（`GET /api/health`），
+谁先通用谁：
+
+```js
+apiBase: 'http://127.0.0.1:8080',     // 模拟器
+apiCandidates: [
+  'http://192.168.1.100:8080'         // 真机预览（这台电脑的 WLAN 地址）
+]
+```
+
+换网络后记得改 `apiCandidates`。探活失败的**具体原因**会显示在登录页上
+（不在合法域名列表 / 超时 / 连不上），不用再对着「网络连接失败」猜。
+
+> 微信开发者工具还要勾 **详情 → 本地设置 → 不校验合法域名…**，
+> 否则 `wx.request` 会被域名校验拦下来。
 
 **后端没配时**：登录页会提示「登录服务还未配置」，所有功能照常可用（纯本地），
 登录页底部有「开发者模式」可以本地模拟登录，用来预览已登录界面。
