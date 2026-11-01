@@ -59,20 +59,6 @@
     </view>
   </view>
 
-  <!-- 本机数据 -->
-  <view class="card">
-    <view class="section-title">本机数据</view>
-
-    <view class="opt" bindtap="goExport">
-      <view class="opt-icon">☁️</view>
-      <view class="grow">
-        <view class="opt-title">导出全部数据</view>
-        <view class="opt-sub">JSON 备份 / CSV 打卡流水</view>
-      </view>
-      <text class="opt-arrow">›</text>
-    </view>
-  </view>
-
   <view class="card" wx:if="{{!loggedIn}}">
     <view class="section-title">你的数据现在在哪</view>
     <view class="tip">

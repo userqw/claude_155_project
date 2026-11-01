@@ -59,11 +59,6 @@ Page({
     wx.navigateTo({ url: '/pages/login/index' })
   },
 
-  /** 导出全部数据（JSON 备份 / CSV 流水）。本机数据，游客也能导 */
-  goExport() {
-    wx.navigateTo({ url: '/pages/mine/export/index' })
-  },
-
   async onMerge() {
     wx.showLoading({ title: '备份中…' })
     let res
