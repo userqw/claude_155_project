@@ -55,7 +55,14 @@ Page({
     })
     // 先探活：登录失败时能直接告诉用户是「地址不对」还是「后端没起」，
     // 而不是只丢一句「网络连接失败」。
-    if (backendReady) this.checkBackend()
+    // 这里不 await，所以要自己接住异常——onLoad 里抛出去没人管，
+    // 只会变成一条看不懂的运行时错误。
+    if (backendReady) {
+      this.checkBackend().catch((e) => {
+        console.error('[登录] 探活失败', e)
+        this.setData({ errorMessage: (e && e.message) || '连不上后端' })
+      })
+    }
   },
 
   /** 探活并把结果写进页面；连不通就把原因说清楚 */
@@ -94,15 +101,23 @@ Page({
    *
    * <p>chooseAvatar 给的是 wxfile://tmp_xxx.jpg——临时文件，重启后就被系统回收。
    * 立刻存成本地持久文件，否则头像看着有、其实留不住。
+   *
+   * <p>存盘失败也不能影响登录：头像只是可选的，
+   * 崩在这里会连带打断整个登录流程（表现为「点了没反应」）。
    */
   async onChooseAvatar(e) {
     const url = e.detail && e.detail.avatarUrl
     if (!url) return
     this.setData({ avatarUrl: url })
-    const saved = await photos.saveToLocal(url)
-    if (saved && saved.url) {
-      this.setData({ avatarUrl: saved.url })
-      auth.setLocalAvatar(saved.url)
+    try {
+      const saved = await photos.saveToLocal(url)
+      if (saved && saved.url) {
+        this.setData({ avatarUrl: saved.url })
+        auth.setLocalAvatar(saved.url)
+      }
+    } catch (err) {
+      // 存不下就用临时路径，头像这会儿还是能显示的
+      console.error('[登录] 保存头像失败', err)
     }
   },
 

@@ -30,13 +30,21 @@ function describeNetworkError(errMsg) {
   const raw = (errMsg || '').toString()
   if (!raw) return ERROR.NETWORK
   if (/not in domain list|不在.*合法域名|url not in domain/i.test(raw)) {
-    return '请求地址不在小程序合法域名列表里（开发者工具：详情 → 本地设置 → 勾选「不校验合法域名…」）'
+    // 开发者工具能勾「不校验合法域名」绕过；真机没这个开关，
+    // 只能用 HTTPS 域名（且要在公众平台配 request 合法域名）或「真机调试」
+    return isRealDevice()
+      ? '请求地址不在小程序合法域名列表里。真机不能像开发者工具那样勾「不校验合法域名」，'
+        + '要么改成已备案的 HTTPS 域名，要么用「真机调试」'
+      : '请求地址不在小程序合法域名列表里（开发者工具：详情 → 本地设置 → 勾选「不校验合法域名…」）'
   }
   if (/timeout/i.test(raw)) {
     return '连接后端超时，后端没起来或地址不对'
   }
   if (/ECONNREFUSED|connect.*refused|无法连接/i.test(raw)) {
-    return '连不上后端。真机预览时 127.0.0.1 指的是手机自己，要用电脑的局域网 IP'
+    return isRealDevice()
+      ? '连不上后端。真机上 127.0.0.1 指的是手机自己，要用电脑的局域网 IP，'
+        + '并确认手机和电脑在同一个 Wi-Fi、电脑防火墙放行了 8080'
+      : '连不上后端，确认后端服务已经启动'
   }
   if (/ssl|certificate|https/i.test(raw)) {
     return 'HTTPS 证书或 TLS 版本不通过（开发者工具可勾「不校验合法域名…」绕过）'

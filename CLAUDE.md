@@ -40,6 +40,9 @@ node 001/test/material.test.js
 # 导航栏验收测试（底部 tab bar 的每个 tab 都能跳、登录页不会把人困住）
 node 001/test/nav.test.js
 
+# 图片持久化（选照片/选头像不能静默卡住）
+node 001/test/photos.test.js
+
 # 样式与配色校验
 node 001/test/style.test.js && node 001/test/theme.test.js
 ```
@@ -196,6 +199,7 @@ These are the recurring traps; follow them even when a change looks locally reas
 13. **Everything time-related is UTC.** The client uploads ISO-8601 UTC timestamps; the server stores and compares them as UTC. The JVM default timezone is forced to UTC by `config/TimeZoneConfig.java` — *not* only in `main()`, because `@SpringBootTest` never calls `main()` and the tests would otherwise run in local time. If client and server disagree by 8 hours, the "后写覆盖先写" merge silently keeps the wrong version.
 14. **Credentials never enter the repo.** The MySQL password lives in `005.后端代码/src/main/resources/application-local.yml` (gitignored; a tracked `application-local.template.yml` sits next to it). The appid lives in `001/project.config.json` (gitignored; `001/project.config.template.json` is tracked). The AppSecret goes in the `WECHAT_SECRET` env var. Don't move any of them into a tracked file, and don't paste a live token or password into a commit message, a log, or the transcript.
 15. **The WeChat nickname never comes from the backend.** `jscode2session` returns only `openid` / `session_key` / `unionid`. Nickname and avatar come from the user tapping `<input type="nickname">` / `<button open-type="chooseAvatar">` in the mini-program. Anyone who expects the backend to hand back a nickname is designing against a WeChat API that doesn't exist.
+16. **Never let a file helper throw.** `wx.env` only exists from base library 2.10.0 — reading `wx.env.USER_DATA_PATH` on an older one throws "undefined is not an object", and because it happens inside a `new Promise` executor, the rejection poisons the upstream `Promise.all` and the picker's callback never fires. The symptom is "点了没反应", not an error. `utils/photos.js` must degrade to the temp path instead of throwing; `test/photos.test.js` guards it.
 
 ## Design system
 
