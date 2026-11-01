@@ -52,6 +52,11 @@ function defaultState() {
     mode: 'guest', // 'guest' | 'account'
     account: null, // { openid, nickname, avatarUrl, createdAt }
     token: '',
+    // 本机持久化的头像路径。
+    // 微信 chooseAvatar 给的是 wxfile://tmp_xxx.jpg——临时文件，重启就没了，
+    // 所以选完立刻存成本地持久文件。显示头像时优先用它，
+    // 免得换个设备就变成一张裂图。
+    localAvatar: '',
     // 后端是否在 mock 模式（没配小程序 appid/secret，openid 是假的）
     mock: false,
     deviceId: '',
@@ -508,6 +513,25 @@ async function login(profile) {
   return { ok: true, account: res.account, mock: s.mock }
 }
 
+/**
+ * 显示用的头像路径。
+ *
+ * <p>优先用本机持久化的那份：服务端存的是选头像当时的路径，
+ * 换一台设备上那个路径根本不存在，直接渲染会是一张裂图。
+ */
+function avatarPath() {
+  const s = getState()
+  if (s.localAvatar) return s.localAvatar
+  return (s.account && s.account.avatarUrl) || ''
+}
+
+/** 记住本机的头像（已持久化的路径） */
+function setLocalAvatar(path) {
+  const s = getState()
+  s.localAvatar = path || ''
+  persist()
+}
+
 /** 更新昵称与头像（均为用户主动提供，可为空） */
 async function updateProfile(profile) {
   if (!isLoggedIn()) return { ok: false, error: 'GUEST', message: '尚未登录' }
@@ -693,6 +717,8 @@ module.exports = {
   logout,
   deleteAccount,
   devLogin,
+  avatarPath,
+  setLocalAvatar,
   backendReady,
   backendStatus,
   probeBackend,

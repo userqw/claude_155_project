@@ -112,7 +112,7 @@ Canvas charts use the Canvas 2D API (`type="2d"`), which needs 基础库 ≥ 2.9
   这些长得完全不一样，`describeNetworkError()` 负责翻译成人话。
   一律吞成「网络连接失败」等于让人对着黑盒猜。
 
-### 真实微信登录的三件事
+### 真实微信登录的四件事
 
 **一、昵称不是微信给的。** `jscode2session` 只返回 `openid` / `session_key` / `unionid`，
 没有昵称。昵称只能由用户在小程序的 `<input type="nickname">` 里点一下昵称建议，
@@ -129,6 +129,26 @@ Canvas charts use the Canvas 2D API (`type="2d"`), which needs 基础库 ≥ 2.9
 
 **三、`session_key` 不落库。** PRD §5.6.2 明确「服务端只存 openid，不存 session_key」，
 拿到就丢，不要加字段。
+
+**四、头像要存成本地持久文件。** `chooseAvatar` 给的是 `wxfile://tmp_xxx.jpg`——
+临时文件，重启就被系统回收。选完立刻用 `FileSystemManager.saveFile` 存成本地文件
+（`utils/photos.js` 的 `saveToLocal`），显示时优先用本机那份。
+服务端存的路径在别的设备上根本不存在，直接渲染会是一张裂图。
+
+### 「保存资料」还是「登录」
+
+登录页有两个入口，**主按钮的文案必须跟着入口走**：
+
+| 从哪来 | intent | 按钮 | 行为 |
+| --- | --- | --- | --- |
+| 「我的 → 微信一键登录」 | `?intent=login` | 登录 | 真的走一次登录 |
+| 「我的 → 账号设置 → 修改头像与昵称」 | 无 | 保存资料 | 只改资料 |
+
+早期版本不区分：本地只要是登录态，按钮一律显示「保存资料」。
+于是从「微信一键登录」点进来，看到的也是「保存资料」，点下去只是把资料
+又存了一遍——服务端收到的是 `POST /api/profile` 而不是 `POST /api/login`，
+`last_login_at` 不动、不建新行，看着就像「登录没反应，账号反倒没了」。
+`test/nav.test.js` 现在盯着这条。
 
 ### 「底部导航栏点了没反应」
 

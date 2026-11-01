@@ -11,7 +11,7 @@
   <view class="card profile">
     <view class="profile-top">
       <view class="profile-avatar">
-        <image wx:if="{{loggedIn && account.avatarUrl}}" src="{{account.avatarUrl}}" mode="aspectFill"></image>
+        <image wx:if="{{loggedIn && avatarUrl}}" src="{{avatarUrl}}" mode="aspectFill"></image>
         <text wx:else>🎀</text>
       </view>
       <view class="grow">

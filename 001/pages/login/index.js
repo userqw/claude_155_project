@@ -1,5 +1,22 @@
 const app = getApp()
 const auth = require('../../utils/auth')
+const photos = require('../../utils/photos')
+
+/**
+ * 主按钮的文案。
+ *
+ * <p>之前不管从哪儿进来，只要本地还是登录态就显示「保存资料」——
+ * 从「我的 → 微信一键登录」点进来也会看到它，于是点下去只是把资料
+ * 又存了一遍，看着就像「登录没反应，账号反倒没了」。
+ *
+ * @param {string} intent      'login' 表示明确是来登录的
+ * @param {boolean} loggedIn   本地是否已是登录态
+ */
+function labelFor(intent, loggedIn) {
+  if (intent === 'login') return '登录'
+  if (loggedIn) return '保存资料'
+  return '微信一键登录'
+}
 
 Page({
   data: {
@@ -12,17 +29,25 @@ Page({
     backendNote: '',
     mockNote: '',
     devVisible: false,
-    alreadyLoggedIn: false
+    alreadyLoggedIn: false,
+    // 'login' = 明确是来登录的（从「我的」的一键登录进来）
+    // 空 = 可能是来改资料的（从账号设置进来）
+    intent: '',
+    actionText: '微信一键登录'
   },
 
-  onLoad() {
+  onLoad(options) {
     const backendReady = auth.backendReady()
     const account = auth.getState().account
+    const intent = (options && options.intent) || ''
+    const loggedIn = auth.isLoggedIn()
     this.setData({
       theme: app.globalData.theme,
       nickname: account ? account.nickname || '' : '',
-      avatarUrl: account ? account.avatarUrl || '' : '',
-      alreadyLoggedIn: auth.isLoggedIn(),
+      avatarUrl: auth.avatarPath(),
+      alreadyLoggedIn: loggedIn,
+      intent: intent,
+      actionText: labelFor(intent, loggedIn),
       mockNote: this.mockHint(),
       // 后端没配时提示一句，并开放开发者模式预览已登录界面
       devVisible: !backendReady,
@@ -64,10 +89,21 @@ Page({
     this.setData({ theme: theme })
   },
 
-  onChooseAvatar(e) {
+  /**
+   * 选头像。
+   *
+   * <p>chooseAvatar 给的是 wxfile://tmp_xxx.jpg——临时文件，重启后就被系统回收。
+   * 立刻存成本地持久文件，否则头像看着有、其实留不住。
+   */
+  async onChooseAvatar(e) {
     const url = e.detail && e.detail.avatarUrl
     if (!url) return
     this.setData({ avatarUrl: url })
+    const saved = await photos.saveToLocal(url)
+    if (saved && saved.url) {
+      this.setData({ avatarUrl: saved.url })
+      auth.setLocalAvatar(saved.url)
+    }
   },
 
   onNicknameInput(e) {
@@ -111,8 +147,12 @@ Page({
   async onLogin() {
     if (this.data.loading) return
 
-    // 已登录时进来是改资料，不需要重复登录，也不必再同意协议
-    if (this.data.alreadyLoggedIn) {
+    // 明确是来登录的（从「我的 → 微信一键登录」进来）：即使本地已是登录态，
+    // 也要真的走一次登录——刷新 token、把昵称头像带上去。
+    const wantLogin = this.data.intent === 'login'
+
+    // 没带「来登录」的意图、且本地已登录 → 这是来改资料的
+    if (this.data.alreadyLoggedIn && !wantLogin) {
       this.setData({ loading: true, errorMessage: '' })
       try {
         const res = await auth.updateProfile({
@@ -134,7 +174,8 @@ Page({
       return
     }
 
-    if (!this.data.agreed) {
+    // 已经登录过就不用再同意一次协议
+    if (!this.data.agreed && !this.data.alreadyLoggedIn) {
       wx.showToast({ title: '请先阅读并同意用户协议', icon: 'none' })
       return
     }

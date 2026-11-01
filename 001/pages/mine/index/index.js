@@ -17,6 +17,7 @@ Page({
     tagCount: 0,
     loggedIn: false,
     account: null,
+    avatarUrl: '',
     accountSub: '',
     displayName: '手作工坊访客',
     craftCode: 'CLAY-2026',
@@ -104,6 +105,8 @@ Page({
       tagCount: db.listTags().length,
       loggedIn: auth.isLoggedIn(),
       account: auth.getState().account,
+      // 本机持久化的头像优先：服务端存的是选头像当时的路径，换台设备就没了
+      avatarUrl: auth.avatarPath(),
       accountSub: auth.isLoggedIn()
         ? (auth.getState().mock
             ? '本地联调模式 · 还没连上真实微信号'
@@ -161,7 +164,10 @@ Page({
   },
 
   goLogin() {
-    wx.navigateTo({ url: '/pages/login/index' })
+    // intent=login：明确是来登录的。登录页据此把主按钮显示成「登录」，
+    // 而不是因为本地已有登录态就变成「保存资料」——
+    // 那样点下去只是把资料再存一遍，看着就像登录没生效。
+    wx.navigateTo({ url: '/pages/login/index?intent=login' })
   },
 
   /**

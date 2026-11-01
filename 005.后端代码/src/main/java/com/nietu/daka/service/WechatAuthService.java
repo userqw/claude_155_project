@@ -62,7 +62,12 @@ public class WechatAuthService {
         boolean secretMissing = secret.isBlank();
 
         if (!appIdMissing && !secretMissing) {
-            log.info("微信登录：AppID {} 与 AppSecret 都已配置，将使用真实的 jscode2session", appId);
+            if (props.isMock()) {
+                log.warn("微信登录：AppID {} 与 AppSecret 都已配置，但 app.wechat.mock=true，"
+                        + "本次仍使用【本地 mock 模式】，登录拿到的是假 openid", appId);
+            } else {
+                log.info("微信登录：AppID {} 与 AppSecret 都已配置，将使用真实的 jscode2session", appId);
+            }
             return;
         }
 

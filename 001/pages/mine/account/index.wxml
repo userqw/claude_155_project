@@ -2,7 +2,7 @@
   <!-- 账号状态 -->
   <view class="card">
     <view class="profile">
-      <image wx:if="{{loggedIn && account.avatarUrl}}" class="avatar" src="{{account.avatarUrl}}" mode="aspectFill"></image>
+      <image wx:if="{{loggedIn && avatarUrl}}" class="avatar" src="{{avatarUrl}}" mode="aspectFill"></image>
       <view wx:elif="{{loggedIn}}" class="avatar avatar-empty">👤</view>
       <view wx:else class="avatar avatar-empty">🎨</view>
 

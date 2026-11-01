@@ -172,6 +172,39 @@ async function main() {
     assert.strictEqual(fallback.url, '/pages/index/index')
   })
 
+  console.log('\n登录页的主按钮文案')
+
+  const auth = require(path.join(root, 'utils/auth'))
+  auth.init()
+
+  await check('没登录时主按钮是「微信一键登录」', () => {
+    const page = makePage()
+    page.onLoad({})
+    assert.strictEqual(page.data.actionText, '微信一键登录')
+  })
+
+  await check('已登录时从账号设置进来是「保存资料」', () => {
+    auth.devLogin()
+    const page = makePage()
+    page.onLoad({})
+    assert.strictEqual(page.data.actionText, '保存资料')
+  })
+
+  await check('已登录时从「我的 → 微信一键登录」进来是「登录」', () => {
+    // 这一条是踩过的坑：本地已有登录态时，按钮显示成「保存资料」，
+    // 点下去只是把资料再存一遍，看着就像登录没生效、账号反倒没了
+    auth.devLogin()
+    const page = makePage()
+    page.onLoad({ intent: 'login' })
+    assert.strictEqual(page.data.actionText, '登录')
+  })
+
+  await check('「我的」页的一键登录入口带着 intent=login', () => {
+    const src = fs.readFileSync(path.join(root, 'pages/mine/index/index.js'), 'utf8')
+    assert.ok(src.indexOf('/pages/login/index?intent=login') > -1,
+      '「我的」页跳登录页要带 intent=login，否则按钮会显示成「保存资料」')
+  })
+
   console.log('\n登录页不会卡在「处理中…」')
 
   await check('请求挂起不回调时，loading 会被清掉并给出提示', async () => {

@@ -42,7 +42,7 @@
     <view class="warn" wx:if="{{mockNote}}">{{mockNote}}</view>
 
     <view class="btn btn-primary login-btn {{loading ? 'btn-disabled' : ''}}" bindtap="onLogin">
-      {{loading ? '处理中…' : (alreadyLoggedIn ? '保存资料' : '微信一键登录')}}
+      {{loading ? '处理中…' : actionText}}
     </view>
 
     <!-- 跳过：任何状态下都可用，不把用户堵死在登录页 -->

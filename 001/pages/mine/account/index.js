@@ -7,6 +7,7 @@ Page({
     theme: 'light',
     loggedIn: false,
     account: null,
+    avatarUrl: '',
     localCount: 0,
     statusText: '',
     devVisible: false,
@@ -42,6 +43,7 @@ Page({
     this.setData({
       loggedIn: loggedIn,
       account: account,
+      avatarUrl: auth.avatarPath(),
       localCount: localCount,
       devVisible: !auth.backendReady(),
       mockMode: mockMode,
