@@ -91,8 +91,8 @@
     <view class="row-item" bindtap="goShapes">
       <view class="row-icon row-icon-purple">🎨</view>
       <view class="grow">
-        <view class="row-title">造型与成本设置</view>
-        <view class="row-sub">OB11娃头、QQ人、正比、默认克重单价</view>
+        <view class="row-title">品类</view>
+        <view class="row-sub">OB11娃头、QQ人、正比</view>
       </view>
       <text class="arrow">›</text>
     </view>

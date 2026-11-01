@@ -22,7 +22,6 @@
           </view>
           <view class="shape-sub">
             已记录 {{item.used}} 个
-            <text wx:if="{{item.defaultPrice}}">· 默认单价 ¥{{item.defaultPrice}}</text>
           </view>
         </view>
       </view>
@@ -76,11 +75,6 @@
           ></view>
         </view>
         <view class="field-sub">颜色跟随分类固定，筛选后不会换色</view>
-      </view>
-
-      <view class="field">
-        <view class="field-label">默认单价<text class="optional">选填，元</text></view>
-        <input class="input" type="digit" placeholder="记录售出时自动带出" value="{{form.defaultPrice}}" bindinput="onPrice" />
       </view>
 
       <view class="footer">

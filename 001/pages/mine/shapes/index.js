@@ -14,8 +14,7 @@ Page({
     form: {
       name: '',
       icon: '🎨',
-      slot: 0,
-      defaultPrice: ''
+      slot: 0
     },
     palette: []
   },
@@ -49,7 +48,6 @@ Page({
       iconPath: s.iconPath || '',
       isBuiltin: s.isBuiltin,
       slot: s.slot,
-      defaultPrice: s.defaultPrice || '',
       color: stat.shapeColor(s, theme),
       used: used[s.id] || 0
     }))
@@ -63,7 +61,7 @@ Page({
     this.setData({
       showEditor: true,
       editingId: '',
-      form: { name: '', icon: '🎨', slot: slot % 8, defaultPrice: '' }
+      form: { name: '', icon: '🎨', slot: slot % 8 }
     })
   },
 
@@ -77,8 +75,7 @@ Page({
       form: {
         name: s.name,
         icon: s.icon || '🎨',
-        slot: s.slot || 0,
-        defaultPrice: s.defaultPrice ? String(s.defaultPrice) : ''
+        slot: s.slot || 0
       }
     })
   },
@@ -89,10 +86,6 @@ Page({
 
   onName(e) {
     this.setData({ 'form.name': e.detail.value })
-  },
-
-  onPrice(e) {
-    this.setData({ 'form.defaultPrice': e.detail.value })
   },
 
   onIcon(e) {
@@ -109,12 +102,12 @@ Page({
       wx.showToast({ title: '给这个分类起个名字', icon: 'none' })
       return
     }
-    const price = this.data.form.defaultPrice === '' ? null : Number(this.data.form.defaultPrice)
+    // 不带 defaultPrice：db.saveShape 是 merge，已存的值不会被抹掉。
+    // 单价本期没有设置入口（成本与利润是 P2），但字段留着给同步与将来用。
     const payload = {
       name: name,
       icon: this.data.form.icon,
-      slot: this.data.form.slot,
-      defaultPrice: isNaN(price) ? null : price
+      slot: this.data.form.slot
     }
     if (this.data.editingId) {
       db.saveShape(Object.assign({ id: this.data.editingId }, payload))
