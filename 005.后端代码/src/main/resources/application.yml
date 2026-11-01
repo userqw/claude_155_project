@@ -45,11 +45,19 @@ app:
     expire-hours: 720
     header: Authorization
     prefix: "Bearer "
-    wechat-app-id: ${WECHAT_APP_ID:}
-    wechat-secret: ${WECHAT_SECRET:}
   wechat:
-    # 本地联调用的假 code2session，生产必须是 false
+    # 小程序 AppID：留空则自动从 app-id-file 指向的小程序工程里读，
+    # 这样后端和小程序用的是同一个 AppID（不一致正是 40029 的头号原因）
+    app-id: ${WECHAT_APP_ID:}
+    # AppSecret 等同于密码，本机写在 application-local.yml（已 gitignore），生产走环境变量
+    secret: ${WECHAT_SECRET:}
+    # 从小程序工程读 AppID 的文件（相对工作目录）
+    app-id-file: ${WECHAT_APP_ID_FILE:../001/project.config.json}
+    # 逃生门：填了 appid/secret 也强制用假 code2session
     mock: ${WECHAT_MOCK:false}
+    # 缺凭据时是否直接报错。生产为 true（见 application-prod.yml）；
+    # 本地为 false——没配凭据自动降级为 mock，不用每次都配一遍
+    require-credentials: ${WECHAT_REQUIRE_CREDENTIALS:false}
 
 logging:
   level:

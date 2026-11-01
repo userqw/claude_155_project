@@ -48,35 +48,41 @@ cp src/main/resources/application-local.template.yml src/main/resources/applicat
 
 ### 3. 接真实微信号（本地 mock 与真实账号的区别）
 
-本地 `dev` profile 跑的是 **mock 模式**：没配 `WECHAT_APP_ID` / `WECHAT_SECRET` 时，
-服务端用 `md5(code)` 当 openid。所以：
+后端在**没配小程序 AppSecret** 时会自动降级为 **mock 模式**：用 `md5(code)` 当 openid。
+所以：
 
 - 数据库里能看到 `mock_xxxx` 开头的账号，**但那不是你的真实微信号**
-- 登录响应里的 `mock: true` 就是这个意思，小程序会把它显示出来
+- 登录与资料接口都会返回 `mock: true`，小程序会把它显示出来
 - **微信昵称后端拿不到**——`code2session` 只返回 `openid` / `session_key` / `unionid`，
   没有昵称。昵称只能由用户在小程序的 `<input type="nickname">` 里点一下授权，
   前端会把它随登录请求一起发过来
 
-要换成真实账号，三步：
+**换成真实账号，只要填一个值：AppSecret。**
 
-1. **小程序要有真实 AppID。** `001/project.config.json` 里现在是 `touristappid`
-   （游客 AppID），它换不到 openid。去微信公众平台 → 开发管理 → 开发设置，
-   拿到自己的 AppID 填进去（这个文件已 gitignore，不会入库）。
-2. **后端拿到 AppID 与 Secret。** 同一页面的「AppSecret」，
-   配成环境变量启动：
+AppID 后端会自己从 `001/project.config.json` 里读，所以后端和小程序**永远是同一个
+AppID**——两边不一致正是微信返回 `40029 invalid code` 的头号原因。
 
-   ```bash
-   export WECHAT_APP_ID=wx1234567890abcdef
-   export WECHAT_SECRET=你的AppSecret
-   export WECHAT_MOCK=false
+1. **确认小程序有真实 AppID。** `001/project.config.json` 的 `appid` 要是
+   微信公众平台上的真实 AppID（`touristappid` 是游客 AppID，换不到 openid）。
+   这个文件已 gitignore，不会入库。
+2. **填 AppSecret。** 微信公众平台 → 开发管理 → 开发设置 → AppSecret，
+   写进本机私有配置（已 gitignore）：
+
+   ```yaml
+   # 005.后端代码/src/main/resources/application-local.yml
+   app:
+     wechat:
+       secret: 你的AppSecret
    ```
 
-   `WECHAT_MOCK=false` 是必须的——`dev` profile 默认把它打开，
-   不关掉的话后端仍然会用假 openid。
-3. **重启后端**。登录一次，数据库里就该出现你的真实 openid，
-   且 `login` 响应里的 `mock` 变成 `false`。
+   首次配置先从模板复制：`cp src/main/resources/application-local.template.yml src/main/resources/application-local.yml`
+3. **重启后端。** 启动日志会打印「已配置 AppID xxx 与 AppSecret，将使用真实的
+   jscode2session」；登录一次，数据库里就会出现你的真实 openid，
+   小程序里的「本地联调模式」提示随之消失。
 
 > AppSecret 等同于密码，不要提交进仓库、也不要用微信官方文档以外的渠道传递。
+> 生产环境用 `WECHAT_SECRET` 环境变量注入，并确保 `app.wechat.require-credentials=true`
+> （`prod` profile 已默认开启）——线上不容许悄悄用假 openid 建号。
 
 ### 3. 跑起来
 

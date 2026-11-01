@@ -37,7 +37,15 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * <p>覆盖三件容易出错的事：注册建号与内置分类下发、同步的字段级合并语义、
  * 以及复合主键下的跨账号数据隔离。
  */
-@SpringBootTest
+@SpringBootTest(properties = {
+        // 测试不能读开发者本机的小程序工程，也不能真调微信接口——
+        // 否则测��结果会取决于这台机器配没配 AppID
+        "app.wechat.app-id=",
+        "app.wechat.secret=",
+        "app.wechat.app-id-file=target/no-such-project.config.json",
+        "app.wechat.mock=true",
+        "app.wechat.require-credentials=false"
+})
 @ActiveProfiles({"dev", "local"})
 class ApiIntegrationTest {
 

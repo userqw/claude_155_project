@@ -2,6 +2,8 @@
 app:
   wechat:
     mock: false
+    # 线上不容许悄悄用假 openid 建号：没配 appid/secret 就直接启动失败
+    require-credentials: true
 
 spring:
   datasource:

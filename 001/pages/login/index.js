@@ -23,9 +23,7 @@ Page({
       nickname: account ? account.nickname || '' : '',
       avatarUrl: account ? account.avatarUrl || '' : '',
       alreadyLoggedIn: auth.isLoggedIn(),
-      mockNote: auth.getState().mock
-        ? '后端还在本地联调模式（没配小程序 appid/secret），登录拿到的是模拟账号，不是你的真实微信号。'
-        : '',
+      mockNote: this.mockHint(),
       // 后端没配时提示一句，并开放开发者模式预览已登录界面
       devVisible: !backendReady,
       errorMessage: backendReady ? '' : '登录服务还未配置，现在只能以游客身份使用；不影响记录和统计。'
@@ -52,10 +50,13 @@ Page({
   /**
    * 后端在 mock 模式时要讲清楚：此时登录拿到的是**假的 openid**，
    * 不是用户的真实微信号，数据库里也查不到自己的账号。
+   * 同时给出换成真实登录的具体位置，别让人对着这句话发懵。
    */
   mockHint() {
     return auth.getState().mock
-      ? '后端还在本地联调模式（没配小程序 appid/secret），登录拿到的是模拟账号，不是你的真实微信号。'
+      ? '当前是本地联调模式：登录拿到的是模拟账号，不是你的真实微信号。'
+          + '要换成真实登录，在 005.后端代码/src/main/resources/application-local.yml 的'
+          + ' app.wechat.secret 填入小程序 AppSecret，重启后端即可。'
       : ''
   },
 

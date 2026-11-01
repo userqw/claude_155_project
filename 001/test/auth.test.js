@@ -20,6 +20,11 @@ let lastRequest = null
 let failErrMsg = 'request:fail'
 // 只让这些主机有响应；为空表示跟随 backendUp。用来测多地址探活。
 let upHosts = null
+// 让下一个「带 token 的请求」返回 401（模拟 token 过期）
+let expireAuthed = false
+// 让下一个「带 token 的请求」返回「账号已注销」
+let deleteAccount = false
+let tokenSeq = 0
 
 /** 内存假后端：够前端跑通登录/资料/推送三条链路 */
 function fakeBackend(pathname, body) {
@@ -28,7 +33,7 @@ function fakeBackend(pathname, body) {
       code: 0,
       message: 'ok',
       data: {
-        token: 'mock_token_' + Date.now(),
+        token: 'mock_token_' + (++tokenSeq),
         account: {
           openid: 'mock_openid',
           unionid: null,
@@ -95,6 +100,17 @@ global.wx = {
     if (!alive) {
       // 后端不可达
       opt.fail({ errMsg: failErrMsg })
+      return
+    }
+    const authed = !!(opt.header && opt.header.Authorization)
+    if (authed && deleteAccount) {
+      deleteAccount = false
+      opt.success({ statusCode: 200, data: { code: 401, message: '账号不存在或已注销，请重新登录' } })
+      return
+    }
+    if (authed && expireAuthed) {
+      expireAuthed = false
+      opt.success({ statusCode: 200, data: { code: 401, message: '登录已过期，请重新登录' } })
       return
     }
     const pathname = opt.url.replace(/^https?:\/\/[^/]+/, '')
@@ -305,6 +321,28 @@ async function main() {
     assert.ok(status.message.indexOf('127.0.0.1:8080') > -1, '应列出试过的地址：' + status.message)
     assert.ok(status.message.indexOf('192.168.1.100:8080') > -1, '应列出试过的地址：' + status.message)
     upHosts = null
+  })
+
+  console.log('\ntoken 过期与静默续登')
+
+  await check('token 过期会自动续登并重试，用户不用重新点登录', async () => {
+    backendUp = true
+    await auth.login()
+    const before = auth.getState().token
+    expireAuthed = true
+    const res = await auth.mergeLocalToAccount()
+    assert.strictEqual(res.ok, true, JSON.stringify(res))
+    assert.notStrictEqual(auth.getState().token, before, '应该换成了新 token')
+    assert.strictEqual(auth.isLoggedIn(), true, '用户仍然是登录态')
+  })
+
+  await check('账号被注销时不靠续登复活它，直接退回游客模式', async () => {
+    await auth.login()
+    deleteAccount = true
+    const res = await auth.mergeLocalToAccount()
+    assert.strictEqual(res.ok, false)
+    assert.strictEqual(auth.isLoggedIn(), false, '账号已注销，应回到游客模式')
+    assert.strictEqual(db.aliveCheckIns().length, 2, '本机记录一条不少')
   })
 
   console.log('\n' + (failed ? failed + ' 个用例失败' : passed + ' 个用例全部通过') + '\n')

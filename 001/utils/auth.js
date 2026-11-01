@@ -261,11 +261,12 @@ function resetBackendStatus() {
   }
 }
 
-function request(path, data, method) {
+function request(path, data, method, opts) {
   if (!backendReady()) {
     return Promise.reject({ code: 'NOT_CONFIGURED', message: ERROR.NOT_CONFIGURED })
   }
   const verb = method || 'POST'
+  const options = opts || {}
   if (CONFIG.cloudFunction) {
     return new Promise((resolve, reject) => {
       wx.cloud.callFunction({
@@ -303,6 +304,23 @@ function request(path, data, method) {
         // 后端统一返回 HTTP 200 + {code, message, data}，业务错误靠 code 区分。
         // 只看 statusCode 会把失败当成功——登录失败会表现成「拿到一个没有 token 的对象」。
         if (body.code !== undefined && body.code !== 0) {
+          // token 过期：静默续登一次再重试，用户不该被弹回登录页
+          if (body.code === 401 && !options.noRetry && path !== CONFIG.paths.login) {
+            if (isAccountGone(body.message)) {
+              // 账号被注销了，不能靠续登把它「复活」——回退到游客模式
+              logout()
+              reject({ code: 401, message: body.message || '账号已注销' })
+              return
+            }
+            refreshToken().then((ok) => {
+              if (ok) {
+                resolve(request(path, data, verb, { noRetry: true }))
+              } else {
+                reject({ code: 401, message: body.message || '登录已过期，请重新登录' })
+              }
+            }).catch(reject)
+            return
+          }
           reject({ code: body.code, message: body.message || ERROR.SERVER })
           return
         }
@@ -315,6 +333,44 @@ function request(path, data, method) {
       fail: (err) => reject({ code: 'NETWORK', message: describeNetworkError(err && err.errMsg) })
     })
   })
+}
+
+/** 后端说「账号不存在或已注销」——这种不能靠续登复活 */
+function isAccountGone(message) {
+  return typeof message === 'string' && message.indexOf('注销') > -1
+}
+
+// -- 静默续登 ----------------------------------------------------------------
+
+// 正在进行的续登。并发请求只触发一次换 token，其余等它。
+let refreshing = null
+
+/**
+ * 静默续登：拿一个新的 wx.login code 换 token。
+ *
+ * <p>token 有效期 30 天，到期后不该把用户弹回登录页——
+ * `wx.login` 不需要用户授权，静默换一个新的就行。
+ */
+function refreshToken() {
+  if (refreshing) return refreshing
+  refreshing = (async () => {
+    try {
+      const code = await wxLoginCode()
+      const res = await request(CONFIG.paths.login, { code: code }, 'POST', { noRetry: true })
+      if (!res || !res.token) return false
+      const s = getState()
+      s.token = res.token
+      if (res.account) s.account = res.account
+      if (typeof res.mock === 'boolean') s.mock = res.mock
+      persist()
+      return true
+    } catch (e) {
+      return false
+    } finally {
+      refreshing = null
+    }
+  })()
+  return refreshing
 }
 
 // -- 登录 -------------------------------------------------------------------
@@ -572,5 +628,6 @@ module.exports = {
   backendStatus,
   probeBackend,
   resetBackendStatus,
-  activeBase
+  activeBase,
+  refreshToken
 }

@@ -24,12 +24,6 @@ public class JwtProperties {
     /** token 前缀 */
     private String prefix = "Bearer ";
 
-    /** 微信小程序 appid（code2session 用） */
-    private String wechatAppId = "";
-
-    /** 微信小程序 secret（code2session 用） */
-    private String wechatSecret = "";
-
     public String getSecret() {
         return secret;
     }
@@ -60,21 +54,5 @@ public class JwtProperties {
 
     public void setPrefix(String prefix) {
         this.prefix = prefix;
-    }
-
-    public String getWechatAppId() {
-        return wechatAppId;
-    }
-
-    public void setWechatAppId(String wechatAppId) {
-        this.wechatAppId = wechatAppId;
-    }
-
-    public String getWechatSecret() {
-        return wechatSecret;
-    }
-
-    public void setWechatSecret(String wechatSecret) {
-        this.wechatSecret = wechatSecret;
     }
 }

@@ -19,11 +19,12 @@
   <view class="card mock-note" wx:if="{{mockMode}}">
     <view class="section-title">当前是本地联调模式</view>
     <view class="tip">
-      后端还没配置小程序的 appid/secret，用的是 md5(code) 编出来的假 openid
+      后端还没配小程序 AppSecret，用的是 md5(code) 编出来的假 openid
       （<text class="mock-openid">{{account.openid}}</text>）。
-      所以数据库里查不到你的真实微信号，昵称也不会自动带过来。
-      要连真实账号：把真实 AppID 填进 001/project.config.json，
-      再把 AppID 与 Secret 设成后端的 WECHAT_APP_ID / WECHAT_SECRET 环境变量。
+      所以数据库里查不到你的真实微信号。
+      换成真实登录：在 005.后端代码/src/main/resources/application-local.yml 的
+      app.wechat.secret 填入小程序 AppSecret，重启后端即可。
+      AppID 后端会自己从小程序工程里读，两边一定一致。
     </view>
   </view>
 

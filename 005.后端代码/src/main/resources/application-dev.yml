@@ -1,7 +1,9 @@
-# 开发环境：本地 MySQL + 假 code2session
-app:
-  wechat:
-    mock: true
+# 开发环境：本地 MySQL + 详细日志
+#
+# 注意：这里**不再**强制 app.wechat.mock = true。
+# mock 现在是自动降级的——只有真的没配 AppID/Secret 时才用假 code2session。
+# 配齐了（001/project.config.json 里的 AppID + application-local.yml 里的 AppSecret）
+# 就是真实微信登录，不需要改任何开关。
 
 logging:
   level:

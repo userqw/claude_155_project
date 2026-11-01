@@ -23,7 +23,12 @@ import static org.mockito.Mockito.when;
  * <p>把 code 换 openid 那一步打桩，专注验证「拿到真实 openid 之后会怎样」：
  * 建号、存 unionid、存昵称头像、mock 标记为 false。
  */
-@SpringBootTest
+@SpringBootTest(properties = {
+        "app.wechat.app-id=",
+        "app.wechat.secret=",
+        "app.wechat.app-id-file=target/no-such-project.config.json",
+        "app.wechat.require-credentials=false"
+})
 @ActiveProfiles({"dev", "local"})
 class RealWechatLoginTest {
 

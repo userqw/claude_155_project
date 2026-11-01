@@ -1,7 +1,15 @@
 # 复制成 application-local.yml 后按本机情况填写（application-local.yml 已被 .gitignore 忽略）。
 #   cp src/main/resources/application-local.template.yml src/main/resources/application-local.yml
-# 本机数据库密码等私有信息只写在这里，不要提交。
+# 本机数据库密码、小程序 AppSecret 等私有信息只写在这里，不要提交。
 spring:
   datasource:
     username: root
     password: 填你本机的 MySQL 密码
+
+app:
+  wechat:
+    # 小程序 AppSecret：微信公众平台 → 开发管理 → 开发设置
+    # 留空则后端跑本地 mock 模式（登录拿到的是假 openid，不是真实微信号）
+    secret: 填你的 AppSecret
+    # AppID 不用填：后端会自己从 001/project.config.json 读，
+    # 保证后端和小程序用的是同一个 AppID
