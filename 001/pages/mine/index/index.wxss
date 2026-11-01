@@ -242,10 +242,6 @@
   background: var(--pink-18);
 }
 
-.row-icon-green {
-  background: var(--green-18);
-}
-
 .row-icon-plain {
   background: var(--sunken);
 }
@@ -273,78 +269,6 @@
   background: var(--pink-14);
   border-radius: 24rpx;
   padding: 8rpx 20rpx;
-}
-
-/* 开关（本期只展示状态，不接订阅消息） */
-.toggle {
-  width: 88rpx;
-  height: 50rpx;
-  border-radius: 25rpx;
-  background: var(--baseline);
-  position: relative;
-  flex: none;
-}
-
-.toggle-off {
-  background: var(--sunken);
-  border: 2rpx solid var(--border);
-}
-
-.toggle-dot {
-  position: absolute;
-  top: 6rpx;
-  left: 6rpx;
-  width: 38rpx;
-  height: 38rpx;
-  border-radius: 50%;
-  background: var(--surface);
-  box-shadow: var(--shadow-sm);
-}
-
-/* 存储与分享 */
-.sub-cards {
-  display: flex;
-  margin-top: 20rpx;
-}
-
-.sub-card {
-  flex: 1;
-  min-width: 0;
-  background: var(--sunken);
-  border-radius: 24rpx;
-  padding: 24rpx 20rpx;
-  margin-right: 20rpx;
-}
-
-.sub-card:last-child {
-  margin-right: 0;
-}
-
-.sub-icon {
-  font-size: 36rpx;
-  margin-bottom: 12rpx;
-}
-
-.sub-title {
-  font-size: 27rpx;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.sub-sub {
-  font-size: 21rpx;
-  color: var(--text-3);
-  margin-top: 6rpx;
-  line-height: 1.5;
-}
-
-.sub-btn {
-  margin-top: 18rpx;
-  width: 100%;
-}
-
-.sub-btn-disabled {
-  opacity: 0.6;
 }
 
 .footer-text {

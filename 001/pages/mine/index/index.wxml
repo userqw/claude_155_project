@@ -106,47 +106,10 @@
       <text class="arrow">›</text>
     </view>
 
-    <view class="row-item">
-      <view class="row-icon row-icon-green">🔔</view>
-      <view class="grow">
-        <view class="row-title">每日打卡催促</view>
-        <view class="row-sub">每晚 20:00 微信服务提醒</view>
-      </view>
-      <view class="toggle toggle-off"><view class="toggle-dot"></view></view>
-    </view>
-  </view>
-
-  <!-- 存储与分享 -->
-  <view class="card">
-    <view class="section-title">📊 数据存储与成果分享</view>
-
-    <view class="sub-cards">
-      <view class="sub-card" bindtap="goExport">
-        <view class="sub-icon">☁️</view>
-        <view class="sub-title">导出全部数据</view>
-        <view class="sub-sub">JSON 备份 / CSV 打卡流水</view>
-        <view class="btn btn-ghost btn-sm sub-btn">立即导出</view>
-      </view>
-
-      <view class="sub-card">
-        <view class="sub-icon">📮</view>
-        <view class="sub-title">{{year}} 手作年鉴</view>
-        <view class="sub-sub">生成九宫格长图海报</view>
-        <view class="btn btn-primary btn-sm sub-btn sub-btn-disabled">即将上线</view>
-      </view>
-    </view>
   </view>
 
   <!-- 系统 -->
   <view class="card">
-    <view class="row-item">
-      <view class="row-icon row-icon-plain">🌗</view>
-      <view class="grow">
-        <view class="row-title">外观跟随系统（深色模式）</view>
-      </view>
-      <text class="row-value">{{theme === 'dark' ? '已开启' : '已关闭'}}</text>
-    </view>
-
     <view class="row-item" bindtap="onClearCache">
       <view class="row-icon row-icon-plain">🧹</view>
       <view class="grow">

@@ -26,8 +26,7 @@ Page({
     folderCount: 0,
     folders: [],
     materialPreviews: [],
-    cacheSize: '0.0',
-    year: ''
+    cacheSize: '0.0'
   },
 
   onLoad() {
@@ -121,8 +120,7 @@ Page({
       folderCount: folders.length,
       folders: folderRows,
       materialPreviews: previews,
-      cacheSize: this.cacheSize(),
-      year: year
+      cacheSize: this.cacheSize()
     })
   },
 
@@ -149,10 +147,6 @@ Page({
 
   goTags() {
     wx.navigateTo({ url: '/pages/mine/tags/index' })
-  },
-
-  goExport() {
-    wx.navigateTo({ url: '/pages/mine/export/index' })
   },
 
   goCalendar() {
