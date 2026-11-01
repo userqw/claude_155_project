@@ -1,6 +1,7 @@
 const date = require('../../utils/date')
 const { CHANNELS, MIN_DATE } = require('../../utils/constants')
 const { money } = require('../../utils/format')
+const { requireLogin } = require('../../utils/require-login')
 
 /**
  * 售出表单。
@@ -119,6 +120,8 @@ Component({
 
     onSave() {
       if (this.data.saving) return
+      // 售出要登录：这是最后一道兜底（页面入口已经拦过一道）
+      if (!requireLogin()) return
       const form = this.data.form
       const max = this.data.maxQuantity || 0
       if (max <= 0) {

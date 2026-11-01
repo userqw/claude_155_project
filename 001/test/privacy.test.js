@@ -69,7 +69,9 @@ function loadPage(rel) {
 }
 
 // 造一些数据：一条打卡、一笔售出、一个素材
-const recId = db.addCheckIn({ date: '2026-06-01', shapeId: 'shape_qq', count: 7, note: '私密记录' })
+// addCheckIn 返回的是记录对象，不是 id
+const rec = db.addCheckIn({ date: '2026-06-01', shapeId: 'shape_qq', count: 7, note: '私密记录' })
+const recId = rec.id
 db.addSale({ checkInId: recId, quantity: 2, unitPrice: 30, soldDate: '2026-06-02' })
 db.addFolder('私密文件夹')
 db.addMaterials('', [{ url: 'wxfile://tmp_p.jpg', name: '私密素材' }])
@@ -201,6 +203,30 @@ async function main() {
     assert.strictEqual(page.data.locked, true)
     assert.strictEqual(page.data.counts.records, 0)
     assert.strictEqual(page.data.counts.sales, 0)
+  })
+
+  await check('售出要登录：未登录时打不开售出面板', () => {
+    auth.logout()
+    const page = loadPage('pages/index/index.js')
+    const calls = []
+    global.wx.navigateTo = (o) => calls.push(o)
+    try {
+      page.onTapSell({ currentTarget: { dataset: { id: recId } } })
+      assert.ok(
+        calls.some((c) => c.url && c.url.indexOf('/pages/login/index') === 0),
+        '应当被带到登录页，实际：' + JSON.stringify(calls)
+      )
+      assert.strictEqual(page.data.showSale, false, '不该打开售出面板')
+    } finally {
+      global.wx.navigateTo = () => {}
+    }
+  })
+
+  await check('未登录时记录上没有售出状态', () => {
+    auth.logout()
+    const page = loadPage('pages/index/index.js')
+    page.load()
+    assert.strictEqual(page.data.recent.length, 0, '记录本身就没有，售出状态自然也没有')
   })
 
   console.log('\n登录后照常可见')

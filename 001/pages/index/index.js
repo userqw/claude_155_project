@@ -166,6 +166,9 @@ Page({
     const id = e.currentTarget.dataset.id
     const rec = db.getCheckIn(id)
     if (!rec) return
+    // 售出要登录：售出是写操作，售出状态也要跟着账号走
+    // （未登录时记录本身就是空的，售出状态自然也不存在）
+    if (!requireLogin()) return
     const shape = db.getShape(rec.shapeId)
     const sold = db.soldCountByCheckIn()[id] || 0
     const max = rec.count - sold

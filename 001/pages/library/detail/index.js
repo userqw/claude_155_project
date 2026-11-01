@@ -4,6 +4,7 @@ const stat = require('../../../utils/stat')
 const date = require('../../../utils/date')
 const { money } = require('../../../utils/format')
 const auth = require('../../../utils/auth')
+const { requireLogin } = require('../../../utils/require-login')
 
 Page({
   data: {
@@ -101,6 +102,8 @@ Page({
       wx.showToast({ title: '这条记录的都已售出', icon: 'none' })
       return
     }
+    // 售出要登录：售出是写操作，状态跟着账号走
+    if (!requireLogin()) return
     const shape = this.data.record.shape
     this.setData({
       showSale: true,
