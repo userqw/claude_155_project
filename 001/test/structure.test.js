@@ -277,27 +277,79 @@ for (const dir of wxmlDirs) {
 // 9. 用了 theme-{{theme}} 的组件必须真的声明 theme 属性
 // 少声明一个属性，类名就渲染成 theme-，组件里所有 var(--…) 全部取不到值——
 // 表现是「整个组件透明、定位失效」，但不报任何错。
-function checkThemeProperty(dir) {
-  const wxmlPath = path.join(root, dir, 'index.wxml')
-  const jsPath = path.join(root, dir, 'index.js')
+//
+// 注意路径：页面在 app.json 里是 `pages/xxx/yyy` 这样的**文件**路径
+// （对应 pages/xxx/yyy.wxml），只有组件才是目录（components/xxx/index.wxml）。
+// 之前这里按目录拼路径，页面一个都没真正检查到——
+// 路径不存在就直接 return，检查静默空转。
+function checkThemeProperty(wxmlPath, jsPath, label) {
   if (!fs.existsSync(wxmlPath) || !fs.existsSync(jsPath)) return
   const wxml = fs.readFileSync(wxmlPath, 'utf8')
   if (wxml.indexOf('theme-{{theme}}') === -1) return
   const js = fs.readFileSync(jsPath, 'utf8')
-  const hasProperty = /properties\s*:[\s\S]{0,400}?\btheme\s*:/.test(js)
-  const hasData = /data\s*:[\s\S]{0,400}?\btheme\s*:/.test(js)
+  // 不按固定窗口截断：properties 里可能排了十几个属性（stat-tile 就是），
+  // 窗口一短就会误报「没声明 theme」。直接认声明形式更靠谱。
+  const hasProperty = /\btheme\s*:\s*\{/.test(js)
+  const hasData = /\btheme\s*:\s*['"]/.test(js)
   if (!hasProperty && !hasData) {
-    errs.push(`${dir} 的 wxml 用了 theme-{{theme}}，但 js 里没有 theme 属性/字段`)
+    errs.push(`${label} 的 wxml 用了 theme-{{theme}}，但 js 里没有 theme 属性/字段`)
   }
 }
-for (const page of appJson.pages) checkThemeProperty(page)
+for (const page of appJson.pages) {
+  checkThemeProperty(
+    path.join(root, page + '.wxml'),
+    path.join(root, page + '.js'),
+    page
+  )
+}
 if (fs.existsSync(compRoot)) {
   for (const name of fs.readdirSync(compRoot)) {
     const dir = path.join(compRoot, name)
-    if (fs.statSync(dir).isDirectory()) checkThemeProperty(dir)
+    if (!fs.statSync(dir).isDirectory()) continue
+    checkThemeProperty(path.join(dir, 'index.wxml'), path.join(dir, 'index.js'), name)
   }
 }
-if (fs.existsSync(path.join(root, 'custom-tab-bar'))) checkThemeProperty('custom-tab-bar')
+if (fs.existsSync(path.join(root, 'custom-tab-bar'))) {
+  checkThemeProperty(
+    path.join(root, 'custom-tab-bar/index.wxml'),
+    path.join(root, 'custom-tab-bar/index.js'),
+    'custom-tab-bar'
+  )
+}
+
+// 10. 弹层内容区的 catchtap 不能指向「关闭」类 handler
+//
+// catchtap 拦住的是点击**往遮罩冒泡**，但 catchtap 自己**也会触发 handler**。
+// 写在弹层容器上就会变成：点弹层里的输入框 → 触发 onClose → 弹层当场收起。
+// 表现是「一打字面板就没了」，而且只在真机上点得到，很容易漏。
+//
+// 正确写法：catchtap 挂一个空函数（sale-sheet 就是这么写的）。
+function checkSheetCatchTap(wxmlPath, label) {
+  if (!fs.existsSync(wxmlPath)) return
+  const wxml = fs.readFileSync(wxmlPath, 'utf8').replace(/<!--[\s\S]*?-->/g, '')
+  // 找 class 里带 sheet / mask 的元素上的 catchtap
+  const re = /<view[^>]*class="[^"]*\b(sheet|mask)\b[^"]*"[^>]*catchtap="([^"]+)"[^>]*>/g
+  let m
+  while ((m = re.exec(wxml))) {
+    const handler = m[2]
+    if (/close|cancel|dismiss|hide/i.test(handler)) {
+      errs.push(
+        `${label} 弹层容器的 catchtap="${handler}" 会让点击直接关掉弹层` +
+        '（catchtap 自己也会触发 handler）。应挂一个空函数，只用来拦住往遮罩的点的冒泡。'
+      )
+    }
+  }
+}
+for (const page of appJson.pages) {
+  checkSheetCatchTap(path.join(root, page + '.wxml'), page)
+}
+if (fs.existsSync(compRoot)) {
+  for (const name of fs.readdirSync(compRoot)) {
+    const dir = path.join(compRoot, name)
+    if (!fs.statSync(dir).isDirectory()) continue
+    checkSheetCatchTap(path.join(dir, 'index.wxml'), name)
+  }
+}
 
 console.log(errs.length ? 'ERRORS:\n' + errs.join('\n') : 'ALL CHECKS PASS')
 if (errs.length) process.exitCode = 1

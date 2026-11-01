@@ -101,6 +101,9 @@ Page({
     this.setData({ showEditor: false })
   },
 
+  /** 空函数：只为了拦住弹层里点击往遮罩冒泡（catchtap 自己也会触发 handler） */
+  onStop() {},
+
   onName(e) {
     this.setData({ 'form.name': e.detail.value })
   },

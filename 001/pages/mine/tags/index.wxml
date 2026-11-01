@@ -15,7 +15,10 @@
 </view>
 
 <view wx:if="{{showEditor}}" class="mask" bindtap="onClose">
-  <view class="sheet theme-{{theme}}" catchtap="onClose">
+  <!-- catchtap 拦住点击往遮罩冒泡，但 catchtap 自己也会触发 handler：
+       这里必须挂一个空函数，不能挂 onClose——否则在输入框里打字，
+       点一下就把弹层关了。 -->
+  <view class="sheet theme-{{theme}}" catchtap="onStop">
     <view class="sheet-body">
       <view class="field">
         <view class="field-label">名称</view>
