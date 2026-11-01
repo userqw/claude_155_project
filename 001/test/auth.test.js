@@ -150,7 +150,10 @@ async function main() {
     assert.strictEqual(auth.isLoggedIn(), false)
   })
 
-  await check('游客模式下打卡照常保存，统计正确', () => {
+  await check('数据层仍可写入（同步合并要能落库），界面入口另有一道登录拦截', () => {
+    // 打卡要登录是**界面**的规则（PRD §5.6.1）：
+    // 未登录时点「去打卡」会被带到登录页。
+    // 数据层不拦——云端同步拉回来的记录本来就要能写进来。
     db.addCheckIn({ date: '2026-03-01', shapeId: 'shape_qq', count: 2 })
     db.addCheckIn({ date: '2026-03-02', shapeId: 'shape_ob11', count: 3 })
     const y = stat.yearlyOverview('2026', 'light')

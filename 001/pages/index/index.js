@@ -3,6 +3,7 @@ const db = require('../../utils/db')
 const stat = require('../../utils/stat')
 const date = require('../../utils/date')
 const auth = require('../../utils/auth')
+const { requireLogin } = require('../../utils/require-login')
 
 Page({
   data: {
@@ -135,12 +136,17 @@ Page({
 
   /** 点「去打卡」跳转到打卡页 */
   onTapCheckin() {
+    // 打卡要登录（PRD §5.6）：没登录先带去登录，登录完接着来打卡，
+    // 不用再点一次
+    if (!requireLogin({ redirect: '/pages/checkin/index' })) return
     wx.navigateTo({ url: '/pages/checkin/index' })
   },
 
   /** 点今天某一条记录 → 去打卡页编辑 */
   onTapEdit(e) {
-    wx.navigateTo({ url: '/pages/checkin/index?id=' + e.currentTarget.dataset.id })
+    const id = e.currentTarget.dataset.id
+    if (!requireLogin({ redirect: '/pages/checkin/index?id=' + id })) return
+    wx.navigateTo({ url: '/pages/checkin/index?id=' + id })
   },
 
   // -- 售出 ---------------------------------------------------------------

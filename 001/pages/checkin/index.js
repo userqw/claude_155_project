@@ -2,6 +2,8 @@ const app = getApp()
 const db = require('../../utils/db')
 const date = require('../../utils/date')
 const stat = require('../../utils/stat')
+const auth = require('../../utils/auth')
+const { requireLogin } = require('../../utils/require-login')
 const { MAX_COUNT, MAX_NOTE, MAX_PHOTOS, MIN_DATE, QUICK_COUNTS } = require('../../utils/constants')
 
 /**
@@ -37,6 +39,21 @@ Page({
   },
 
   onLoad(options) {
+    // 打卡要登录（PRD §5.6）。这一页能从首页、作品库详情、日历补录三处进来，
+    // 所以除了入口处拦一道，这里自己也要拦——直接打开这个页面也得先登录。
+    // 用 redirectTo 把本页顶掉，登录完再回到本页（带着原来的参数），
+    // 页面栈才不会越叠越深。
+    if (!auth.isLoggedIn()) {
+      const query = []
+      if (options.id) query.push('id=' + options.id)
+      if (options.date) query.push('date=' + options.date)
+      requireLogin({
+        redirect: '/pages/checkin/index' + (query.length ? '?' + query.join('&') : ''),
+        replace: true
+      })
+      return
+    }
+
     const theme = app.globalData.theme
     const id = options.id || ''
     const shapes = db.listShapes().map((s) => {
@@ -151,6 +168,8 @@ Page({
 
   onSave() {
     if (this.data.saving) return
+    // 兜底：万一停留在页面期间登录态没了（退出登录 / token 失效）
+    if (!requireLogin()) return
     const form = this.data.form
     if (!form.shapeId) {
       wx.showToast({ title: '先选一个作品类型', icon: 'none' })

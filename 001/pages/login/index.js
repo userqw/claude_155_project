@@ -33,6 +33,9 @@ Page({
     // 'login' = 明确是来登录的（从「我的」的一键登录进来）
     // 空 = 可能是来改资料的（从账号设置进来）
     intent: '',
+    // 登录成功后接着去的页面（如 '/pages/checkin/index'），
+    // 为空则登录完回原来那一页
+    redirect: '',
     actionText: '微信一键登录'
   },
 
@@ -40,6 +43,7 @@ Page({
     const backendReady = auth.backendReady()
     const account = auth.getState().account
     const intent = (options && options.intent) || ''
+    const redirect = (options && options.redirect) || ''
     const loggedIn = auth.isLoggedIn()
     this.setData({
       theme: app.globalData.theme,
@@ -47,6 +51,7 @@ Page({
       avatarUrl: auth.avatarPath(),
       alreadyLoggedIn: loggedIn,
       intent: intent,
+      redirect: redirect,
       actionText: labelFor(intent, loggedIn),
       mockNote: this.mockHint(),
       // 后端没配时提示一句，并开放开发者模式预览已登录界面
@@ -227,6 +232,20 @@ Page({
       }
 
       // 昵称与头像已经随登录请求一起发过去了，不用再补一次 updateProfile
+
+      // 登录是为了接着做某件事（打卡）的话，登录完直接过去，
+      // 不用让用户再点一次
+      if (this.data.redirect) {
+        const target = this.data.redirect
+        this.setData({ redirect: '' })
+        setTimeout(() => {
+          wx.redirectTo({
+            url: target,
+            fail: () => this.back()
+          })
+        }, 600)
+        return
+      }
 
       setTimeout(() => this.back(), 800)
     } catch (e) {

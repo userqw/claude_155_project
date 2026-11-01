@@ -44,6 +44,7 @@ global.Component = (def) => { tabBarDef = def }
 global.wx = {
   switchTab: (o) => { wxCalls.push({ type: 'switchTab', ...o }) },
   navigateTo: (o) => { wxCalls.push({ type: 'navigateTo', ...o }) },
+  redirectTo: (o) => { wxCalls.push({ type: 'redirectTo', ...o }) },
   navigateBack: (o) => { wxCalls.push({ type: 'navigateBack', ...o }) },
   // 探活请求：只记录，不回调 —— 模拟「连接挂起」
   request: (opt) => { wxRequests.push(opt) }
@@ -203,6 +204,57 @@ async function main() {
     const src = fs.readFileSync(path.join(root, 'pages/mine/index/index.js'), 'utf8')
     assert.ok(src.indexOf('/pages/login/index?intent=login') > -1,
       '「我的」页跳登录页要带 intent=login，否则按钮会显示成「保存资料」')
+  })
+
+  console.log('\n打卡要登录')
+
+  // 加载首页与打卡页
+  let homeDef = null
+  global.Page = (def) => { homeDef = def }
+  require(path.join(root, 'pages/index/index.js'))
+  const home = Object.assign({}, homeDef, { data: Object.assign({}, homeDef.data) })
+  home.setData = (patch) => Object.assign(home.data, patch)
+
+  let checkinDef = null
+  global.Page = (def) => { checkinDef = def }
+  require(path.join(root, 'pages/checkin/index.js'))
+  const checkin = Object.assign({}, checkinDef, { data: Object.assign({}, checkinDef.data) })
+  checkin.setData = (patch) => Object.assign(checkin.data, patch)
+
+  await check('未登录点「去打卡」→ 带到登录页，并带上登录完要接着去的地址', () => {
+    auth.logout()
+    wxCalls.length = 0
+    home.onTapCheckin()
+    assert.strictEqual(wxCalls.length, 1)
+    assert.strictEqual(wxCalls[0].type, 'navigateTo')
+    assert.ok(wxCalls[0].url.indexOf('/pages/login/index') === 0, wxCalls[0].url)
+    assert.ok(wxCalls[0].url.indexOf('intent=login') > -1, '要明确是来登录的：' + wxCalls[0].url)
+    assert.ok(
+      decodeURIComponent(wxCalls[0].url).indexOf('/pages/checkin/index') > -1,
+      '登录完要接着去打卡页：' + wxCalls[0].url
+    )
+  })
+
+  await check('已登录点「去打卡」→ 直接进打卡页', () => {
+    auth.devLogin()
+    wxCalls.length = 0
+    home.onTapCheckin()
+    assert.strictEqual(wxCalls.length, 1)
+    assert.strictEqual(wxCalls[0].type, 'navigateTo')
+    assert.strictEqual(wxCalls[0].url, '/pages/checkin/index')
+  })
+
+  await check('打卡页被直接打开时也要先登录（作品库详情 / 日历补录进来的）', () => {
+    auth.logout()
+    wxCalls.length = 0
+    checkin.onLoad({ id: 'ci_x' })
+    assert.strictEqual(wxCalls.length, 1)
+    assert.strictEqual(wxCalls[0].type, 'redirectTo', '要用 redirectTo 把本页顶掉，页面栈才不会越叠越深')
+    assert.ok(wxCalls[0].url.indexOf('/pages/login/index') === 0, wxCalls[0].url)
+    assert.ok(
+      decodeURIComponent(wxCalls[0].url).indexOf('id=ci_x') > -1,
+      '登录完要回到原来那条记录，参数不能丢：' + wxCalls[0].url
+    )
   })
 
   console.log('\n登录页不会卡在「处理中…」')
