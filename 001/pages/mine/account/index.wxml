@@ -13,6 +13,13 @@
 
       <view class="btn btn-ghost btn-sm" wx:if="{{!loggedIn}}" bindtap="goLogin">去登录</view>
     </view>
+
+    <!-- 云端账号：数据库 account 表里就是按这个 openid 找你的记录 -->
+    <view class="account-id" wx:if="{{loggedIn}}">
+      <text class="account-id-label">云端账号</text>
+      <text class="account-id-value">{{account.openid}}</text>
+      <text class="account-id-hint">在数据库的 account 表里按这个 openid 就能找到你的记录</text>
+    </view>
   </view>
 
   <!-- 本地联调模式说明：后端没配 appid/secret，openid 是假的 -->

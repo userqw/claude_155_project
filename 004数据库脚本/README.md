@@ -124,6 +124,24 @@ erDiagram
 
 ## 关键设计决策
 
+### 0. 所有时间列存的是 **UTC**
+
+`created_at` / `updated_at` / `deleted_at` 一律存 **UTC**（`DATETIME(3)`，不带时区）。
+
+服务端 JVM 的默认时区被固定成 UTC（`config/TimeZoneConfig.java`），客户端上传的也是
+ISO-8601 UTC。两边统一 UTC，「后写覆盖先写」的同步判定才不会因为时差把新旧版本搞反。
+
+**⚠️ 由此带来的坑：MySQL 服务端的 `NOW()` 返回的是服务器本地时间，和表里存的值差一个时差。**
+
+```
+SELECT NOW();          -- 本地时间，比如 20:11:22
+SELECT UTC_TIMESTAMP(); -- UTC，比如 12:11:22   ← 和表里的值同一个基准
+```
+
+排查线上数据时请用 `UTC_TIMESTAMP()`，或者心里记得加/减时差。
+按 `created_at DESC` 排序时，最新的记录**不一定**排在最前面——
+如果你的服务器时区是 UTC+8，表里的 12:09 会排在本地时间 04:09 的记录前面。
+
 ### 1. `deleted_at` 取代 PRD 的 `status` 枚举
 
 PRD §6.2 写的是 `status enum('normal','deleted')`。这里改成 `deleted_at DATETIME(3) NULL`，理由：

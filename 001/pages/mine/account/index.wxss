@@ -84,6 +84,34 @@
   border-color: var(--pink-28);
 }
 
+.account-id {
+  margin-top: 20rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid var(--border);
+  display: flex;
+  flex-direction: column;
+}
+
+.account-id-label {
+  font-size: 22rpx;
+  color: var(--text-3);
+}
+
+.account-id-value {
+  font-size: 24rpx;
+  color: var(--text-2);
+  font-family: monospace;
+  word-break: break-all;
+  margin-top: 6rpx;
+}
+
+.account-id-hint {
+  font-size: 21rpx;
+  color: var(--text-3);
+  margin-top: 8rpx;
+  line-height: 1.6;
+}
+
 .mock-openid {
   font-family: monospace;
   font-size: 22rpx;
