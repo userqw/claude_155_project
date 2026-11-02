@@ -13,6 +13,7 @@ One product, four layers:
 - `003.前端代码/` — Stitch 原型代码 + `sakura_clay_studio/DESIGN.md`（**视觉规范来源**）
 - `004数据库脚本/` — MySQL 8 表结构 / 视图 / 种子数据 / 同步语句（已在本地 MySQL 实跑验证）
 - `005.后端代码/` — Spring Boot 3 服务端 API（Maven + JDK 21）
+- `006.开发规范/` — Java/Spring Boot 开发规范（带编号的规则集，PR 与评审按编号引用）
 
 **There is a git repo (remote: GitHub) and there is no npm and no lint setup.** Don't invent npm scripts.
 
