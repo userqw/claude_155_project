@@ -20,9 +20,6 @@ Page({
     overview: null,
     monthTrend: [],
     recent: [],
-    showSale: false,
-    saleTarget: null,
-    saleMax: 1,
     showLoginBar: false,
     // 未登录时首页的数字不给看（PRD §5.6.1）
     loggedIn: false
@@ -98,6 +95,7 @@ Page({
     const recent = all.slice(0, 12).map((c) => {
       const photos = db.listPhotos(c.id)
       const sold = db.soldCountByCheckIn()[c.id] || 0
+      const unsold = Math.max(0, c.count - sold)
       return {
         id: c.id,
         date: c.date,
@@ -107,7 +105,9 @@ Page({
         cover: photos.length ? photos[0].url : '',
         shape: shapeMap[c.shapeId] || stat.shapeView(null, theme),
         sold: sold,
-        unsold: Math.max(0, c.count - sold)
+        unsold: unsold,
+        // 状态只有一个：全部卖完才算「售出」，卖了一部分仍是「未售」
+        fullySold: c.count > 0 && unsold <= 0
       }
     })
 
@@ -161,42 +161,11 @@ Page({
   },
 
   // -- 售出 ---------------------------------------------------------------
+  // 记售出的入口在作品详情页（「标记售出」）。首页这一行只显示状态：
+  // 之前这里还挂着一个「售出」按钮，未售完的记录会并排显示两个「售出」，
+  // 看着像两个状态。现在只留状态徽标。
 
-  onTapSell(e) {
-    const id = e.currentTarget.dataset.id
-    const rec = db.getCheckIn(id)
-    if (!rec) return
-    // 售出要登录：售出是写操作，售出状态也要跟着账号走
-    // （未登录时记录本身就是空的，售出状态自然也不存在）
-    if (!requireLogin()) return
-    const shape = db.getShape(rec.shapeId)
-    const sold = db.soldCountByCheckIn()[id] || 0
-    const max = rec.count - sold
-    if (max <= 0) {
-      wx.showToast({ title: '这条记录的都已售出', icon: 'none' })
-      return
-    }
-    this.setData({
-      showSale: true,
-      saleTarget: {
-        id: id,
-        shapeName: shape ? shape.name : '',
-        defaultPrice: shape && shape.defaultPrice ? shape.defaultPrice : ''
-      },
-      saleMax: max
-    })
-  },
 
-  onSaleClose() {
-    this.setData({ showSale: false })
-  },
-
-  onSaleSave(e) {
-    db.addSale(e.detail)
-    this.setData({ showSale: false })
-    wx.showToast({ title: '已记录售出', icon: 'success' })
-    this.load()
-  },
 
   // -- 账号 ---------------------------------------------------------------
 

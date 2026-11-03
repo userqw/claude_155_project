@@ -4,9 +4,8 @@
   "usingComponents": {
     "stat-tile": "../../components/stat-tile/index", 
     "shape-picker": "../../components/shape-picker/index", 
-    "app-header": "../../components/app-header/index", 
-    "sale-sheet": "../../components/sale-sheet/index", 
-    "shape-icon": "../../components/shape-icon/index", 
+    "app-header": "../../components/app-header/index",
+    "shape-icon": "../../components/shape-icon/index",
     "empty-state": "../../components/empty-state/index", 
     "chart-bar": "../../components/chart-bar/index", 
     "badge": "../../components/badge/index"

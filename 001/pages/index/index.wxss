@@ -196,25 +196,12 @@
   color: var(--text-3);
 }
 
-/* 状态徽标与「售出」放同一列，右边缘对齐；
-   之前一个在标题行尾、一个在整行右侧垂直居中，看起来是错位的 */
+/* 状态徽标靠右边缘对齐。每条记录只显示一个状态：
+   卖完了「售出」，还剩着「未售」。 */
 .record-side {
   flex: none;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   margin-left: 16rpx;
-}
-
-.record-sell {
-  margin-top: 12rpx;
-  height: 48rpx;
-  display: flex;
-  align-items: center;
-  font-size: 24rpx;
-  line-height: 1;
-  color: var(--accent);
-  background: var(--pink-14);
-  border-radius: 24rpx;
-  padding: 0 24rpx;
 }

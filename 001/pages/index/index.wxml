@@ -122,31 +122,17 @@
         </view>
       </view>
 
-      <!-- 状态徽标与「售出」按钮同高（badge size=lg = 48rpx，按钮也是 48rpx） -->
+      <!-- 状态只有一个：卖完了显示「售出」，还剩着就显示「未售」。
+           之前这里还挂着一个「售出」按钮，未售完的记录会并排显示两个「售出」，
+           看着像两个状态。现在只留状态徽标；记售出点这条记录进详情页。 -->
       <view class="record-side">
         <badge
           theme="{{theme}}"
-          tone="{{item.sold > 0 ? 'sold' : 'stock'}}"
-          text="{{item.sold > 0 ? '售出' : '未售'}}"
+          tone="{{item.fullySold ? 'sold' : 'stock'}}"
+          text="{{item.fullySold ? '售出' : '未售'}}"
           size="lg"
         ></badge>
-        <view
-          wx:if="{{item.unsold > 0}}"
-          class="record-sell"
-          catchtap="onTapSell"
-          data-id="{{item.id}}"
-        >售出</view>
       </view>
     </view>
   </view>
 </view>
-
-
-<sale-sheet
-  visible="{{showSale}}"
-  check-in="{{saleTarget}}"
-  max-quantity="{{saleMax}}"
-  theme="{{theme}}"
-  bindclose="onSaleClose"
-  bindsave="onSaleSave"
-></sale-sheet>

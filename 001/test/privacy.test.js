@@ -207,11 +207,17 @@ async function main() {
 
   await check('售出要登录：未登录时打不开售出面板', () => {
     auth.logout()
-    const page = loadPage('pages/index/index.js')
+    // 记售出的入口在作品详情页（首页那条记录只显示状态）
+    const page = loadPage('pages/library/detail/index.js')
+    page.setData({
+      id: recId,
+      unsold: 3,
+      record: { id: recId, shape: { name: 'QQ人' } }
+    })
     const calls = []
     global.wx.navigateTo = (o) => calls.push(o)
     try {
-      page.onTapSell({ currentTarget: { dataset: { id: recId } } })
+      page.onSell()
       assert.ok(
         calls.some((c) => c.url && c.url.indexOf('/pages/login/index') === 0),
         '应当被带到登录页，实际：' + JSON.stringify(calls)

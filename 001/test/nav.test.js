@@ -287,6 +287,51 @@ async function main() {
     assert.ok(home.data.recent.length > 0, '登录后应能看到最近记录')
   })
 
+  console.log('\n首页记录只显示一个状态')
+
+  await check('卖了一部分也算「未售」，全部卖完才算「售出」', () => {
+    const db = require(path.join(root, 'utils/db.js'))
+    auth.devLogin()
+    // 显式加载首页：上面几节最后加载的是别的页面，makePage() 拿到的不一定是它
+    let homeDef = null
+    global.Page = (def) => { homeDef = def }
+    const homePath = path.join(root, 'pages/index/index.js')
+    delete require.cache[require.resolve(homePath)]
+    require(homePath)
+    const page = Object.assign({}, homeDef, { data: Object.assign({}, homeDef.data) })
+    page.setData = (patch) => Object.assign(page.data, patch)
+
+    const unsoldRec = db.addCheckIn({ date: '2026-07-01', shapeId: 'shape_qq', count: 3 })
+    const partialRec = db.addCheckIn({ date: '2026-07-02', shapeId: 'shape_qq', count: 3 })
+    const soldRec = db.addCheckIn({ date: '2026-07-03', shapeId: 'shape_qq', count: 2 })
+
+    // 部分售出：3 个里卖了 1 个
+    db.addSale({ checkInId: partialRec.id, quantity: 1, unitPrice: 10, soldDate: '2026-07-04' })
+    // 全部售出
+    db.addSale({ checkInId: soldRec.id, quantity: 2, unitPrice: 10, soldDate: '2026-07-04' })
+
+    const page2 = page
+    page2.load()
+    const byId = {}
+    page2.data.recent.forEach((r) => { byId[r.id] = r })
+
+    assert.strictEqual(byId[unsoldRec.id].fullySold, false, '没卖过的不是售出')
+    assert.strictEqual(byId[partialRec.id].fullySold, false, '卖了一部分仍是未售')
+    assert.strictEqual(byId[partialRec.id].sold, 1)
+    assert.strictEqual(byId[partialRec.id].unsold, 2)
+    assert.strictEqual(byId[soldRec.id].fullySold, true, '全卖完才是售出')
+    assert.strictEqual(byId[soldRec.id].unsold, 0)
+  })
+
+  await check('记录行里只有一个状态徽标，没有第二个「售出」', () => {
+    const wxml = require('fs').readFileSync(path.join(root, 'pages/index/index.wxml'), 'utf8')
+    const row = wxml.split('wx:for="{{recent}}"')[1] || ''
+    const badges = (row.match(/<badge/g) || []).length
+    assert.strictEqual(badges, 1, '一条记录只能有一个状态徽标，实际 ' + badges + ' 个')
+    assert.strictEqual(row.indexOf('record-sell'), -1,
+      '记录行里不该再有「售出」按钮——它和状态徽标并排显示，看着像两个状态')
+  })
+
   console.log('\n登录页不会卡在「处理中…」')
 
   await check('请求挂起不回调时，loading 会被清掉并给出提示', async () => {
