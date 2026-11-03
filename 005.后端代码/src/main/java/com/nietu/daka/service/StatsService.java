@@ -11,9 +11,12 @@ import com.nietu.daka.dto.ShapeRevenueRow;
 import com.nietu.daka.dto.YearlyOverviewRow;
 import com.nietu.daka.dto.YearlyProductionRow;
 import com.nietu.daka.dto.YearlyRevenueRow;
+import com.nietu.daka.dto.YearCompareRow;
 import com.nietu.daka.mapper.StatsMapper;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 /**
@@ -31,11 +34,41 @@ public class StatsService {
         this.statsMapper = statsMapper;
     }
 
+    /**
+     * 年度总览。
+     *
+     * <p>这一年没有记录时返回**全 0 的总览**，不是 404——
+     * 「这一年没记录」是正常状态，前端要拿它渲染空态。
+     */
     public YearlyOverviewRow overview(String openid, int year) {
         return statsMapper.yearlyOverview(openid).stream()
                 .filter(r -> r.year() == year)
                 .findFirst()
-                .orElseThrow(() -> BizException.notFound("没有这一年的数据"));
+                .orElseGet(() -> emptyOverview(year));
+    }
+
+    /** 空年份的总览 */
+    private YearlyOverviewRow emptyOverview(int year) {
+        return new YearlyOverviewRow(year, 0L, 0L, 0L, BigDecimal.ZERO,
+                BigDecimal.ZERO, 0L, 0L, 0, BigDecimal.ZERO);
+    }
+
+    /**
+     * 跨年对比：与前端 {@code stat.yearCompare()} 同口径。
+     *
+     * <p>上一年没有记录时 {@code rate} 为 null——没有基数就不该给百分比。
+     */
+    public YearCompareRow compare(String openid, int year) {
+        YearlyOverviewRow current = overview(openid, year);
+        YearlyOverviewRow previous = overview(openid, year - 1);
+        long cur = current.production() == null ? 0 : current.production();
+        long prev = previous.production() == null ? 0 : previous.production();
+        long delta = cur - prev;
+        BigDecimal rate = prev > 0
+                ? BigDecimal.valueOf(delta).multiply(BigDecimal.valueOf(100))
+                        .divide(BigDecimal.valueOf(prev), 1, RoundingMode.HALF_UP)
+                : null;
+        return new YearCompareRow(year, year - 1, cur, prev, delta, rate, prev > 0);
     }
 
     public List<YearlyProductionRow> yearlyProduction(String openid) {

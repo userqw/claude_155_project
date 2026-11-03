@@ -9,6 +9,7 @@ import com.nietu.daka.dto.MonthlyRevenueRow;
 import com.nietu.daka.dto.ShapeDistributionRow;
 import com.nietu.daka.dto.ShapeRevenueRow;
 import com.nietu.daka.dto.YearlyOverviewRow;
+import com.nietu.daka.dto.YearCompareRow;
 import com.nietu.daka.security.AuthContext;
 import com.nietu.daka.service.StatsService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,6 +41,12 @@ public class StatsController {
     @GetMapping("/year")
     public Result<YearlyOverviewRow> year(@RequestParam int year) {
         return Result.ok(statsService.overview(AuthContext.require(), year));
+    }
+
+    @Operation(summary = "跨年对比（与上一年比产量）")
+    @GetMapping("/compare")
+    public Result<YearCompareRow> compare(@RequestParam int year) {
+        return Result.ok(statsService.compare(AuthContext.require(), year));
     }
 
     @Operation(summary = "按月的产量")

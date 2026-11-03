@@ -1,13 +1,15 @@
 package com.nietu.daka.controller;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.nietu.daka.common.PageResult;
 import com.nietu.daka.common.Result;
 import com.nietu.daka.dto.CheckInDto;
-import com.nietu.daka.entity.CheckIn;
+import com.nietu.daka.dto.CheckInRequest;
+import com.nietu.daka.dto.CheckInVo;
 import com.nietu.daka.security.AuthContext;
 import com.nietu.daka.service.CheckInService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,7 +20,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-/** 打卡记录。 */
+/**
+ * 打卡记录。
+ *
+ * <p>出参用 VO 不用 Entity（规范 API-02）：实体里的 {@code deviceId}、
+ * {@code deletedAt} 属于内部实现或软删除状态，不该出现在对外契约里。
+ */
 @Tag(name = "打卡")
 @RestController
 @RequestMapping("/api/checkin")
@@ -32,23 +39,24 @@ public class CheckInController {
 
     @Operation(summary = "分页查询打卡记录")
     @GetMapping
-    public Result<Page<CheckIn>> list(@RequestParam(required = false) Integer year,
-                                    @RequestParam(required = false) String shapeId,
-                                    @RequestParam(defaultValue = "1") long page,
-                                    @RequestParam(defaultValue = "20") long size) {
+    public Result<PageResult<CheckInVo>> list(@RequestParam(required = false) Integer year,
+                                              @RequestParam(required = false) String shapeId,
+                                              @RequestParam(defaultValue = "1") long page,
+                                              @RequestParam(defaultValue = "20") long size) {
         return Result.ok(checkInService.list(AuthContext.require(), year, shapeId, page, size));
     }
 
     @Operation(summary = "新建打卡记录")
     @PostMapping
-    public Result<CheckInDto> create(@RequestBody CheckInDto dto) {
-        return Result.ok(checkInService.create(AuthContext.require(), dto));
+    public Result<CheckInDto> create(@RequestBody @Valid CheckInRequest request) {
+        return Result.ok(checkInService.create(AuthContext.require(), request.toDto()));
     }
 
     @Operation(summary = "修改打卡记录")
     @PutMapping("/{id}")
-    public Result<CheckInDto> update(@PathVariable String id, @RequestBody CheckInDto dto) {
-        return Result.ok(checkInService.update(AuthContext.require(), id, dto));
+    public Result<CheckInDto> update(@PathVariable String id,
+                                     @RequestBody @Valid CheckInRequest request) {
+        return Result.ok(checkInService.update(AuthContext.require(), id, request.toDto()));
     }
 
     @Operation(summary = "软删除打卡记录（进 30 天回收站）")

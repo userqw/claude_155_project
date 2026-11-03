@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 /**
  * 登录与账号。
  *
@@ -57,9 +59,9 @@ public class AuthController {
 
     @Operation(summary = "注销账号并清除该账号全部数据")
     @PostMapping("/account/delete")
-    public Result<Void> deleteAccount() {
+    public Result<Map<String, Boolean>> deleteAccount() {
         authService.deleteAccount(AuthContext.require());
-        return Result.ok();
+        return Result.ok(Map.of("deleted", true));
     }
 
     @Operation(summary = "健康检查（不需要 token）")

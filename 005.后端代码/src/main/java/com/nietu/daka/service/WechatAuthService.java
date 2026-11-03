@@ -115,10 +115,19 @@ public class WechatAuthService {
     }
 
     /**
-     * 现在是不是在跑 mock：没配 appid/secret 时为 true。
-     * 游客 AppID（touristappid）也算没配——它换不到 openid。
+     * 现在是不是在跑 mock。
+     *
+     * <p>两种情况：
+     * <ul>
+     *   <li>{@code app.wechat.mock=true} —— 强制 mock，即使凭据齐全也用假 openid</li>
+     *   <li>没配 appid/secret（或配的是游客 AppID）—— 自动降级为 mock</li>
+     * </ul>
+     * 客户端靠这个标记告诉用户「你登录拿到的不是真实微信号」。
      */
     public boolean isMockMode() {
+        if (props.isMock()) {
+            return true;
+        }
         return appId().isBlank() || secret().isBlank();
     }
 

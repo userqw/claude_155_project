@@ -118,6 +118,9 @@ docker compose up -d --build
 
 ## 接口一览
 
+**完整契约见 [`docs/api.md`](docs/api.md)**（45 个接口的字段、校验、错误码）。
+前端接入示例见 `003.前端代码/frontend/api/`（baseURL 只在一个地方，改端口只改那一行）。
+
 所有接口除 `/api/login`、`/api/health` 外都要带 token：
 
 ```
@@ -132,11 +135,13 @@ Authorization: Bearer <token>
 | --- | --- | --- |
 | 响应包裹 | HTTP 200 + `{ code, message, data }`；`code !== 0` 是业务失败 | 前端早期把 `code !== 0` 当成功，错误被吞掉 |
 | token 位置 | **只在 `Authorization` 头**，不放 body | 放 body 后拦截器拿不到 |
-| 登录返回 | `{ token, account: { openid, unionid, nickname, avatarUrl, createdAt }, newUser, expireSeconds }` | 早期返回的是扁平字段，前端读 `res.account` 拿到 undefined |
-| 时间格式 | 一律 **ISO-8601 带时区**（`2026-11-01T02:23:11.170Z`） | 前端直接发裸毫秒数，Jackson 对 `LocalDateTime` 直接报错 |
-| 时区 | 服务端 JVM 与 Jackson 都固定 **UTC**（`application.yml` 的 `time-zone` + `TimeZone.setDefault`） | 本地时区会让「今天」跨天错位 |
+| 登录返回 | `{ token, account: { openid, unionid, nickname, avatarUrl, createdAt }, newUser, expireSeconds, mock }` | 早期返回的是扁平字段，前端读 `res.account` 拿到 undefined |
+| 时间格式 | 一律 **ISO-8601 带 `Z`**（`2026-11-01T02:23:11.170Z`） | 不带 `Z` 的话 JS 端 `new Date()` 会按本地时间解析，差 8 小时 |
+| 时区 | 服务端 JVM 与 Jackson 都固定 **UTC** | 本地时区会让「今天」跨天错位 |
 | 未知字段 | 请求 DTO 一律 `@JsonIgnoreProperties(ignoreUnknown = true)` | 前端多发一个字段就 500 |
 | 软删除 | 客户端发 `deleted: true` **或** `deletedAt` 非空，任一成立即视为删除 | 两个字段名都出现过，得都认 |
+| 出参不是 Entity | 一律走 VO（`CheckInVo` / `ShapeVo` …） | 直接返回 Entity，数据库加字段就等于接口变更 |
+| 复合主键的查询 | 任何按 id 的查询都要**同时带 openid** | `updateById` 只按 `id` 匹配，会改到别人账号的数据 |
 
 服务端的 `LoginRequest` / `SyncPushRequest` 等 DTO 上都加了 `ignoreUnknown`，
 所以前端临时多传字段不会打挂服务——但字段名本身必须对得上。
@@ -162,17 +167,57 @@ Authorization: Bearer <token>
 
 | 方法 | 路径 | 说明 |
 | --- | --- | --- |
-| GET | `/api/checkin?year=&shapeId=&page=&size=` | 分页查询 |
+| GET | `/api/checkin?year=&shapeId=&page=&size=` | 分页查询（出参 `CheckInVo`，带品类名与售出数） |
 | POST | `/api/checkin` | 新建 |
 | PUT | `/api/checkin/{id}` | 修改 |
 | DELETE | `/api/checkin/{id}` | 软删除（进 30 天回收站） |
 | POST | `/api/checkin/{id}/restore` | 从回收站恢复 |
 
+### 品类（造型）
+
+内置四个可改名、可排序、**不可删**；自定义品类可增删改删，最多 4 个。
+
+| 方法 | 路径 | 说明 |
+| --- | --- | --- |
+| GET | `/api/shapes` | 品类列表（带每个品类的累计用量） |
+| POST | `/api/shapes` | 新建自定义品类（色槽由服务端分配，不循环） |
+| PUT | `/api/shapes/{id}` | 修改（内置的只能改名称与图标） |
+| DELETE | `/api/shapes/{id}` | 删自定义品类（历史记录迁到「其他」） |
+| POST | `/api/shapes/reorder` | 调整顺序 |
+
+### 标签
+
+| 方法 | 路径 | 说明 |
+| --- | --- | --- |
+| GET | `/api/tags` | 标签列表（带引用条数） |
+| POST | `/api/tags` | 新建 |
+| PUT | `/api/tags/{id}` | 修改 |
+| DELETE | `/api/tags/{id}` | 删除（内置的不可删） |
+
+### 售出
+
+**追加型，只增不改**：金额已经进过报表，改写会让历史失真。撤单就删掉再记一条。
+
+| 方法 | 路径 | 说明 |
+| --- | --- | --- |
+| GET | `/api/sales?checkInId=` | 售出记录列表 |
+| POST | `/api/sales` | 新增（数量不能超过未售出数量，超了 400） |
+| DELETE | `/api/sales/{id}` | 撤单（软删除） |
+
+### 回收站
+
+| 方法 | 路径 | 说明 |
+| --- | --- | --- |
+| GET | `/api/trash` | 回收站列表（打卡记录 + 素材） |
+| DELETE | `/api/trash?entityType=&id=` | 彻底删除一条 |
+| DELETE | `/api/trash/all` | 清空回收站 |
+
 ### 统计
 
 | 方法 | 路径 | 说明 |
 | --- | --- | --- |
-| GET | `/api/stats/year?year=` | 年度总览：产量 / 营收 / 未售出 / 日均 |
+| GET | `/api/stats/year?year=` | 年度总览：产量 / 营收 / 未售出 / 日均。**该年无记录返回全 0，不是 404** |
+| GET | `/api/stats/compare?year=` | 跨年对比（与上一年比产量） |
 | GET | `/api/stats/monthly-production?year=` | 按月产量 |
 | GET | `/api/stats/monthly-revenue?year=` | 按月营收 |
 | GET | `/api/stats/shapes?year=` | 造型分布 |
@@ -187,9 +232,12 @@ Authorization: Bearer <token>
 | --- | --- | --- |
 | GET | `/api/material/folder` | 文件夹列表 |
 | POST | `/api/material/folder` | 新建文件夹 |
+| PUT | `/api/material/folder/{id}` | 文件夹改名 |
+| POST | `/api/material/folder/reorder` | 调整文件夹顺序 |
 | DELETE | `/api/material/folder/{id}` | 删文件夹（素材转未分类，**不删素材**） |
-| GET | `/api/material?folderId=` | 素材列表 |
+| GET | `/api/material?folderId=` | 素材列表。不传 = 全部；**空串 = 只查未分类** |
 | POST | `/api/material` | 新增素材 |
+| PUT | `/api/material/{id}` | 改名称 / 备注 / 所属文件夹 |
 | DELETE | `/api/material/{id}` | 软删除素材 |
 
 ## 几个关键设计

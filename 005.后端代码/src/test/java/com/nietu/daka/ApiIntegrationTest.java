@@ -140,12 +140,12 @@ class ApiIntegrationTest {
                         LocalDateTime.of(2026, 4, 1, 10, 0)));
 
         checkInService.delete(response.account().openid(), id);
-        assertThat(checkInService.list(response.account().openid(), 2026, null, 1, 20).getRecords())
-                .noneMatch(r -> r.getId().equals(id));
+        assertThat(checkInService.list(response.account().openid(), 2026, null, 1, 20).records())
+                .noneMatch(r -> r.id().equals(id));
 
         checkInService.restore(response.account().openid(), id);
-        assertThat(checkInService.list(response.account().openid(), 2026, null, 1, 20).getRecords())
-                .anyMatch(r -> r.getId().equals(id));
+        assertThat(checkInService.list(response.account().openid(), 2026, null, 1, 20).records())
+                .anyMatch(r -> r.id().equals(id));
     }
 
     @Test

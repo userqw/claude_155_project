@@ -4,57 +4,110 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.nietu.daka.common.BizException;
+import com.nietu.daka.common.PageResult;
 import com.nietu.daka.dto.CheckInDto;
+import com.nietu.daka.dto.CheckInVo;
 import com.nietu.daka.dto.PhotoDto;
 import com.nietu.daka.dto.SaleDto;
 import com.nietu.daka.entity.CheckIn;
 import com.nietu.daka.entity.CheckInTag;
 import com.nietu.daka.entity.Photo;
 import com.nietu.daka.entity.Sale;
+import com.nietu.daka.entity.Shape;
 import com.nietu.daka.mapper.CheckInMapper;
 import com.nietu.daka.mapper.CheckInTagMapper;
 import com.nietu.daka.mapper.PhotoMapper;
 import com.nietu.daka.mapper.SaleMapper;
+import com.nietu.daka.mapper.ShapeMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /** 打卡记录的增删改查。删除是软删除，进 30 天回收站。 */
 @Service
 public class CheckInService {
 
+    /** 每页最多多少条（规范 API-08：size 必须有上限） */
+    private static final long MAX_PAGE_SIZE = 100L;
+
     private final CheckInMapper checkInMapper;
     private final PhotoMapper photoMapper;
     private final SaleMapper saleMapper;
     private final CheckInTagMapper checkInTagMapper;
+    private final ShapeMapper shapeMapper;
     private final DeviceService deviceService;
 
     public CheckInService(CheckInMapper checkInMapper, PhotoMapper photoMapper,
                           SaleMapper saleMapper, CheckInTagMapper checkInTagMapper,
-                          DeviceService deviceService) {
+                          ShapeMapper shapeMapper, DeviceService deviceService) {
         this.checkInMapper = checkInMapper;
         this.photoMapper = photoMapper;
         this.saleMapper = saleMapper;
         this.checkInTagMapper = checkInTagMapper;
+        this.shapeMapper = shapeMapper;
         this.deviceService = deviceService;
     }
 
-    public Page<CheckIn> list(String openid, Integer year, String shapeId, long page, long size) {
+    /**
+     * 分页查询。
+     *
+     * <p>按年过滤用**日期范围**而不是 {@code YEAR(date) = ?}：
+     * 函数包在列上就用不了索引（规范 DB-06），数据量一大就全表扫。
+     *
+     * <p>出参是 VO 不是 Entity（规范 API-02）。
+     */
+    public PageResult<CheckInVo> list(String openid, Integer year, String shapeId,
+                                      long page, long size) {
+        // 每页条数上限：不让 size=999999 把数据库拖垮（规范 API-08）
+        long safeSize = Math.min(Math.max(size, 1L), MAX_PAGE_SIZE);
+        long safePage = Math.max(page, 1L);
+
         LambdaQueryWrapper<CheckIn> query = new LambdaQueryWrapper<CheckIn>()
                 .eq(CheckIn::getOpenid, openid)
                 .isNull(CheckIn::getDeletedAt);
         if (year != null) {
-            query.apply("YEAR(`date`) = {0}", year);
+            query.ge(CheckIn::getDate, LocalDate.of(year, 1, 1))
+                    .lt(CheckIn::getDate, LocalDate.of(year + 1, 1, 1));
         }
         if (shapeId != null && !shapeId.isBlank()) {
             query.eq(CheckIn::getShapeId, shapeId);
         }
         query.orderByDesc(CheckIn::getDate).orderByDesc(CheckIn::getCreatedAt);
-        return checkInMapper.selectPage(new Page<>(page, size), query);
+        Page<CheckIn> result = checkInMapper.selectPage(new Page<>(safePage, safeSize), query);
+
+        Map<String, String> shapeNames = new HashMap<>();
+        for (Shape shape : shapeMapper.selectList(new LambdaQueryWrapper<Shape>()
+                .eq(Shape::getOpenid, openid)
+                .isNull(Shape::getDeletedAt))) {
+            shapeNames.put(shape.getId(), shape.getName());
+        }
+        Map<String, Integer> soldMap = soldCounts(openid);
+
+        List<CheckInVo> records = result.getRecords().stream()
+                .map(row -> CheckInVo.of(row,
+                        shapeNames.getOrDefault(row.getShapeId(), "其他"),
+                        soldMap.getOrDefault(row.getId(), 0)))
+                .toList();
+        return PageResult.of(records, result.getTotal(), safePage, safeSize);
+    }
+
+    /** 每条记录已售出的数量 */
+    private Map<String, Integer> soldCounts(String openid) {
+        Map<String, Integer> counts = new HashMap<>();
+        for (Sale sale : saleMapper.selectList(new LambdaQueryWrapper<Sale>()
+                .eq(Sale::getOpenid, openid)
+                .isNull(Sale::getDeletedAt))) {
+            counts.merge(sale.getCheckInId(), sale.getQuantity() == null ? 0 : sale.getQuantity(),
+                    Integer::sum);
+        }
+        return counts;
     }
 
     @Transactional
@@ -76,7 +129,28 @@ public class CheckInService {
         replacePhotos(openid, row.getId(), dto.photos(), now);
         replaceTags(openid, row.getId(), dto.tagIds(), now);
         replaceSales(openid, row.getId(), dto.sales(), now);
-        return dto;
+        // 返回**落库后**的记录：id 是服务端生成的，入参里没有，
+        // 直接把入参原样返回的话客户端拿不到自己刚建的记录（规范 API-09）
+        return toDto(row, dto);
+    }
+
+    /** 按落库的记录组装出参 */
+    private CheckInDto toDto(CheckIn row, CheckInDto source) {
+        return new CheckInDto(
+                row.getId(),
+                row.getDate(),
+                row.getShapeId(),
+                row.getCount(),
+                row.getNote(),
+                row.getDurationMin(),
+                row.getCoverPhotoId(),
+                source == null ? null : source.tagIds(),
+                source == null ? null : source.photos(),
+                source == null ? null : source.sales(),
+                false,
+                row.getUpdatedAt(),
+                null
+        );
     }
 
     @Transactional
@@ -108,7 +182,7 @@ public class CheckInService {
         if (dto.tagIds() != null) {
             replaceTags(openid, id, dto.tagIds(), row.getUpdatedAt());
         }
-        return dto;
+        return toDto(row, dto);
     }
 
     /** 软删除：置 deleted_at，回收站保留 30 天 */
